@@ -73,6 +73,7 @@ class CoinChip extends StatelessWidget {
       builder: (context, _) => Semantics(
         button: onTap != null,
         label: '${s.economy.coins} ${s.loc.t('shop.coins')}',
+        excludeSemantics: true,
         child: Pressable(
           onTap: onTap ?? () {},
           child: Container(

@@ -30,7 +30,7 @@ class CreatedSpecial {
   const CreatedSpecial(this.tileId, this.pos, this.type, this.kind);
 }
 
-enum EffectKind { row, column, area, colorBurst, fullBoard }
+enum EffectKind { row, column, area, colorBurst, fullBoard, hammer }
 
 /// Visual hint for special activations (rocket beam, bomb ring, ...).
 class SpecialEffect {

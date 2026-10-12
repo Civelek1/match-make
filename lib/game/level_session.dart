@@ -76,15 +76,45 @@ class LevelSession {
     return _consume(steps);
   }
 
-  TurnResult _consume(List<BoardStep> steps) {
-    movesLeft--;
-    movesUsed++;
+  /// Hammer booster at [p]. Never costs a move.
+  TurnResult? useHammer(Pos p) {
+    if (!isPlaying) return null;
+    final steps = engine.hammerAt(p);
+    if (steps == null) return null;
+    return _consume(steps, costsMove: false);
+  }
+
+  /// Broom booster on row [y]. Never costs a move.
+  TurnResult? useBroom(int y) {
+    if (!isPlaying) return null;
+    final steps = engine.sweepRow(y);
+    if (steps == null) return null;
+    return _consume(steps, costsMove: false);
+  }
+
+  /// Shuffle booster. Never costs a move.
+  TurnResult? useShuffle() {
+    if (!isPlaying) return null;
+    return TurnResult([engine.shuffle()], false, const {});
+  }
+
+  /// Start boosters: places specials before the first move.
+  List<Pos> placeStartSpecials(List<SpecialKind> kinds) => [
+    if (movesUsed == 0)
+      for (final k in kinds) ...engine.placeSpecials(k, 1),
+  ];
+
+  TurnResult _consume(List<BoardStep> steps, {bool costsMove = true}) {
+    if (costsMove) {
+      movesLeft--;
+      movesUsed++;
+    }
     final deltas = <ClearStep, Map<String, int>>{};
     for (final s in steps) {
       if (s is ClearStep) deltas[s] = _applyClear(s);
     }
     _evaluate();
-    return TurnResult(steps, true, deltas);
+    return TurnResult(steps, costsMove, deltas);
   }
 
   Map<String, int> _applyClear(ClearStep s) {

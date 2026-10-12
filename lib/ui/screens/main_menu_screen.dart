@@ -15,6 +15,7 @@ import '../widgets/game_button.dart';
 import '../widgets/game_text.dart';
 import '../widgets/game_widgets.dart';
 import '../widgets/logo.dart';
+import 'shop_panel.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({super.key});
@@ -119,7 +120,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                   onTap: () => showDebugPanel(context),
                                 ),
                               ),
-                            const CoinChip(),
+                            CoinChip(onTap: () => showShop(context)),
                             const SizedBox(width: 8),
                             CounterChip(icon: Icons.star_rounded, text: '${s.progress.totalStars}'),
                           ],
@@ -169,6 +170,15 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                 label: loc.t('menu.gallery'),
                                 tone: ButtonTone.purple,
                                 onTap: () => s.navigator.go(AppScreen.gallery, style: TransitionStyle.slideUp),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _MenuTile(
+                                icon: Icons.shopping_basket_rounded,
+                                label: loc.t('menu.shop'),
+                                tone: ButtonTone.green,
+                                onTap: () => showShop(context),
                               ),
                             ),
                             const SizedBox(width: 10),

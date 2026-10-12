@@ -16,6 +16,7 @@ import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
 import '../widgets/game_text.dart';
 import '../widgets/game_widgets.dart';
+import 'shop_panel.dart';
 
 /// Illustrated chapter map with level nodes connected by a path.
 class ChapterMapScreen extends StatefulWidget {
@@ -117,9 +118,9 @@ class _ChapterMapScreenState extends State<ChapterMapScreen> {
                       ],
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(12, 6, 12, 0),
-                    child: Align(alignment: Alignment.centerRight, child: CoinChip()),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                    child: Align(alignment: Alignment.centerRight, child: CoinChip(onTap: () => showShop(context))),
                   ),
                   const Spacer(),
                   _chapterStrip(context, chapter),

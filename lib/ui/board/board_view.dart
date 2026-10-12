@@ -16,6 +16,9 @@ import '../theme/game_colors.dart';
 abstract class BoardListener {
   void onSwapRequested(Pos a, Pos b);
   void onSpecialTapped(Pos p);
+
+  /// A cell was tapped while a targeting booster is armed.
+  void onCellPicked(Pos p);
   void onSwapAnimated(bool reverted);
   void onClear(ClearStep step, Map<int, Offset> clearedCentersGlobal);
   void onShuffle();
@@ -79,6 +82,9 @@ class BoardView extends StatefulWidget {
   final BoardListener listener;
   final bool Function() inputEnabled;
 
+  /// True while taps should pick a booster target.
+  final bool Function() pickMode;
+
   const BoardView({
     super.key,
     required this.width,
@@ -88,7 +94,10 @@ class BoardView extends StatefulWidget {
     required this.controller,
     required this.listener,
     required this.inputEnabled,
-  });
+    bool Function()? pickMode,
+  }) : pickMode = pickMode ?? _never;
+
+  static bool _never() => false;
 
   @override
   State<BoardView> createState() => _BoardViewState();
@@ -497,6 +506,11 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
     if (!widget.inputEnabled()) return;
     final p = _cellAt(d.localPosition);
     if (p == null) return;
+    if (widget.pickMode()) {
+      _selected = null;
+      widget.listener.onCellPicked(p);
+      return;
+    }
     if (_grid[_idx(p)] == null) return; // crate cell
     final sel = _selected;
     if (sel == null) {
@@ -520,7 +534,7 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
 
   void _onPanStart(DragStartDetails d) {
     _panConsumed = false;
-    _panStart = widget.inputEnabled() ? _cellAt(d.localPosition) : null;
+    _panStart = widget.inputEnabled() && !widget.pickMode() ? _cellAt(d.localPosition) : null;
     if (_panStart != null && _grid[_idx(_panStart!)] == null) _panStart = null;
   }
 
@@ -624,6 +638,18 @@ class _BoardPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 3
           ..color = GameColors.gold,
+      );
+    }
+
+    // Targeting booster armed: pulsing gold frame.
+    if (s.widget.pickMode()) {
+      final pulse = 0.5 + 0.5 * sin(now * 6);
+      canvas.drawRRect(
+        frame,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4 + 3 * pulse
+          ..color = GameColors.gold.withValues(alpha: 0.6 + 0.4 * pulse),
       );
     }
 
@@ -799,6 +825,36 @@ class _BoardPainter extends CustomPainter {
           canvas.drawCircle(o, cell * 0.7, Paint()..color = Colors.white.withValues(alpha: alpha));
         case EffectKind.fullBoard:
           canvas.drawRect(board, Paint()..color = Colors.white.withValues(alpha: 0.8 * alpha));
+        case EffectKind.hammer:
+          // Mallet swings down onto the cell, then a star-shaped impact.
+          final swing = Curves.easeIn.transform(min(1, k * 3));
+          if (k < 0.4) {
+            canvas.save();
+            canvas.translate(o.dx + cell * 0.5, o.dy - cell * 0.4);
+            canvas.rotate(-1.1 + swing * 1.1);
+            final head = Rect.fromCenter(center: Offset(-cell * 0.55, 0), width: cell * 0.5, height: cell * 0.34);
+            canvas.drawRect(Rect.fromLTWH(-cell * 0.5, -cell * 0.05, cell * 0.6, cell * 0.1), Paint()..color = const Color(0xFF8B5E3C));
+            canvas.drawRRect(RRect.fromRectAndRadius(head, Radius.circular(cell * 0.06)), Paint()..color = const Color(0xFFFF9A3C));
+            canvas.drawRRect(
+              RRect.fromRectAndRadius(head, Radius.circular(cell * 0.06)),
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 2
+                ..color = GameColors.ink,
+            );
+            canvas.restore();
+          } else {
+            final kk = (k - 0.3) / 0.7;
+            Pk.sparkle(canvas, o, cell * (0.4 + kk * 0.9), Colors.white.withValues(alpha: 1 - kk));
+            canvas.drawCircle(
+              o,
+              cell * (0.3 + kk * 0.7),
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = cell * 0.12 * (1 - kk)
+                ..color = const Color(0xFFFFE066).withValues(alpha: 1 - kk),
+            );
+          }
       }
     }
   }

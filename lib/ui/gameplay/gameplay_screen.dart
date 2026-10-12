@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../app/game_navigator.dart';
 import '../../data/models/level_data.dart';
+import '../../economy/economy_config.dart';
 import '../../game/gameplay_controller.dart';
 import '../../localization/localization.dart';
 import '../board/board_view.dart';
 import '../scenes/scene_art.dart';
+import '../screens/shop_panel.dart';
 import '../theme/game_colors.dart';
+import '../widgets/economy_widgets.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
 import '../widgets/game_text.dart';
@@ -45,6 +48,7 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
     }
     c.onFly = _fly;
     c.onCelebrateScene = () => _sceneKey.currentState?.celebrate();
+    c.onNeedBooster = _offer;
     c.addListener(_onChange);
     _nav.backOverride = _onBack;
     WidgetsBinding.instance.addObserver(this);
@@ -73,7 +77,11 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
     switch (c.phase) {
       case PlayPhase.playing:
       case PlayPhase.resolving:
-        c.pause();
+        if (c.pickMode) {
+          c.cancelBooster();
+        } else {
+          c.pause();
+        }
         return true;
       case PlayPhase.paused:
         c.resume();
@@ -82,6 +90,16 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
         return true;
       default:
         return false;
+    }
+  }
+
+  Future<void> _offer(BoosterKind kind) async {
+    final bought = await offerBooster(context, kind);
+    if (!bought || !mounted) return;
+    if (kind.preLevel) {
+      c.toggleStartBooster(kind);
+    } else {
+      c.tapBooster(kind);
     }
   }
 
@@ -145,7 +163,9 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
             child: LayoutBuilder(
               builder: (context, cons) {
                 final width = min(cons.maxWidth, 720.0);
-                const topBar = 64.0, objectives = 70.0, scoreBar = 40.0, gaps = 18.0;
+                final boosters = c.levelBoosters;
+                final scoreBar = boosters.isEmpty ? 40.0 : 58.0;
+                const topBar = 64.0, objectives = 70.0, gaps = 18.0;
                 final rest = cons.maxHeight - topBar - objectives - scoreBar - gaps;
                 final boardSize = min(width - 12, rest * 0.66).clamp(200.0, 680.0);
                 final sceneH = max(120.0, rest - boardSize);
@@ -166,25 +186,50 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
                         SizedBox(
                           width: boardSize,
                           height: boardSize,
-                          child: BoardView(
-                            width: widget.level.gridWidth,
-                            height: widget.level.gridHeight,
-                            tileTypeIds: widget.level.tileTypeIds,
-                            theme: theme,
-                            controller: c.board,
-                            listener: c,
-                            inputEnabled: () => c.inputEnabled,
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: BoardView(
+                                  width: widget.level.gridWidth,
+                                  height: widget.level.gridHeight,
+                                  tileTypeIds: widget.level.tileTypeIds,
+                                  theme: theme,
+                                  controller: c.board,
+                                  listener: c,
+                                  inputEnabled: () => c.inputEnabled,
+                                  pickMode: () => c.pickMode,
+                                ),
+                              ),
+                              if (c.armed != null)
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  top: -2,
+                                  child: IgnorePointer(child: _PickHint(kind: c.armed!)),
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 8),
                         SizedBox(
                           height: scoreBar,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
-                            child: ScoreBar(
-                              score: c.displayScore,
-                              thresholds: widget.level.starThresholds,
-                              label: loc.t('common.score'),
+                            padding: EdgeInsets.symmetric(horizontal: boosters.isEmpty ? 18 : 10),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ScoreBar(
+                                    score: c.displayScore,
+                                    thresholds: widget.level.starThresholds,
+                                    label: loc.t('common.score'),
+                                  ),
+                                ),
+                                for (final b in boosters)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: _BoosterButton(c: c, kind: b),
+                                  ),
+                              ],
                             ),
                           ),
                         ),
@@ -309,11 +354,101 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            for (final o in objs)
-              ObjectiveCounter(key: _counterKeys[o.id], objective: o, value: c.displayed[o.id] ?? 0, size: size),
+            for (final o in objs) ObjectiveCounter(key: _counterKeys[o.id], objective: o, value: c.displayed[o.id] ?? 0, size: size),
           ],
         );
       },
+    );
+  }
+}
+
+/// In-level booster button with its owned count; glows while armed.
+class _BoosterButton extends StatelessWidget {
+  final GameplayController c;
+  final BoosterKind kind;
+  const _BoosterButton({required this.c, required this.kind});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.services;
+    final armed = c.armed == kind;
+    final enabled = c.boostersEnabled;
+    return ListenableBuilder(
+      listenable: s.economy,
+      builder: (context, _) => Semantics(
+        button: true,
+        selected: armed,
+        label: s.loc.t(kind.nameKey),
+        value: '${s.economy.count(kind)}',
+        excludeSemantics: true,
+        child: Pressable(
+          onTap: enabled ? () => c.tapBooster(kind) : null,
+          child: Opacity(
+            opacity: enabled ? 1 : 0.55,
+            child: SizedBox(
+              width: 52,
+              height: 52,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    left: 2,
+                    top: 4,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: armed ? GameColors.gold : Colors.white,
+                        boxShadow: [
+                          if (armed) const BoxShadow(color: GameColors.gold, blurRadius: 14, spreadRadius: 2),
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 3)),
+                        ],
+                      ),
+                      child: BoosterIcon(kind, size: 42),
+                    ),
+                  ),
+                  Positioned(right: -4, top: -2, child: CountBadge(count: s.economy.count(kind))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Tap a piece to smash it" chip shown over the board while targeting.
+class _PickHint extends StatelessWidget {
+  final BoosterKind kind;
+  const _PickHint({required this.kind});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.services.loc;
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: GameColors.ink.withValues(alpha: 0.88),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: GameColors.gold, width: 2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BoosterIcon(kind, size: 22),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                loc.t(kind == BoosterKind.hammer ? 'booster.pick_cell' : 'booster.pick_row'),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

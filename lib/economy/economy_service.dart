@@ -79,10 +79,13 @@ class EconomyService extends ChangeNotifier {
     return false;
   }
 
+  /// Whether the unlock gift for [kind] was already handed out.
+  bool isIntroduced(BoosterKind kind) => progress.hasSeenTip(_tip(kind));
+
   /// Boosters this level is the first chance to use (shown on the intro card).
   List<BoosterKind> newBoostersFor(LevelData level) => [
     for (final b in BoosterKind.values)
-      if (level.number >= b.unlockLevel && !progress.hasSeenTip(_tip(b))) b,
+      if (level.number >= b.unlockLevel && !isIntroduced(b)) b,
   ];
 
   /// Gifts [EconomyConfig.unlockGift] of every newly available booster.

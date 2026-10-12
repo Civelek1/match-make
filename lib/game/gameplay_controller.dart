@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../app/app_services.dart';
 import '../audio/audio_service.dart';
 import '../data/models/level_data.dart';
+import '../economy/economy_config.dart';
 import '../match3/board.dart';
 import '../match3/board_steps.dart';
 import '../match3/match3_engine.dart';
@@ -59,6 +60,20 @@ class GameplayController extends ChangeNotifier implements BoardListener {
   int coinsEarned = 0;
   int displayScore = 0;
 
+  /// In-level booster waiting for the player to pick a cell / row.
+  BoosterKind? armed;
+
+  /// Start boosters chosen on the intro card (applied by [start]).
+  final Set<BoosterKind> selectedStart = {};
+
+  /// Boosters this level showed as "new" on its intro card.
+  late final List<BoosterKind> newBoosters;
+
+  /// Asks the UI to offer buying a booster the player has none of.
+  void Function(BoosterKind kind)? onNeedBooster;
+  int boostersUsed = 0;
+  int continuesUsed = 0;
+
   /// -1 = no tutorial; 0 = make the move; 1 = objectives; 2 = scene.
   int tutorialStep = -1;
   Move? tutorialMove;
@@ -82,15 +97,59 @@ class GameplayController extends ChangeNotifier implements BoardListener {
       displayed[o.id] = 0;
     }
     restoration.onStage = _onRestorationStage;
+    newBoosters = services.economy.newBoostersFor(level);
   }
 
   bool get inputEnabled => phase == PlayPhase.playing && (tutorialStep == -1 || tutorialStep == 0) && !_disposed;
+
+  /// Boosters can be used while playing, outside the first-move tutorial.
+  bool get boostersEnabled => phase == PlayPhase.playing && tutorialStep == -1 && !_disposed;
+
+  /// Board taps pick a target instead of selecting pieces.
+  bool get pickMode => armed != null;
+
+  /// In-level boosters available on this level (by unlock level).
+  List<BoosterKind> get levelBoosters => [
+    for (final b in BoosterKind.inLevel)
+      if (services.economy.availableOn(b, level)) b,
+  ];
+
+  /// Start boosters the intro card may offer on this level.
+  List<BoosterKind> get startBoosters => [
+    for (final b in BoosterKind.start)
+      if (services.economy.availableOn(b, level)) b,
+  ];
+
+  void toggleStartBooster(BoosterKind kind) {
+    if (phase != PlayPhase.intro || !kind.preLevel) return;
+    if (!selectedStart.remove(kind)) {
+      if (services.economy.count(kind) <= 0) {
+        onNeedBooster?.call(kind);
+        return;
+      }
+      selectedStart.add(kind);
+    }
+    services.audio.play(Sfx.click);
+    notifyListeners();
+  }
 
   int get movesLeft => session.movesLeft;
 
   /// Called by the intro card's PLAY button.
   void start() {
     if (phase != PlayPhase.intro) return;
+    services.economy.introduceBoosters(level);
+    final specials = <SpecialKind>[];
+    for (final b in BoosterKind.start) {
+      if (!selectedStart.contains(b) || !services.economy.consume(b)) continue;
+      boostersUsed++;
+      specials.add(switch (b) {
+        BoosterKind.startBomb => SpecialKind.bomb,
+        BoosterKind.startRainbow => SpecialKind.colorBomb,
+        _ => DateTime.now().microsecond.isEven ? SpecialKind.rocketH : SpecialKind.rocketV,
+      });
+    }
+    session.placeStartSpecials(specials);
     board.reset(session.engine.board);
     phase = PlayPhase.playing;
     final tip = level.introducesObstacle;
@@ -118,9 +177,61 @@ class GameplayController extends ChangeNotifier implements BoardListener {
   // BoardListener
   // ---------------------------------------------------------------------------
 
+  /// Booster button tapped: shuffle fires at once, hammer / broom arm and
+  /// wait for a target (tap again to cancel).
+  void tapBooster(BoosterKind kind) {
+    if (!boostersEnabled || kind.preLevel) return;
+    if (services.economy.count(kind) <= 0) {
+      armed = null;
+      notifyListeners();
+      onNeedBooster?.call(kind);
+      return;
+    }
+    if (kind == BoosterKind.shuffle) {
+      armed = null;
+      final result = session.useShuffle();
+      if (result == null) return;
+      services.economy.consume(kind);
+      boostersUsed++;
+      _runTurn(result);
+      return;
+    }
+    armed = armed == kind ? null : kind;
+    services.audio.play(Sfx.click);
+    if (armed != null) {
+      _hintTimer?.cancel();
+      board.showHint(null);
+    } else {
+      _armHint();
+    }
+    notifyListeners();
+  }
+
+  void cancelBooster() {
+    if (armed == null) return;
+    armed = null;
+    if (phase == PlayPhase.playing) _armHint();
+    notifyListeners();
+  }
+
+  @override
+  void onCellPicked(Pos p) {
+    final kind = armed;
+    if (kind == null || !boostersEnabled) return;
+    final result = kind == BoosterKind.hammer ? session.useHammer(p) : session.useBroom(p.y);
+    if (result == null) {
+      services.audio.play(Sfx.invalid);
+      return;
+    }
+    armed = null;
+    services.economy.consume(kind);
+    boostersUsed++;
+    _runTurn(result);
+  }
+
   @override
   void onSwapRequested(Pos a, Pos b) {
-    if (!inputEnabled) return;
+    if (!inputEnabled || pickMode) return;
     if (tutorialStep == 0 && tutorialMove != null) {
       final m = tutorialMove!;
       final ok = (a == m.a && b == m.b) || (a == m.b && b == m.a);
@@ -143,7 +254,7 @@ class GameplayController extends ChangeNotifier implements BoardListener {
 
   @override
   void onSpecialTapped(Pos p) {
-    if (!inputEnabled || tutorialStep == 0) return;
+    if (!inputEnabled || tutorialStep == 0 || pickMode) return;
     final result = session.activate(p);
     if (result == null) return;
     _runTurn(result);
@@ -162,7 +273,7 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     if (kinds.contains(EffectKind.fullBoard) || kinds.contains(EffectKind.colorBurst)) {
       services.audio.play(Sfx.colorBomb);
       services.haptics.special();
-    } else if (kinds.contains(EffectKind.area)) {
+    } else if (kinds.contains(EffectKind.area) || kinds.contains(EffectKind.hammer)) {
       services.audio.play(Sfx.bomb);
       services.haptics.special();
     } else if (kinds.isNotEmpty) {
@@ -266,7 +377,7 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     await board.play(result.steps);
     if (_disposed) return;
     // Let in-flight icons land, then make sure HUD matches the rules exactly.
-    if (result.consumedMove) await Future<void>.delayed(const Duration(milliseconds: 380));
+    if (result.steps.any((s) => s is ClearStep)) await Future<void>.delayed(const Duration(milliseconds: 380));
     if (_disposed) return;
     _syncDisplayed();
     _currentTurn = null;
@@ -341,6 +452,7 @@ class GameplayController extends ChangeNotifier implements BoardListener {
       return;
     }
     if (phase != PlayPhase.playing) return;
+    armed = null;
     phase = PlayPhase.paused;
     _hintTimer?.cancel();
     notifyListeners();
@@ -363,8 +475,22 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     notifyListeners();
   }
 
+  /// Coin price of the next continue on this attempt.
+  int get continuePrice => services.economy.continuePrice(continuesUsed);
+  int get continueMoves => services.economy.config.continueMoves;
+
+  /// Buys extra moves after running out. False if the player can't afford it.
+  bool buyContinue() {
+    if (phase != PlayPhase.lost) return false;
+    if (!services.economy.spendCoins(continuePrice)) return false;
+    continuesUsed++;
+    services.audio.play(Sfx.unlock);
+    continueWithExtraMoves(continueMoves);
+    return true;
+  }
+
   /// True if restarting / leaving would throw away meaningful progress.
-  bool get hasProgress => session.movesUsed > 0;
+  bool get hasProgress => session.movesUsed > 0 || boostersUsed > 0;
 
   void debugWin() {
     if (phase == PlayPhase.won || phase == PlayPhase.celebrating) return;

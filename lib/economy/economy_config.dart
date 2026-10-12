@@ -31,8 +31,14 @@ enum BoosterKind {
 
   const BoosterKind({required this.price, required this.unlockLevel, required this.preLevel});
 
-  static List<BoosterKind> get inLevel => [for (final b in values) if (!b.preLevel) b];
-  static List<BoosterKind> get start => [for (final b in values) if (b.preLevel) b];
+  static List<BoosterKind> get inLevel => [
+    for (final b in values)
+      if (!b.preLevel) b,
+  ];
+  static List<BoosterKind> get start => [
+    for (final b in values)
+      if (b.preLevel) b,
+  ];
 
   String get nameKey => 'booster.$name';
   String get howKey => 'booster.$name.how';
@@ -97,6 +103,5 @@ class EconomyConfig {
     ],
   });
 
-  int continuePrice(int continuesUsed) =>
-      continuePrices[continuesUsed.clamp(0, continuePrices.length - 1)];
+  int continuePrice(int continuesUsed) => continuePrices[continuesUsed.clamp(0, continuePrices.length - 1)];
 }

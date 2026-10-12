@@ -6,6 +6,7 @@ import '../../app/app_services.dart';
 import '../../app/game_navigator.dart';
 import '../../audio/audio_service.dart';
 import '../../data/models/level_data.dart';
+import '../../economy/economy_config.dart';
 import '../../game/gameplay_controller.dart';
 import '../../match3/board.dart';
 import '../art/tile_art.dart';
@@ -53,84 +54,138 @@ class LevelIntroOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.services.loc;
     final level = c.level;
-    return _Scrim(
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.6, end: 1),
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutBack,
-        builder: (context, s, child) => Transform.scale(scale: s, child: child),
-        child: GamePanel(
-          title: loc.t('common.level_n', {'n': level.number}),
-          ribbon: EnvironmentTheme.of(level.environmentId).accent,
-          onClose: () => context.services.navigator.go(AppScreen.chapterMap, style: TransitionStyle.zoomOut),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GameText(loc.t(level.nameKey), size: 34, color: GameColors.gold),
-              const SizedBox(height: 4),
-              BodyText(loc.t(level.descKey), color: GameColors.inkSoft, size: 14),
-              const SizedBox(height: 14),
-              Text(
-                loc.t('intro.restore'),
-                style: const TextStyle(fontWeight: FontWeight.w900, color: GameColors.inkSoft, letterSpacing: 2, fontSize: 13),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final o in level.objectives)
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(4, 4, 10, 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: GameColors.creamDark, width: 2),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TileIcon(o.tileTypeId, size: 30),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${loc.t(o.nameKey)} ×${o.target}',
-                            style: const TextStyle(fontWeight: FontWeight.w900, color: GameColors.ink, fontSize: 13),
-                          ),
-                        ],
-                      ),
+    // The details scroll inside the panel when they don't fit; start
+    // boosters, the move count and PLAY stay pinned so the call to action is
+    // always visible.
+    return ColoredBox(
+      color: Colors.black.withValues(alpha: 0.5),
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, cons) => Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: max(320.0, cons.maxHeight - 24)),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.6, end: 1),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutBack,
+                  builder: (context, s, child) => Transform.scale(scale: s, child: child),
+                  child: GamePanel(
+                    title: loc.t('common.level_n', {'n': level.number}),
+                    ribbon: EnvironmentTheme.of(level.environmentId).accent,
+                    onClose: () => context.services.navigator.go(AppScreen.chapterMap, style: TransitionStyle.zoomOut),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(child: SingleChildScrollView(child: _details(context))),
+                        if (c.startBoosters.isNotEmpty) ...[const SizedBox(height: 10), _startBoosters(context)],
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.swap_horiz_rounded, color: GameColors.purple, size: 28),
+                            const SizedBox(width: 4),
+                            GameText(
+                              loc.t('intro.moves', {'n': level.moves}),
+                              size: 22,
+                              color: GameColors.purple,
+                              stroke: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        GameButton.primary(label: loc.t('intro.play'), icon: Icons.play_arrow_rounded, width: 240, onTap: c.start),
+                      ],
                     ),
-                ],
-              ),
-              if (level.introduces != null) ...[
-                const SizedBox(height: 14),
-                _NewSpecialCard(feature: level.introduces!, tileTypeId: level.tileTypeIds.first),
-              ],
-              if (level.introducesObstacle != null && !context.services.progress.hasSeenTip('obstacle_${level.introducesObstacle}')) ...[
-                const SizedBox(height: 14),
-                _NewObstacleCard(obstacle: level.introducesObstacle!),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.swap_horiz_rounded, color: GameColors.purple, size: 28),
-                  const SizedBox(width: 4),
-                  GameText(
-                    loc.t('intro.moves', {'n': level.moves}),
-                    size: 22,
-                    color: GameColors.purple,
-                    stroke: Colors.white,
-                    strokeWidth: 3,
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 14),
-              GameButton.primary(label: loc.t('intro.play'), icon: Icons.play_arrow_rounded, width: 240, onTap: c.start),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  static const _label = TextStyle(fontWeight: FontWeight.w900, color: GameColors.inkSoft, letterSpacing: 2, fontSize: 13);
+
+  /// Name, description, objectives and one-time tips.
+  Widget _details(BuildContext context) {
+    final s = context.services;
+    final loc = s.loc;
+    final level = c.level;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GameText(loc.t(level.nameKey), size: 34, color: GameColors.gold),
+        const SizedBox(height: 4),
+        BodyText(loc.t(level.descKey), color: GameColors.inkSoft, size: 14),
+        const SizedBox(height: 14),
+        Text(loc.t('intro.restore'), style: _label),
+        const SizedBox(height: 8),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final o in level.objectives)
+              Container(
+                padding: const EdgeInsets.fromLTRB(4, 4, 10, 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: GameColors.creamDark, width: 2),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TileIcon(o.tileTypeId, size: 30),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${loc.t(o.nameKey)} ×${o.target}',
+                      style: const TextStyle(fontWeight: FontWeight.w900, color: GameColors.ink, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+        if (level.introduces != null) ...[
+          const SizedBox(height: 14),
+          _NewSpecialCard(feature: level.introduces!, tileTypeId: level.tileTypeIds.first),
+        ],
+        if (level.introducesObstacle != null && !s.progress.hasSeenTip('obstacle_${level.introducesObstacle}')) ...[
+          const SizedBox(height: 14),
+          _NewObstacleCard(obstacle: level.introducesObstacle!),
+        ],
+        if (c.newBoosters.isNotEmpty) ...[const SizedBox(height: 10), _NewBoostersCard(kinds: c.newBoosters)],
+      ],
+    );
+  }
+
+  Widget _startBoosters(BuildContext context) {
+    final s = context.services;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(s.loc.t('intro.boosters'), style: _label),
+        const SizedBox(height: 8),
+        ListenableBuilder(
+          listenable: Listenable.merge([c, s.economy]),
+          builder: (context, _) => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final b in c.startBoosters)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: _StartBoosterToggle(c: c, kind: b),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -172,6 +227,116 @@ class _NewObstacleCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// One-time card for boosters unlocked on this level (with their gift).
+class _NewBoostersCard extends StatelessWidget {
+  final List<BoosterKind> kinds;
+  const _NewBoostersCard({required this.kinds});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.services;
+    final loc = s.loc;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAFBE3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: GameColors.green, width: 2.5),
+      ),
+      child: Row(
+        children: [
+          for (final k in kinds.take(3)) Padding(padding: const EdgeInsets.only(right: 4), child: BoosterIcon(k, size: 36)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${loc.t('intro.new')} ${[for (final k in kinds) loc.t(k.nameKey)].join(', ')}',
+                  style: const TextStyle(fontWeight: FontWeight.w900, color: GameColors.greenDark, fontSize: 14),
+                ),
+                Text(
+                  kinds.length == 1
+                      ? '${loc.t(kinds.single.howKey)} ${loc.t('booster.gift', {'n': s.economy.config.unlockGift})}'
+                      : loc.t('booster.gift', {'n': s.economy.config.unlockGift}),
+                  style: const TextStyle(fontWeight: FontWeight.w700, color: GameColors.ink, fontSize: 12, height: 1.25),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Selectable start booster on the intro card.
+class _StartBoosterToggle extends StatelessWidget {
+  final GameplayController c;
+  final BoosterKind kind;
+  const _StartBoosterToggle({required this.c, required this.kind});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.services;
+    final selected = c.selectedStart.contains(kind);
+    // Newly unlocked boosters are gifted on PLAY; show the count they'll have.
+    final pending = s.economy.isIntroduced(kind) || !c.newBoosters.contains(kind) ? 0 : s.economy.config.unlockGift;
+    final count = s.economy.count(kind) + pending;
+    return Semantics(
+      button: true,
+      toggled: selected,
+      label: s.loc.t(kind.nameKey),
+      value: '$count',
+      excludeSemantics: true,
+      child: Pressable(
+        onTap: () {
+          if (pending > 0) s.economy.introduceBoosters(c.level);
+          c.toggleStartBooster(kind);
+        },
+        child: SizedBox(
+          width: 62,
+          height: 62,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 58,
+                height: 58,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: selected ? const Color(0xFFEAFBE3) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: selected ? GameColors.green : GameColors.creamDark, width: selected ? 3.5 : 2.5),
+                ),
+                child: BoosterIcon(kind, size: 44),
+              ),
+              Positioned(
+                right: -2,
+                top: -6,
+                child: selected
+                    ? Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: GameColors.green,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Icon(Icons.check_rounded, size: 15, color: Colors.white),
+                      )
+                    : CountBadge(count: count),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -552,8 +717,7 @@ class WinOverlay extends StatelessWidget {
                   tween: Tween(begin: 0, end: c.session.finalScore.toDouble()),
                   duration: const Duration(milliseconds: 1400),
                   curve: Curves.easeOutCubic,
-                  builder: (context, v, _) =>
-                      GameText('${v.round()}', size: 36, color: Colors.white, stroke: GameColors.purpleDark),
+                  builder: (context, v, _) => GameText('${v.round()}', size: 36, color: Colors.white, stroke: GameColors.purpleDark),
                 ),
                 if (c.coinsEarned > 0)
                   Padding(
@@ -748,6 +912,8 @@ class LoseOverlay extends StatelessWidget {
               fill: GameColors.orange,
               label: '${(c.session.completion * 100).round()}%',
             ),
+            const SizedBox(height: 14),
+            _ContinueButton(c: c),
             if (s.rewards.extraMovesAvailable) ...[
               const SizedBox(height: 12),
               GameButton.secondary(
@@ -777,6 +943,94 @@ class LoseOverlay extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// "+5 MOVES  (coin) 300" offer on the lose card.
+class _ContinueButton extends StatelessWidget {
+  final GameplayController c;
+  const _ContinueButton({required this.c});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.services;
+    final loc = s.loc;
+    return ListenableBuilder(
+      listenable: s.economy,
+      builder: (context, _) {
+        final price = c.continuePrice;
+        final affordable = s.economy.coins >= price;
+        return Column(
+          children: [
+            Semantics(
+              button: true,
+              label: '${loc.t('lose.continue', {'n': c.continueMoves})} $price',
+              excludeSemantics: true,
+              child: Pressable(
+                onTap: () {
+                  if (!c.buyContinue()) {
+                    s.audio.play(Sfx.locked);
+                    showGameToast(context, loc.t('shop.not_enough'), message: loc.t('shop.not_enough_msg'));
+                  }
+                },
+                child: Opacity(
+                  opacity: affordable ? 1 : 0.6,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFFB892FF), GameColors.purple],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: GameColors.purpleDark, width: 3),
+                      boxShadow: const [BoxShadow(color: GameColors.purpleDark, offset: Offset(0, 5))],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.add_circle_rounded, color: Colors.white, size: 30),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: GameText(
+                              loc.t('lose.continue', {'n': c.continueMoves}),
+                              size: 22,
+                              stroke: GameColors.purpleDark,
+                              strokeWidth: 4,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(4, 3, 10, 3),
+                          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(14)),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const CoinIcon(size: 24),
+                              const SizedBox(width: 4),
+                              GameText('$price', size: 18, strokeWidth: 3, stroke: GameColors.purpleDark),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              loc.t('lose.continue_hint'),
+              style: const TextStyle(fontWeight: FontWeight.w700, color: GameColors.inkSoft, fontSize: 12),
+            ),
+          ],
+        );
+      },
     );
   }
 }

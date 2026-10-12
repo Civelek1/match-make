@@ -304,6 +304,41 @@ class Match3Engine {
     return _resolve(seed: _Seed()..activate.add(p));
   }
 
+  /// Hammer booster: smashes the piece at [p] (a special fires, a chain or
+  /// crate loses one layer). Null if there is nothing to hit.
+  List<BoardStep>? hammerAt(Pos p) {
+    if (!board.inBounds(p.x, p.y)) return null;
+    if (board.atPos(p) == null && !board.hasCrate(p)) return null;
+    final seed = _Seed()
+      ..clear.add(p)
+      ..effects.add(SpecialEffect(EffectKind.hammer, p));
+    return _resolve(seed: seed);
+  }
+
+  /// Broom booster: sweeps row [y] as if a rocket crossed it.
+  List<BoardStep>? sweepRow(int y) {
+    if (y < 0 || y >= board.height) return null;
+    final seed = _Seed()..effects.add(SpecialEffect(EffectKind.row, Pos(board.width ~/ 2, y)));
+    for (var x = 0; x < board.width; x++) {
+      seed.clear.add(Pos(x, y));
+    }
+    return _resolve(seed: seed);
+  }
+
+  /// Turns up to [count] random free, normal pieces into [kind] (start
+  /// boosters). Returns the positions changed.
+  List<Pos> placeSpecials(SpecialKind kind, int count) {
+    final candidates = [
+      for (final p in board.positions)
+        if (board.atPos(p) case final t? when !t.isSpecial && !t.locked) p,
+    ]..shuffle(_rng);
+    final placed = candidates.take(count).toList();
+    for (final p in placed) {
+      board.atPos(p)!.special = kind;
+    }
+    return placed;
+  }
+
   /// Debug / dead-board shuffle.
   ShuffleStep shuffle() => _shuffle();
 
