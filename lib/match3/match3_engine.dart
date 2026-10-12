@@ -173,6 +173,9 @@ class Match3Engine {
 
   /// Seeds the top row with the first keys (up to [maxDropsOnBoard]).
   void _placeInitialDrops() {
+    // Levels without keys must not touch the RNG, so their boards stay
+    // exactly as they were before keys existed.
+    if (dropsTotal == 0) return;
     final cols = [
       for (var x = 0; x < board.width; x++)
         if (board.at(x, 0) case final t? when !t.locked && !t.isSpecial) x,
