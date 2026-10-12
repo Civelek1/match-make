@@ -129,6 +129,38 @@ const Map<String, TileVisual> tileVisuals = {
   'reel': TileVisual(Icons.local_movies, 2),
   'console': TileVisual(Icons.videogame_asset, 3),
   'projector': TileVisual(Icons.tv, 4),
+  // Chapters 6–10
+  'banner': TileVisual(Icons.tour, 0),
+  'shield': TileVisual(Icons.shield, 1),
+  'torch': TileVisual(Icons.local_fire_department, 2),
+  'book': TileVisual(Icons.menu_book, 3),
+  'scroll': TileVisual(Icons.history_edu, 4),
+  'hourglass': TileVisual(Icons.hourglass_bottom, 5),
+  'medal': TileVisual(Icons.military_tech, 4),
+  'globe': TileVisual(Icons.public, 3),
+  'snowflake': TileVisual(Icons.ac_unit, 0),
+  'ski': TileVisual(Icons.downhill_skiing, 1),
+  'sled': TileVisual(Icons.sledding, 2),
+  'snowboard': TileVisual(Icons.snowboarding, 3),
+  'skate': TileVisual(Icons.ice_skating, 4),
+  'chalet': TileVisual(Icons.chalet, 3),
+  'hot_tub': TileVisual(Icons.hot_tub, 4),
+  'anchor': TileVisual(Icons.anchor, 0),
+  'boat': TileVisual(Icons.sailing, 1),
+  'fish': TileVisual(Icons.set_meal, 2),
+  'rod': TileVisual(Icons.phishing, 3),
+  'cargo': TileVisual(Icons.inventory_2, 5),
+  'beacon': TileVisual(Icons.flare, 2),
+  'compass': TileVisual(Icons.explore, 4),
+  'palette': TileVisual(Icons.palette, 0),
+  'column': TileVisual(Icons.account_balance, 1),
+  'science': TileVisual(Icons.science, 2),
+  'brush': TileVisual(Icons.brush, 3),
+  'photo': TileVisual(Icons.photo, 4),
+  'mask': TileVisual(Icons.theater_comedy, 0),
+  'ticket': TileVisual(Icons.confirmation_number, 1),
+  'mic': TileVisual(Icons.mic, 3),
+  'spotlight': TileVisual(Icons.highlight, 5),
 };
 
 TileVisual visualOf(String tileTypeId) => tileVisuals[tileTypeId] ?? const TileVisual(Icons.help_outline, 0);
@@ -210,11 +242,77 @@ void _drawIcon(Canvas canvas, IconData icon, Offset center, double size, Color c
 
 /// Draws a piece or, for obstacle ids (crate / ice / chain), its icon.
 void paintPiece(Canvas canvas, Rect r, String id, SpecialKind special) {
-  if (ObjectiveData.obstacleIds.contains(id)) {
+  if (id == ObjectiveData.dropId) {
+    paintKey(canvas, r);
+  } else if (ObjectiveData.obstacleIds.contains(id)) {
     ObstacleArt.icon(canvas, r, id);
   } else {
     paintTile(canvas, r, visualOf(id), special);
   }
+}
+
+/// The collectible key: a golden key on a round teal token, deliberately
+/// unlike any coloured piece so it reads as "not matchable".
+void paintKey(Canvas canvas, Rect r) {
+  final c = r.center;
+  final rad = r.width * 0.43;
+  canvas.drawCircle(
+    c + Offset(0, r.height * 0.05),
+    rad,
+    Paint()
+      ..color = Colors.black.withValues(alpha: 0.3)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, r.width * 0.03),
+  );
+  canvas.drawCircle(
+    c,
+    rad,
+    Paint()
+      ..shader = ui.Gradient.radial(
+        c - Offset(rad * 0.3, rad * 0.35),
+        rad * 1.3,
+        const [Color(0xFF6FD3DE), Color(0xFF1F8A99), Color(0xFF115866)],
+        const [0, 0.6, 1],
+      ),
+  );
+  canvas.drawCircle(
+    c,
+    rad,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = r.width * 0.05
+      ..color = const Color(0xFFFFD447),
+  );
+  final gold = Paint()..color = const Color(0xFFFFD447);
+  final goldDark = Paint()
+    ..color = const Color(0xFFB8740A)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = r.width * 0.028
+    ..strokeJoin = StrokeJoin.round;
+  canvas.save();
+  canvas.translate(c.dx, c.dy);
+  canvas.rotate(-pi / 4);
+  final w = r.width;
+  // Bow (ring), shaft and two teeth.
+  final bow = Offset(-w * 0.17, 0);
+  final shaft = Rect.fromLTWH(-w * 0.06, -w * 0.045, w * 0.32, w * 0.09);
+  final tooth1 = Rect.fromLTWH(w * 0.12, w * 0.03, w * 0.06, w * 0.09);
+  final tooth2 = Rect.fromLTWH(w * 0.2, w * 0.03, w * 0.05, w * 0.12);
+  final key = Path()
+    ..addOval(Rect.fromCircle(center: bow, radius: w * 0.13))
+    ..addRect(shaft)
+    ..addRect(tooth1)
+    ..addRect(tooth2);
+  canvas.drawPath(key.shift(Offset(0, w * 0.025)), Paint()..color = const Color(0xFF0B3F49).withValues(alpha: 0.5));
+  canvas.drawPath(key, gold);
+  canvas.drawPath(key, goldDark);
+  canvas.drawCircle(bow, w * 0.055, Paint()..color = const Color(0xFF1F8A99));
+  canvas.drawCircle(bow, w * 0.055, goldDark);
+  canvas.restore();
+  // Gloss.
+  canvas.drawOval(
+    Rect.fromCenter(center: c - Offset(0, rad * 0.5), width: rad * 1.1, height: rad * 0.45),
+    Paint()..color = Colors.white.withValues(alpha: 0.25),
+  );
 }
 
 /// Draws a complete game piece into [r].

@@ -19,7 +19,10 @@ class ClearedTile {
   final Pos pos;
   final int type;
   final SpecialKind special;
-  const ClearedTile(this.id, this.pos, this.type, this.special);
+
+  /// A key collected at the bottom of the board.
+  final bool drop;
+  const ClearedTile(this.id, this.pos, this.type, this.special, {this.drop = false});
 }
 
 class CreatedSpecial {
@@ -67,6 +70,9 @@ class ClearStep extends BoardStep {
   /// 0 for the direct result of the move, 1+ for cascades.
   final int cascade;
 
+  /// Keys that reached the bottom in this step.
+  final int dropsCollected;
+
   ClearStep({
     required this.cleared,
     required this.created,
@@ -75,6 +81,7 @@ class ClearStep extends BoardStep {
     required this.score,
     required this.cascade,
     this.obstacleHits = const [],
+    this.dropsCollected = 0,
   });
 }
 
@@ -93,7 +100,8 @@ class TileSpawn {
 
   /// Row the tile starts falling from (negative = above the board).
   final int fromY;
-  const TileSpawn(this.id, this.type, this.special, this.to, this.fromY);
+  final bool drop;
+  const TileSpawn(this.id, this.type, this.special, this.to, this.fromY, {this.drop = false});
 }
 
 class FallStep extends BoardStep {
@@ -102,13 +110,20 @@ class FallStep extends BoardStep {
   FallStep(this.moves, this.spawns);
 }
 
+/// Keys sinking one row: each pair is (key position, piece below), swapped.
+class SinkStep extends BoardStep {
+  final List<(Pos, Pos)> swaps;
+  SinkStep(this.swaps);
+}
+
 class ShuffledTile {
   final int id;
   final int type;
   final SpecialKind special;
   final Pos pos;
   final int chain;
-  const ShuffledTile(this.id, this.type, this.special, this.pos, {this.chain = 0});
+  final bool drop;
+  const ShuffledTile(this.id, this.type, this.special, this.pos, {this.chain = 0, this.drop = false});
 }
 
 class ShuffleStep extends BoardStep {

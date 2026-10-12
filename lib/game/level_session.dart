@@ -37,6 +37,7 @@ class LevelSession {
         scoring: scoring,
         seed: seed,
         obstacles: level.obstacles,
+        dropsTotal: level.dropsTotal,
       ),
       movesLeft = level.moves,
       progress = {for (final o in level.objectives) o.id: 0} {
@@ -127,6 +128,17 @@ class LevelSession {
         if (before < o.target) {
           progress[o.id] = before + 1;
           delta[o.id] = (delta[o.id] ?? 0) + 1;
+        }
+      }
+    }
+    if (s.dropsCollected > 0) {
+      for (final o in level.objectives) {
+        if (!o.isDrop) continue;
+        final before = progress[o.id]!;
+        final after = (before + s.dropsCollected).clamp(0, o.target);
+        if (after > before) {
+          progress[o.id] = after;
+          delta[o.id] = after - before;
         }
       }
     }

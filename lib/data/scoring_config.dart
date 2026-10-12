@@ -14,6 +14,9 @@ class ScoringConfig {
   /// Points per point of damage dealt to a crate, ice layer or chain.
   final int obstacleHitBonus;
 
+  /// Points for bringing a key to the bottom of the board.
+  final int dropCollectedBonus;
+
   const ScoringConfig({
     this.pointsPerPiece = 100,
     this.rocketCreatedBonus = 500,
@@ -24,6 +27,7 @@ class ScoringConfig {
     this.maxMultiplier = 4.0,
     this.remainingMoveBonus = 1000,
     this.obstacleHitBonus = 150,
+    this.dropCollectedBonus = 1000,
   });
 
   double multiplierFor(int cascade) {

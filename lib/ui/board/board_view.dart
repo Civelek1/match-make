@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../../data/models/level_data.dart';
 import '../../match3/board.dart';
 import '../../match3/board_steps.dart';
 import '../../match3/match3_engine.dart';
@@ -85,6 +86,9 @@ class BoardView extends StatefulWidget {
   /// True while taps should pick a booster target.
   final bool Function() pickMode;
 
+  /// Draw exit arrows under each column (levels with keys).
+  final bool showExits;
+
   const BoardView({
     super.key,
     required this.width,
@@ -95,6 +99,7 @@ class BoardView extends StatefulWidget {
     required this.listener,
     required this.inputEnabled,
     bool Function()? pickMode,
+    this.showExits = false,
   }) : pickMode = pickMode ?? _never;
 
   static bool _never() => false;
@@ -210,7 +215,7 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
     for (final p in board.positions) {
       final t = board.atPos(p);
       if (t == null) continue;
-      final s = _makeSprite(t.id, t.type, t.special, p.x.toDouble(), p.y.toDouble())..chain = t.chain;
+      final s = _makeSprite(t.id, t.type, t.special, p.x.toDouble(), p.y.toDouble(), drop: t.drop)..chain = t.chain;
       // Drop-in intro animation, staggered by row.
       s.fy = p.y - widget.height - 1.0;
       s.t0 = _now + (widget.height - p.y) * 0.03 + p.x * 0.01;
@@ -220,10 +225,10 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
     }
   }
 
-  _Sprite _makeSprite(int id, int type, SpecialKind special, double x, double y) {
+  _Sprite _makeSprite(int id, int type, SpecialKind special, double x, double y, {bool drop = false}) {
     final s = _Sprite()
       ..id = id
-      ..typeId = widget.tileTypeIds[type]
+      ..typeId = drop ? ObjectiveData.dropId : widget.tileTypeIds[type]
       ..special = special
       ..fx = x
       ..fy = y
@@ -279,6 +284,8 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
           await _playFall(step);
         case ShuffleStep():
           await _playShuffle(step);
+        case SinkStep():
+          await _playSink(step);
       }
     }
   }
@@ -326,7 +333,11 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
       _dying.add(s);
       final center = _cellCenter(c.pos.x.toDouble(), c.pos.y.toDouble());
       if (box != null && box.attached) centers[c.id] = box.localToGlobal(center);
-      _burst(center, slotColors[visualOf(s.typeId).slot % 6], step.cleared.length > 12 ? 3 : 6);
+      if (c.drop) {
+        _burst(center, const Color(0xFFFFD447), 14);
+      } else {
+        _burst(center, slotColors[visualOf(s.typeId).slot % 6], step.cleared.length > 12 ? 3 : 6);
+      }
     }
     for (final cs in step.created) {
       final s = _makeSprite(cs.tileId, cs.type, cs.kind, cs.pos.x.toDouble(), cs.pos.y.toDouble())
@@ -399,7 +410,7 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
       _grid[_idx(m.to)] = m.id;
     }
     for (final sp in step.spawns) {
-      final s = _makeSprite(sp.id, sp.type, sp.special, sp.to.x.toDouble(), sp.fromY.toDouble());
+      final s = _makeSprite(sp.id, sp.type, sp.special, sp.to.x.toDouble(), sp.fromY.toDouble(), drop: sp.drop);
       final dist = (sp.to.y - sp.fromY).toDouble();
       final d = 0.12 + sqrt(dist) * 0.07;
       _tween(s, sp.to.x.toDouble(), sp.to.y.toDouble(), d, gravity: true);
@@ -409,6 +420,21 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
     await _wait(maxT + 0.04);
   }
 
+  /// Keys and the pieces under them trade places together.
+  Future<void> _playSink(SinkStep step) async {
+    const d = 0.2;
+    for (final (a, b) in step.swaps) {
+      final ia = _grid[_idx(a)], ib = _grid[_idx(b)];
+      final sa = _sprites[ia], sb = _sprites[ib];
+      if (sa == null || sb == null) continue;
+      _tween(sa, b.x.toDouble(), b.y.toDouble(), d);
+      _tween(sb, a.x.toDouble(), a.y.toDouble(), d);
+      _grid[_idx(a)] = ib;
+      _grid[_idx(b)] = ia;
+    }
+    await _wait(d + 0.02);
+  }
+
   Future<void> _playShuffle(ShuffleStep step) async {
     widget.listener.onShuffle();
     await _wait(0.5);
@@ -416,10 +442,10 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
     for (final t in step.tiles) {
       var s = _sprites[t.id];
       if (s == null) {
-        s = _makeSprite(t.id, t.type, t.special, t.pos.x.toDouble(), t.pos.y.toDouble());
+        s = _makeSprite(t.id, t.type, t.special, t.pos.x.toDouble(), t.pos.y.toDouble(), drop: t.drop);
       } else {
         s
-          ..typeId = widget.tileTypeIds[t.type]
+          ..typeId = t.drop ? ObjectiveData.dropId : widget.tileTypeIds[t.type]
           ..special = t.special
           ..chain = t.chain;
       }
@@ -708,6 +734,7 @@ class _BoardPainter extends CustomPainter {
     _paintObstacles(canvas, boardRect, now, cell);
     canvas.restore();
 
+    if (s.widget.showExits) _paintExits(canvas, boardRect, now, cell);
     _paintEffects(canvas, boardRect, now, cell);
 
     // Particles.
@@ -766,6 +793,35 @@ class _BoardPainter extends CustomPainter {
     }
     for (var i = 0; i < s._crates.length; i++) {
       if (s._crates[i] > 0) ObstacleArt.crate(canvas, cellRect(i, wobble(i)), s._crates[i], damaged: s._crates[i] < s._crateStart[i]);
+    }
+  }
+
+  /// Small gold chevrons under the lowest free cell of each column: where
+  /// keys leave the board.
+  void _paintExits(Canvas canvas, Rect board, double now, double cell) {
+    final w = s.widget.width, h = s.widget.height;
+    final bob = sin(now * 3) * cell * 0.04;
+    final fill = Paint()..color = const Color(0xFFFFD447).withValues(alpha: 0.9);
+    final edge = Paint()
+      ..color = GameColors.ink.withValues(alpha: 0.8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = max(1.0, cell * 0.03)
+      ..strokeJoin = StrokeJoin.round;
+    for (var x = 0; x < w; x++) {
+      var y = h - 1;
+      while (y >= 0 && x + y * w < s._crates.length && s._crates[x + y * w] > 0) {
+        y--;
+      }
+      if (y < 0) continue;
+      final cx = board.left + (x + 0.5) * cell;
+      final top = board.top + (y + 1) * cell - cell * 0.16 + bob;
+      final a = Path()
+        ..moveTo(cx - cell * 0.14, top)
+        ..lineTo(cx + cell * 0.14, top)
+        ..lineTo(cx, top + cell * 0.13)
+        ..close();
+      canvas.drawPath(a, fill);
+      canvas.drawPath(a, edge);
     }
   }
 

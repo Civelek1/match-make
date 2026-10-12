@@ -293,6 +293,10 @@ class GameplayController extends ChangeNotifier implements BoardListener {
         services.audio.play(Sfx.restore);
       }
     }
+    if (step.dropsCollected > 0) {
+      services.audio.play(Sfx.objectiveComplete);
+      services.haptics.success();
+    }
     if (step.cascade >= 1) {
       combo.value = ComboEvent(step.cascade.clamp(1, 4), ++_serial);
     }
@@ -304,7 +308,12 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     deltas.forEach((objId, amount) {
       final obj = level.objectives.firstWhere((o) => o.id == objId);
       final typeIndex = level.tileIndexOf(obj.tileTypeId);
-      final sources = obj.isObstacle
+      final sources = obj.isDrop
+          ? [
+              for (final c in step.cleared)
+                if (c.drop && clearedCentersGlobal.containsKey(c.id)) clearedCentersGlobal[c.id]!,
+            ]
+          : obj.isObstacle
           ? [
               for (final h in step.obstacleHits)
                 if (h.kind.name == obj.tileTypeId) ?board.cellCenterGlobal(h.pos),

@@ -198,6 +198,7 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
                                   listener: c,
                                   inputEnabled: () => c.inputEnabled,
                                   pickMode: () => c.pickMode,
+                                  showExits: widget.level.dropsTotal > 0,
                                 ),
                               ),
                               if (c.armed != null)

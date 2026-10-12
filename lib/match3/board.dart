@@ -41,7 +41,11 @@ class Tile {
   /// Remaining chain stages; a chained tile cannot move.
   int chain = 0;
 
-  Tile(this.id, this.type, [this.special = SpecialKind.none]);
+  /// A collectible key: never matches and survives blasts; it is collected
+  /// when it reaches the bottom of its column. Its [type] is meaningless.
+  final bool drop;
+
+  Tile(this.id, this.type, [this.special = SpecialKind.none, this.drop = false]);
 
   bool get isSpecial => special != SpecialKind.none;
   bool get locked => chain > 0;

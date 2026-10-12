@@ -39,6 +39,10 @@ class ObjectiveData {
   /// Objectives can also count obstacle damage (tileTypeId crate / ice / chain).
   static const obstacleIds = {'crate', 'ice', 'chain'};
   bool get isObstacle => obstacleIds.contains(tileTypeId);
+
+  /// Objectives with this tileTypeId count keys brought to the bottom.
+  static const dropId = 'key';
+  bool get isDrop => tileTypeId == dropId;
 }
 
 /// Fully data-driven level definition. Gameplay code never branches on a
@@ -103,6 +107,9 @@ class LevelData {
   String get descKey => 'level.$id.desc';
 
   int tileIndexOf(String tileTypeId) => tileTypeIds.indexOf(tileTypeId);
+
+  /// Total keys the level spawns (sum of its key objectives).
+  int get dropsTotal => objectives.where((o) => o.isDrop).fold(0, (n, o) => n + o.target);
 
   int starsForScore(int score) {
     if (score >= starThresholds[1]) return 3;

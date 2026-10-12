@@ -53,6 +53,14 @@ class Match3Engine {
   /// Obstacle layout rows (see [parseObstacle]); null = plain board.
   final List<String>? obstacles;
 
+  /// Keys (drop pieces) this level hands out in total, how many may be on
+  /// the board at once, and how many player actions pass between spawns.
+  final int dropsTotal;
+  final int maxDropsOnBoard;
+  final int dropGap;
+  int _dropsSpawned = 0;
+  int _actionsSinceDrop = 0;
+
   Match3Engine({
     required int width,
     required int height,
@@ -61,6 +69,9 @@ class Match3Engine {
     this.scoring = const ScoringConfig(),
     int? seed,
     this.obstacles,
+    this.dropsTotal = 0,
+    this.maxDropsOnBoard = 2,
+    this.dropGap = 2,
   }) : assert(typeCount >= 3),
        board = Board(width, height),
        specials = specials ?? SpecialFeature.values.toSet(),
@@ -114,6 +125,18 @@ class Match3Engine {
   }
 
   Tile _newTile(int type, [SpecialKind s = SpecialKind.none]) => Tile(_nextId++, type, s);
+  Tile _newDrop() {
+    _dropsSpawned++;
+    _actionsSinceDrop = 0;
+    return Tile(_nextId++, 0, SpecialKind.none, true);
+  }
+
+  int get dropsOnBoard => board.positions.where((p) => board.atPos(p)?.drop ?? false).length;
+
+  /// Keys still to appear (not yet spawned).
+  int get dropsPending => dropsTotal - _dropsSpawned;
+
+  bool get _dropDue => _dropsSpawned < dropsTotal && dropsOnBoard < maxDropsOnBoard && _actionsSinceDrop >= dropGap;
 
   // ---------------------------------------------------------------------------
   // Generation
@@ -141,17 +164,33 @@ class Match3Engine {
           board.put(x, y, t);
         }
       }
-      if (findAnyMove() != null) return;
+      if (findAnyMove() != null) {
+        _placeInitialDrops();
+        return;
+      }
     }
+  }
+
+  /// Seeds the top row with the first keys (up to [maxDropsOnBoard]).
+  void _placeInitialDrops() {
+    final cols = [
+      for (var x = 0; x < board.width; x++)
+        if (board.at(x, 0) case final t? when !t.locked && !t.isSpecial) x,
+    ]..shuffle(_rng);
+    final n = min(min(dropsTotal, maxDropsOnBoard), cols.length);
+    for (final x in cols.take(n)) {
+      board.put(x, 0, _newDrop());
+    }
+    if (n > 0 && findAnyMove() == null) _shuffle();
   }
 
   /// Random type that does not complete a 3-run to the left or above.
   int _safeType(int x, int y) {
     final banned = <int>{};
     final l1 = board.at(x - 1, y), l2 = board.at(x - 2, y);
-    if (l1 != null && l2 != null && l1.type == l2.type) banned.add(l1.type);
+    if (_matchable(l1) && _matchable(l2) && l1!.type == l2!.type) banned.add(l1.type);
     final u1 = board.at(x, y - 1), u2 = board.at(x, y - 2);
-    if (u1 != null && u2 != null && u1.type == u2.type) banned.add(u1.type);
+    if (_matchable(u1) && _matchable(u2) && u1!.type == u2!.type) banned.add(u1.type);
     final options = [
       for (var t = 0; t < typeCount; t++)
         if (!banned.contains(t)) t,
@@ -163,7 +202,7 @@ class Match3Engine {
   // Move detection
   // ---------------------------------------------------------------------------
 
-  bool _matchable(Tile? t) => t != null && t.special != SpecialKind.colorBomb;
+  bool _matchable(Tile? t) => t != null && t.special != SpecialKind.colorBomb && !t.drop;
 
   /// True if the tile at (x,y) is part of a horizontal or vertical 3-run.
   bool _hasMatchAt(int x, int y) {
@@ -271,7 +310,7 @@ class Match3Engine {
       final bombPos = ta.special == SpecialKind.colorBomb ? b : a;
       final other = ta.special == SpecialKind.colorBomb ? tb : ta;
       final seed = _Seed()..consumed.add(bombPos);
-      final targets = _positionsOfType(other.type);
+      final targets = _positionsOfType(other.drop ? _mostCommonType() : other.type);
       seed.clear
         ..add(bombPos)
         ..addAll(targets);
@@ -309,6 +348,7 @@ class Match3Engine {
   List<BoardStep>? hammerAt(Pos p) {
     if (!board.inBounds(p.x, p.y)) return null;
     if (board.atPos(p) == null && !board.hasCrate(p)) return null;
+    if (board.atPos(p)?.drop ?? false) return null;
     final seed = _Seed()
       ..clear.add(p)
       ..effects.add(SpecialEffect(EffectKind.hammer, p));
@@ -330,7 +370,7 @@ class Match3Engine {
   List<Pos> placeSpecials(SpecialKind kind, int count) {
     final candidates = [
       for (final p in board.positions)
-        if (board.atPos(p) case final t? when !t.isSpecial && !t.locked) p,
+        if (board.atPos(p) case final t? when !t.isSpecial && !t.locked && !t.drop) p,
     ]..shuffle(_rng);
     final placed = candidates.take(count).toList();
     for (final p in placed) {
@@ -348,8 +388,22 @@ class Match3Engine {
 
   List<Pos> _positionsOfType(int type) => [
     for (final p in board.positions)
-      if (board.atPos(p) != null && board.atPos(p)!.type == type && board.atPos(p)!.special != SpecialKind.colorBomb) p,
+      if (_matchable(board.atPos(p)) && board.atPos(p)!.type == type) p,
   ];
+
+  /// Most common matchable piece type (colour bomb fallback target).
+  int _mostCommonType() {
+    final counts = List<int>.filled(typeCount, 0);
+    for (final q in board.positions) {
+      final o = board.atPos(q);
+      if (_matchable(o)) counts[o!.type]++;
+    }
+    var best = 0;
+    for (var i = 1; i < typeCount; i++) {
+      if (counts[i] > counts[best]) best = i;
+    }
+    return best;
+  }
 
   _Seed _comboSeed(Pos a, Pos b, Tile ta, Tile tb) {
     // After the swap, ta sits at b and tb at a. Effects centre on b.
@@ -436,16 +490,7 @@ class Match3Engine {
         return (cells, SpecialEffect(EffectKind.area, p, radius: 2));
       case SpecialKind.colorBomb:
         // Chain-triggered colour bomb targets the most common type.
-        final counts = List<int>.filled(typeCount, 0);
-        for (final q in board.positions) {
-          final o = board.atPos(q);
-          if (o != null && o.special != SpecialKind.colorBomb) counts[o.type]++;
-        }
-        var best = 0;
-        for (var i = 1; i < typeCount; i++) {
-          if (counts[i] > counts[best]) best = i;
-        }
-        final targets = _positionsOfType(best);
+        final targets = _positionsOfType(_mostCommonType());
         return ([p, ...targets], SpecialEffect(EffectKind.colorBurst, p, targets: targets));
       case SpecialKind.none:
         return ([p], SpecialEffect(EffectKind.area, p));
@@ -553,13 +598,46 @@ class Match3Engine {
   /// gravity → refill, repeated until the board is stable.
   List<BoardStep> _resolve({_Seed? seed, Set<Pos> preferred = const {}}) {
     final steps = <BoardStep>[];
+    _actionsSinceDrop++;
+    _cascade(steps, seed, preferred);
+    // Keys drift down one row after every action, then the board settles
+    // again (the swapped piece may complete a match, a key may reach the exit).
+    final sink = _sinkKeys();
+    if (sink != null) {
+      steps.add(sink);
+      _cascade(steps, null, const {});
+    }
+    if (findAnyMove() == null) steps.add(_shuffle());
+    return steps;
+  }
+
+  /// Swaps every key with the free piece below it. Null if none can move.
+  SinkStep? _sinkKeys() {
+    if (dropsTotal == 0) return null;
+    final swaps = <(Pos, Pos)>[];
+    for (var y = board.height - 2; y >= 0; y--) {
+      for (var x = 0; x < board.width; x++) {
+        final k = board.at(x, y);
+        if (k == null || !k.drop) continue;
+        final below = board.at(x, y + 1);
+        if (!board.isSlot(x, y + 1) || below == null || below.drop) continue;
+        board.put(x, y + 1, k);
+        board.put(x, y, below);
+        swaps.add((Pos(x, y), Pos(x, y + 1)));
+      }
+    }
+    return swaps.isEmpty ? null : SinkStep(swaps);
+  }
+
+  void _cascade(List<BoardStep> steps, _Seed? seed, Set<Pos> preferred) {
     var cascade = 0;
     var pending = seed;
     var prefer = preferred;
 
     while (cascade < 60) {
       final groups = _findGroups();
-      if (groups.isEmpty && pending == null) break;
+      final exits = _keysAtExit();
+      if (groups.isEmpty && pending == null && exits.isEmpty) break;
 
       final clear = <Pos>{};
       final activated = <Pos>{};
@@ -627,9 +705,14 @@ class Match3Engine {
 
       final cleared = <ClearedTile>[];
       final collected = <int, int>{};
+      for (final p in exits) {
+        final t = board.atPos(p)!;
+        cleared.add(ClearedTile(t.id, p, t.type, t.special, drop: true));
+        board.putPos(p, null);
+      }
       for (final p in clear) {
         final t = board.atPos(p);
-        if (t == null) continue;
+        if (t == null || t.drop) continue; // keys survive blasts
         if (t.locked) {
           // A chained piece loses a chain stage instead of being cleared.
           t.chain--;
@@ -654,7 +737,9 @@ class Match3Engine {
         bonus += _createdBonus(kind);
       }
 
-      final base = cleared.length * scoring.pointsPerPiece + hits.length * scoring.obstacleHitBonus + bonus;
+      final pieces = cleared.length - exits.length;
+      final base =
+          pieces * scoring.pointsPerPiece + hits.length * scoring.obstacleHitBonus + exits.length * scoring.dropCollectedBonus + bonus;
       steps.add(
         ClearStep(
           cleared: cleared,
@@ -664,6 +749,7 @@ class Match3Engine {
           score: (base * scoring.multiplierFor(cascade)).round(),
           cascade: cascade,
           obstacleHits: hits,
+          dropsCollected: exits.length,
         ),
       );
       steps.add(_applyGravity());
@@ -672,9 +758,20 @@ class Match3Engine {
       prefer = const {};
       cascade++;
     }
+  }
 
-    if (findAnyMove() == null) steps.add(_shuffle());
-    return steps;
+  /// Keys resting on the lowest free cell of their column.
+  List<Pos> _keysAtExit() {
+    final out = <Pos>[];
+    for (var x = 0; x < board.width; x++) {
+      for (var y = board.height - 1; y >= 0; y--) {
+        if (!board.isSlot(x, y)) continue;
+        // The lowest slot in this column is the exit.
+        if (board.at(x, y)?.drop ?? false) out.add(Pos(x, y));
+        break;
+      }
+    }
+    return out;
   }
 
   FallStep _applyGravity() {
@@ -701,19 +798,20 @@ class Match3Engine {
       }
       for (var i = falling.length; i < slots.length; i++) {
         final y = slots[i];
-        final t = _newTile(_rng.nextInt(typeCount));
+        // A due key enters as the topmost new piece of its column.
+        final t = i == slots.length - 1 && _dropDue && _rng.nextInt(3) == 0 ? _newDrop() : _newTile(_rng.nextInt(typeCount));
         board.put(x, y, t);
-        spawns.add(TileSpawn(t.id, t.type, t.special, Pos(x, y), -1 - (i - falling.length)));
+        spawns.add(TileSpawn(t.id, t.type, t.special, Pos(x, y), -1 - (i - falling.length), drop: t.drop));
       }
     }
     return FallStep(moves, spawns);
   }
 
   ShuffleStep _shuffle() {
-    // Only free pieces are shuffled; crates and chained pieces stay put.
+    // Only free pieces are shuffled; crates, chained pieces and keys stay put.
     final cells = [
       for (final p in board.positions)
-        if (board.atPos(p) != null && !board.atPos(p)!.locked) p,
+        if (board.atPos(p) case final t? when !t.locked && !t.drop) p,
     ];
     final tiles = [for (final p in cells) board.atPos(p)!];
     var ok = false;
@@ -730,7 +828,7 @@ class Match3Engine {
         for (var y = 0; y < board.height; y++) {
           for (var x = 0; x < board.width; x++) {
             final t = board.at(x, y);
-            if (t != null && !t.isSpecial && !t.locked) {
+            if (t != null && !t.isSpecial && !t.locked && !t.drop) {
               board.put(x, y, null);
               t.type = _safeType(x, y);
               board.put(x, y, t);
@@ -748,7 +846,7 @@ class Match3Engine {
     }
     return ShuffleStep([
       for (final p in board.positions)
-        if (board.atPos(p) != null) ShuffledTile(board.atPos(p)!.id, board.atPos(p)!.type, board.atPos(p)!.special, p, chain: board.atPos(p)!.chain),
+        if (board.atPos(p) case final t?) ShuffledTile(t.id, t.type, t.special, p, chain: t.chain, drop: t.drop),
     ]);
   }
 }
