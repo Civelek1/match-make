@@ -8,6 +8,7 @@ import '../art/paint_kit.dart';
 import 'attic_scene.dart';
 import 'bathroom_scene.dart';
 import 'chapter_scenes.dart';
+import 'chapter_scenes_2.dart';
 import 'gaming_room_scene.dart';
 import 'garden_scene.dart';
 import 'kitchen_scene.dart';
@@ -48,6 +49,7 @@ final Map<String, SceneArt Function()> _registry = {
   'gaming_room': GamingRoomScene.new,
   'attic': AtticScene.new,
   ...chapterScenes,
+  ...chapterScenes2,
 };
 
 final Map<String, SceneArt> _cache = {};

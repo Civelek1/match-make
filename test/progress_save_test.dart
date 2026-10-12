@@ -46,11 +46,11 @@ void main() {
     expect(p.chapterStars(content.chapters.first), 10);
   });
 
-  test('all 25 levels unlock in order; chapters open at 5, 10, 15, 20', () async {
+  test('all 50 levels unlock in order; a new chapter opens every 5 levels', () async {
     final (p, _, _) = await fresh();
     final all = [for (final c in content.chapters) ...content.levelsOf(c.id)];
-    expect(all.length, 25);
-    expect([for (final l in all) l.number], [for (var i = 1; i <= 25; i++) i]);
+    expect(all.length, 50);
+    expect([for (final l in all) l.number], [for (var i = 1; i <= 50; i++) i]);
     for (var i = 0; i < all.length; i++) {
       expect(p.isUnlocked(all[i].id), isTrue, reason: '${all[i].id} should be open');
       for (final later in all.skip(i + 1)) {
@@ -62,8 +62,8 @@ void main() {
         expect(p.isChapterUnlocked(next), isTrue, reason: 'chapter ${next.id} after level ${all[i].number}');
       }
     }
-    expect(p.totalStars, 75);
-    expect(p.levelsCompleted, 25);
+    expect(p.totalStars, 150);
+    expect(p.levelsCompleted, 50);
   });
 
   test('a version-1 Chapter 1 save keeps everything and opens the Farm', () async {

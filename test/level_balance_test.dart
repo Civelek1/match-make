@@ -7,9 +7,12 @@ import 'package:match_make/game/level_session.dart';
 import 'package:match_make/match3/board.dart';
 import 'package:match_make/match3/match3_engine.dart';
 
+import 'support/key_bot.dart';
+
 /// A deliberately simple bot: prefers specials, then moves whose tile type is
 /// still needed by the objective with the most remaining, with a bonus for
-/// playing next to obstacles an objective still needs. Humans plan better,
+/// playing next to obstacles an objective still needs and for clearing
+/// under keys. Humans plan better,
 /// so a level the bot can beat is comfortably beatable.
 Move pickMove(LevelSession s, Random rng) {
   final moves = s.engine.allMoves();
@@ -22,7 +25,7 @@ Move pickMove(LevelSession s, Random rng) {
     return n;
   }
 
-  final crateNeed = need('crate'), iceNeed = need('ice'), chainNeed = need('chain');
+  final crateNeed = need('crate'), iceNeed = need('ice'), chainNeed = need('chain'), keyNeed = need('key');
   double near(Pos p) {
     var bonus = 0.0;
     for (final d in const [Pos(0, 0), Pos(1, 0), Pos(-1, 0), Pos(0, 1), Pos(0, -1)]) {
@@ -42,7 +45,9 @@ Move pickMove(LevelSession s, Random rng) {
     for (final t in [ta.type, tb.type]) {
       best = max(best, need(s.level.tileTypeIds[t]).toDouble());
     }
-    return best + near(m.a) + near(m.b) + rng.nextDouble();
+    // Keys are the slowest objective, so a sensible player chases them first.
+    final keys = keyNeed > 0 ? keyMoveValue(b, m) * 5 : 0.0;
+    return best + near(m.a) + near(m.b) + keys + rng.nextDouble();
   }
 
   moves.sort((x, y) => scoreOf(y).compareTo(scoreOf(x)));
@@ -76,13 +81,19 @@ Move pickMove(LevelSession s, Random rng) {
 void main() {
   final content = GameContent.standard();
   // Minimum bot win rates: the curve falls chapter by chapter, but no level
-  // is luck-only. Level 25 is the finale.
+  // is luck-only. Level 50 is the finale.
   const minWinRate = {
     'garden': 0.9, 'kitchen': 0.75, 'bathroom': 0.6, 'gaming_room': 0.5, 'attic': 0.4,
     'farmyard': 0.85, 'barn': 0.7, 'chicken_coop': 0.58, 'workshop': 0.58, 'farmhouse': 0.48,
     'entrance': 0.6, 'rest_kitchen': 0.5, 'dining_hall': 0.58, 'terrace': 0.46, 'vip_room': 0.5,
     'beach': 0.46, 'pool': 0.44, 'beach_bar': 0.44, 'hotel_room': 0.45, 'rooftop': 0.36,
     'front_yard': 0.3, 'grand_hall': 0.3, 'luxury_bedroom': 0.33, 'cinema_room': 0.3, 'penthouse': 0.2,
+    // Chapters 6–10 (keys from level 26). Each chapter opens gently and ends harder.
+    'castle_gate': 0.62, 'banquet_hall': 0.5, 'castle_library': 0.44, 'armory': 0.46, 'throne_room': 0.4,
+    'lodge_front': 0.56, 'lodge_lounge': 0.46, 'ski_room': 0.4, 'lodge_spa': 0.4, 'lodge_suite': 0.4,
+    'harbor_dock': 0.46, 'fish_market': 0.4, 'boathouse': 0.4, 'lighthouse_base': 0.42, 'keeper_cottage': 0.32,
+    'museum_steps': 0.48, 'sculpture_hall': 0.38, 'art_gallery': 0.38, 'history_hall': 0.4, 'museum_cafe': 0.34,
+    'theater_front': 0.38, 'theater_lobby': 0.36, 'dressing_room': 0.36, 'concert_hall': 0.34, 'grand_stage': 0.3,
   };
 
   for (final chapter in content.chapters) {

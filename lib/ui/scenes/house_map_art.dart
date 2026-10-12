@@ -23,6 +23,11 @@ ChapterMapArt? chapterMapArtFor(String id) => switch (id) {
   'restaurant' => restaurantMap,
   'beach' => beachMap,
   'mansion' => mansionMap,
+  'castle' => castleMap,
+  'lodge' => lodgeMap,
+  'harbor' => harborMap,
+  'museum' => museumMap,
+  'theater' => theaterMap,
   _ => null,
 };
 

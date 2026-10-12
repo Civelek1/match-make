@@ -18,13 +18,15 @@ enum PK {
   bottleShelf, wineRack, menuBoard, door, awning, podium, workbench, pegboard, barrel, crates, machine,
   toolbox, stall, lantern, cinemaSeats, projector, speaker, console, mirror, bathtub, shower, luggage,
   trolley, stairs, trophyCase, vase, clock, neonSign, stage, champagneTower, discoBall, sign,
+  // Chapters 6–10
+  banner, torch, snowman, sailboat, anchor, column, spotlight,
 }
 
 /// Props hung on walls pop from their centre; everything else grows from the floor.
 const wallProps = {
   PK.window, PK.curtains, PK.painting, PK.shelf, PK.pendant, PK.chandelier, PK.screen, PK.bottleShelf,
   PK.menuBoard, PK.awning, PK.pegboard, PK.lantern, PK.mirror, PK.clock, PK.neonSign, PK.stringLights,
-  PK.discoBall, PK.sign,
+  PK.discoBall, PK.sign, PK.banner, PK.torch, PK.spotlight,
 };
 
 class PropKit {
@@ -719,6 +721,85 @@ class PropKit {
       case PK.sign:
         Pk.box(c, r, a, radius: h * 0.3, outline: Pk.dark(a, 0.35), ow: 2);
         c.drawLine(Offset(r.left + w * 0.15, r.center.dy), Offset(r.right - w * 0.15, r.center.dy), Pk.stroke(b, h * 0.18));
+      case PK.banner:
+        // Hanging pennant on a rod, gently swaying, with an emblem.
+        c.drawLine(Offset(r.left, r.top + 2), Offset(r.right, r.top + 2), Pk.stroke(const Color(0xFF8B5E3C), 3));
+        final sway = sin(t * 1.4 + r.left) * w * 0.04;
+        Pk.poly(
+          c,
+          [
+            Offset(r.left + w * 0.1, r.top + 3),
+            Offset(r.right - w * 0.1, r.top + 3),
+            Offset(r.right - w * 0.1 + sway, r.bottom),
+            Offset(r.center.dx + sway, r.bottom - h * 0.16),
+            Offset(r.left + w * 0.1 + sway, r.bottom),
+          ],
+          Pk.fill(a),
+        );
+        c.drawCircle(Offset(r.center.dx + sway * 0.5, r.top + h * 0.42), w * 0.18, Pk.fill(b));
+        c.drawLine(Offset(r.left + w * 0.14, r.top + h * 0.12), Offset(r.right - w * 0.14, r.top + h * 0.12), Pk.stroke(Pk.light(a, 0.3), 2));
+      case PK.torch:
+        // Wall sconce with a flickering flame.
+        Pk.box(c, Rect.fromLTWH(r.center.dx - w * 0.12, r.top + h * 0.45, w * 0.24, h * 0.55), a, radius: 2);
+        Pk.box(c, Rect.fromLTWH(r.left + w * 0.2, r.top + h * 0.38, w * 0.6, h * 0.1), Pk.dark(a, 0.2), radius: 2);
+        final f = 1 + 0.12 * sin(t * 9 + r.left);
+        Pk.glow(c, Offset(r.center.dx, r.top + h * 0.25), w * 2.2, b, 0.55);
+        Pk.poly(c, [Offset(r.center.dx, r.top), Offset(r.center.dx + w * 0.3 * f, r.top + h * 0.36), Offset(r.center.dx - w * 0.3 * f, r.top + h * 0.36)], Pk.fill(b));
+        Pk.poly(c, [Offset(r.center.dx, r.top + h * 0.12), Offset(r.center.dx + w * 0.14, r.top + h * 0.36), Offset(r.center.dx - w * 0.14, r.top + h * 0.36)], Pk.fill(Colors.white.withValues(alpha: 0.8)));
+      case PK.snowman:
+        Pk.shadow(c, r.bottomCenter, w, h * 0.08);
+        c.drawCircle(Offset(r.center.dx, r.bottom - w * 0.36), w * 0.38, Pk.fill(a));
+        c.drawCircle(Offset(r.center.dx, r.bottom - w * 0.92), w * 0.28, Pk.fill(a));
+        c.drawCircle(Offset(r.center.dx, r.bottom - w * 1.34), w * 0.2, Pk.fill(a));
+        Pk.box(c, Rect.fromLTWH(r.center.dx - w * 0.24, r.bottom - w * 1.16, w * 0.48, w * 0.08), b, radius: 2);
+        Pk.poly(c, [Offset(r.center.dx, r.bottom - w * 1.36), Offset(r.center.dx + w * 0.22, r.bottom - w * 1.32), Offset(r.center.dx, r.bottom - w * 1.28)], Pk.fill(const Color(0xFFFF9A3C)));
+        for (final dx in [-0.07, 0.07]) {
+          c.drawCircle(Offset(r.center.dx + w * dx, r.bottom - w * 1.4), w * 0.03, Pk.fill(const Color(0xFF3B3452)));
+        }
+        Pk.box(c, Rect.fromLTWH(r.center.dx - w * 0.16, r.bottom - w * 1.72, w * 0.32, w * 0.22), const Color(0xFF3B3452), radius: 2);
+      case PK.sailboat:
+        final bob = sin(t * 1.5 + r.left) * h * 0.03;
+        final hull = Path()
+          ..moveTo(r.left, r.top + h * 0.7 + bob)
+          ..lineTo(r.right, r.top + h * 0.7 + bob)
+          ..lineTo(r.right - w * 0.15, r.bottom + bob)
+          ..lineTo(r.left + w * 0.12, r.bottom + bob)
+          ..close();
+        c.drawPath(hull, Pk.fill(a));
+        c.drawLine(Offset(r.left + w * 0.05, r.top + h * 0.78 + bob), Offset(r.right - w * 0.05, r.top + h * 0.78 + bob), Pk.stroke(Pk.light(a, 0.4), 2));
+        c.drawLine(Offset(r.center.dx, r.top + bob), Offset(r.center.dx, r.top + h * 0.7 + bob), Pk.stroke(const Color(0xFF8B5E3C), 2));
+        Pk.poly(c, [Offset(r.center.dx + 2, r.top + bob), Offset(r.right - w * 0.08, r.top + h * 0.62 + bob), Offset(r.center.dx + 2, r.top + h * 0.62 + bob)], Pk.fill(b));
+        Pk.poly(c, [Offset(r.center.dx - 2, r.top + h * 0.15 + bob), Offset(r.left + w * 0.12, r.top + h * 0.62 + bob), Offset(r.center.dx - 2, r.top + h * 0.62 + bob)], Pk.fill(Pk.light(b, 0.15)));
+      case PK.anchor:
+        final ink = Pk.stroke(a, w * 0.12)..strokeCap = StrokeCap.round;
+        c.drawCircle(Offset(r.center.dx, r.top + h * 0.12), w * 0.12, Pk.stroke(a, w * 0.08));
+        c.drawLine(Offset(r.center.dx, r.top + h * 0.22), Offset(r.center.dx, r.bottom - h * 0.06), ink);
+        c.drawLine(Offset(r.left + w * 0.2, r.top + h * 0.34), Offset(r.right - w * 0.2, r.top + h * 0.34), ink);
+        final arc = Path()
+          ..moveTo(r.left + w * 0.08, r.top + h * 0.62)
+          ..quadraticBezierTo(r.center.dx, r.bottom + h * 0.08, r.right - w * 0.08, r.top + h * 0.62);
+        c.drawPath(arc, ink..style = PaintingStyle.stroke);
+        c.drawCircle(Offset(r.center.dx, r.top + h * 0.12), w * 0.05, Pk.fill(b));
+      case PK.column:
+        Pk.box(c, Rect.fromLTWH(r.left, r.bottom - h * 0.08, w, h * 0.08), Pk.dark(a, 0.1), radius: 1);
+        Pk.box(c, Rect.fromLTWH(r.left, r.top, w, h * 0.08), Pk.dark(a, 0.1), radius: 1);
+        Pk.box(c, Rect.fromLTWH(r.left + w * 0.14, r.top + h * 0.08, w * 0.72, h * 0.84), a, radius: 1);
+        for (var i = 1; i < 4; i++) {
+          final x = r.left + w * 0.14 + w * 0.72 * i / 4;
+          c.drawLine(Offset(x, r.top + h * 0.1), Offset(x, r.bottom - h * 0.1), Pk.stroke(Pk.dark(a, 0.15), 1));
+        }
+        c.drawLine(Offset(r.left, r.top + h * 0.08), Offset(r.right, r.top + h * 0.08), Pk.stroke(b, 2));
+      case PK.spotlight:
+        // Ceiling spotlight casting a soft cone.
+        final cone = Path()
+          ..moveTo(r.center.dx - w * 0.15, r.top + h * 0.2)
+          ..lineTo(r.center.dx + w * 0.15, r.top + h * 0.2)
+          ..lineTo(r.right, r.bottom)
+          ..lineTo(r.left, r.bottom)
+          ..close();
+        c.drawPath(cone, Pk.fill(b.withValues(alpha: 0.18 + 0.06 * sin(t * 2 + r.left))));
+        Pk.box(c, Rect.fromCenter(center: Offset(r.center.dx, r.top + h * 0.1), width: w * 0.36, height: h * 0.2), a, radius: 3);
+        c.drawCircle(Offset(r.center.dx, r.top + h * 0.2), w * 0.1, Pk.fill(b));
     }
   }
 }

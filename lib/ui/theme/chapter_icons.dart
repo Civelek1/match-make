@@ -7,5 +7,10 @@ IconData chapterIcon(String chapterId) => switch (chapterId) {
   'restaurant' => Icons.restaurant_rounded,
   'beach' => Icons.beach_access_rounded,
   'mansion' => Icons.castle_rounded,
+  'castle' => Icons.fort_rounded,
+  'lodge' => Icons.downhill_skiing_rounded,
+  'harbor' => Icons.anchor_rounded,
+  'museum' => Icons.museum_rounded,
+  'theater' => Icons.theater_comedy_rounded,
   _ => Icons.place_rounded,
 };

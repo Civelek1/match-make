@@ -1,10 +1,15 @@
 import '../models/chapter_data.dart';
 import '../models/level_data.dart';
 import 'beach_chapter.dart';
+import 'castle_chapter.dart';
 import 'farm_chapter.dart';
+import 'harbor_chapter.dart';
 import 'house_chapter.dart';
+import 'lodge_chapter.dart';
 import 'mansion_chapter.dart';
+import 'museum_chapter.dart';
 import 'restaurant_chapter.dart';
+import 'theater_chapter.dart';
 
 /// Registry of every chapter and level shipped with the game.
 ///
@@ -27,8 +32,30 @@ class GameContent {
   }
 
   factory GameContent.standard() => GameContent(
-    chapters: const [houseChapter, farmChapter, restaurantChapter, beachChapter, mansionChapter],
-    levels: [...houseLevels, ...farmLevels, ...restaurantLevels, ...beachLevels, ...mansionLevels],
+    chapters: const [
+      houseChapter,
+      farmChapter,
+      restaurantChapter,
+      beachChapter,
+      mansionChapter,
+      castleChapter,
+      lodgeChapter,
+      harborChapter,
+      museumChapter,
+      theaterChapter,
+    ],
+    levels: [
+      ...houseLevels,
+      ...farmLevels,
+      ...restaurantLevels,
+      ...beachLevels,
+      ...mansionLevels,
+      ...castleLevels,
+      ...lodgeLevels,
+      ...harborLevels,
+      ...museumLevels,
+      ...theaterLevels,
+    ],
   );
 
   LevelData? level(String id) => _levels[id];
