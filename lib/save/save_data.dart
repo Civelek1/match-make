@@ -11,7 +11,7 @@ class LevelProgress {
 
   factory LevelProgress.fromJson(Object? j) {
     if (j is! Map) return LevelProgress();
-    return LevelProgress(completed: j['c'] == true, stars: _int(j['s']).clamp(0, 3), bestScore: _int(j['b']).clamp(0, 1 << 40));
+    return LevelProgress(completed: j['c'] == true, stars: _int(j['s']).clamp(0, 3), bestScore: _int(j['b']).clamp(0, _maxStored));
   }
 }
 
@@ -175,7 +175,7 @@ class SaveData {
       settings: SettingsData.fromJson(j['settings']),
       profile: ProfileData.fromJson(j['profile']),
       tutorialDone: j['tutorial'] == true,
-      coins: _int(j['coins']).clamp(0, 1 << 40),
+      coins: _int(j['coins']).clamp(0, _maxStored),
       boosters: {
         if (boostersJson is Map)
           for (final e in boostersJson.entries)
@@ -185,6 +185,10 @@ class SaveData {
     );
   }
 }
+
+/// Upper bound for stored counters. A literal, not `1 << 40`: on the web
+/// shifts are 32-bit, so that expression evaluates to 0 there.
+const _maxStored = 1000000000000;
 
 int _int(Object? v) => v is int ? v : (v is num ? v.toInt() : 0);
 

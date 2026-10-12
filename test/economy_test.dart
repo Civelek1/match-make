@@ -193,6 +193,16 @@ void main() {
     });
   });
 
+  test('large coin and score values survive a round trip (web ints too)', () async {
+    final w = await _World.create();
+    w.economy.addCoins(5000000000);
+    w.progress.recordWin(content.level('garden')!, 7000000000, 3);
+    await w.store.commit();
+    final w2 = await _World.create(raw: w.repo.raw);
+    expect(w2.economy.coins, w.economy.coins);
+    expect(w2.progress.bestScoreOf('garden'), 7000000000);
+  });
+
   test('corrupt economy fields fall back to defaults', () async {
     const raw = '{"v":3,"coins":"lots","boosters":{"hammer":-4,"broom":"x","shuffle":2,"5":1},"daily":[1,2]}';
     final w = await _World.create(raw: raw);

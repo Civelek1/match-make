@@ -137,6 +137,9 @@ class DailyRewardService extends ChangeNotifier {
 
   DailyRewardService(this._store, this.economy, {DateTime Function()? clock}) : clock = clock ?? DateTime.now;
 
+  /// The calendar pops up by itself at most once per app session.
+  bool promptedThisSession = false;
+
   DailyData get _d => _store.data.daily;
   List<DailyReward> get rewards => economy.config.daily;
 

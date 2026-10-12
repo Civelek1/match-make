@@ -15,6 +15,7 @@ import '../widgets/game_button.dart';
 import '../widgets/game_text.dart';
 import '../widgets/game_widgets.dart';
 import '../widgets/logo.dart';
+import 'daily_reward_panel.dart';
 import 'shop_panel.dart';
 
 class MainMenuScreen extends StatefulWidget {
@@ -29,6 +30,17 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   void initState() {
     super.initState();
     context.services.audio.playMusic(MusicTrack.menu);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptDaily());
+  }
+
+  /// Returning players see the calendar once per session while a reward is
+  /// waiting (never on the very first launch, before any level is played).
+  void _maybePromptDaily() {
+    if (!mounted) return;
+    final s = context.services;
+    if (s.daily.promptedThisSession || !s.daily.canClaim || s.progress.levelsCompleted == 0) return;
+    s.daily.promptedThisSession = true;
+    showDailyReward(context);
   }
 
   @override
@@ -126,7 +138,14 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                           ],
                         ),
                         const SizedBox(height: 6),
-                        LayoutBuilder(builder: (context, c) => MatchMakeLogo(width: min(c.maxWidth * 0.82, 330))),
+                        Stack(
+                          children: [
+                            Center(
+                              child: LayoutBuilder(builder: (context, c) => MatchMakeLogo(width: min(c.maxWidth * 0.7, 330))),
+                            ),
+                            const Positioned(left: 0, top: 6, child: DailyButton()),
+                          ],
+                        ),
                         if (allDone)
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
