@@ -3,7 +3,19 @@
 A match-3 restoration puzzle built with Flutter (Android · iOS · web). Match pieces to
 collect objectives, and watch each location restore itself live above the board.
 
-**Chapter 1 — House:** Garden → Kitchen → Bathroom → Gaming Room → Attic.
+**10 chapters, 50 levels:** House, Farm, Restaurant, Beach Resort, Mansion, Castle,
+Mountain Lodge, Harbor, Museum and Theater (five locations each).
+
+* **Mechanics:** rockets, bombs, colour bombs and their combos; crates, ice and chains;
+  falling **keys** from level 26 (they sink one row per move and are collected at the
+  bottom).
+* **Boosters** (never cost a move): hammer, broom (sweeps a row), shuffle; start boosters
+  pick a rocket, bomb or colour bomb before the first move. Each unlocks at a set level
+  with a free gift.
+* **Economy:** coins from wins and a 7-day daily-reward calendar; spend them in the shop
+  or on +5 moves when a level runs out (300 / 600 / 900 per attempt). All numbers live in
+  `lib/economy/economy_config.dart`. Nothing is sold for real money yet.
+* **Languages:** English and Turkish; a new install starts in the device language.
 
 ## Run
 
@@ -27,7 +39,9 @@ lib/
   app/            composition root (AppServices), navigator/state machine, root + transitions
   data/           LevelData / ChapterData models, ScoringConfig, content registry
     content/      house_chapter.dart  ← all level balancing lives here
-  match3/         pure-Dart engine: board, matching, specials, gravity, cascades, shuffle
+  economy/        EconomyConfig (prices, rewards), EconomyService (coins, boosters),
+                  DailyRewardService (7-day streak calendar)
+  match3/         pure-Dart engine: board, matching, specials, gravity, cascades, keys, shuffle
   game/           LevelSession (moves, score, objectives, win/lose), GameplayController
   restoration/    RestorationState: milestone stages + timing for live restoration
   progression/    ProgressService: unlocks, stars (never downgraded), gallery, chapters
@@ -55,23 +69,27 @@ input is locked, so visuals can never corrupt board state. Objective deltas trav
 each `ClearStep`, fly to the HUD, and feed `RestorationState`, which advances the scene
 at each milestone (25/50/75/100% by default, configurable per objective).
 
-## Adding Chapter 2 (e.g. Farm)
+## Adding a chapter
 
 No engine, save, gallery or navigation changes are needed:
 
-1. **ChapterData + LevelData** — create `lib/data/content/farm_chapter.dart` (copy the
-   House file). Set `requiresChapterId: 'house'` and chain `unlockRequirement`s.
+1. **ChapterData + LevelData** — create `lib/data/content/<id>_chapter.dart` (copy
+   `theater_chapter.dart`). Set `requiresChapterId` to the previous chapter and chain
+   `unlockRequirement`s. A key objective is `ObjectiveData(tileTypeId: 'key', ...)`; its
+   target is also how many keys the level spawns.
 2. **Register** — add the chapter and levels in `GameContent.standard()`, and lower
    `comingSoonChapters` if you like.
 3. **Tile types** — add any new tile ids to `tileVisuals` in `ui/art/tile_art.dart`
-   (icon + shape slot; keep the slots within a level distinct).
-4. **Restoration scenes** — implement a `SceneArt` per location (anchors per objective)
-   and register it in `ui/scenes/scene_art.dart`; add a `ChapterMapArt` for the chapter
-   map in `ui/scenes/house_map_art.dart`'s `chapterMapArtFor`.
-5. **Theme** — add an `EnvironmentTheme` entry per environment id in `game_colors.dart`.
-6. **Strings** — add `chapter.farm`, `level.<id>`, `level.<id>.desc`, `obj.<id>` to both
+   (icon + shape slot; the six pieces of a level must use six different slots).
+4. **Restoration scenes** — add a `PropScene` per location (props per objective id) to
+   `ui/scenes/chapter_scenes_2.dart`; add a `LocationMapArt` (landmark style + five
+   spots) in `ui/scenes/location_map_art.dart` and map it in `chapterMapArtFor`.
+5. **Theme** — add an `EnvironmentTheme` entry per environment id in `game_colors.dart`,
+   and a chapter icon in `chapter_icons.dart`.
+6. **Strings** — add `chapter.<id>`, `level.<id>`, `level.<id>.desc`, `obj.<id>` to both
    string files (a test fails if a key is missing).
-7. Run `flutter test` — the balance test automatically bot-plays new levels.
+7. Run `flutter test` — the balance test bot-plays every level 100 times; add a win-rate
+   floor for each new level in `test/level_balance_test.dart`.
 
 ## Replacing placeholder assets
 

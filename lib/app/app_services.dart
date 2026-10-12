@@ -38,6 +38,9 @@ class AppServices {
   final RewardsService rewards;
   final GameNavigator navigator;
 
+  /// Device languages in preference order (injectable for tests).
+  final List<String> Function() deviceLanguages;
+
   AppServices._({
     required this.content,
     required this.store,
@@ -52,9 +55,15 @@ class AppServices {
     required this.leaderboard,
     required this.rewards,
     required this.navigator,
+    required this.deviceLanguages,
   });
 
-  factory AppServices.create({SaveRepository? repository, AudioService? audio, DateTime Function()? clock}) {
+  factory AppServices.create({
+    SaveRepository? repository,
+    AudioService? audio,
+    DateTime Function()? clock,
+    List<String> Function()? deviceLanguages,
+  }) {
     final content = GameContent.standard();
     final store = SaveStore(repository ?? LocalSaveRepository());
     final progress = ProgressService(content, store);
@@ -76,11 +85,16 @@ class AppServices {
       leaderboard: MockLeaderboardService(),
       rewards: const DisabledRewardsService(),
       navigator: GameNavigator(),
+      deviceLanguages: deviceLanguages ?? () => [for (final l in PlatformDispatcher.instance.locales) l.languageCode],
     );
   }
 
   Future<void> load() async {
     await store.load();
+    // A new install starts in the device language when we support it.
+    if (store.firstLaunch) {
+      settings.language = deviceLanguages().firstWhere(Localization.supported.containsKey, orElse: () => 'en');
+    }
     loc.language = settings.language;
     economy.ensureStarterPack();
     progress.refresh();

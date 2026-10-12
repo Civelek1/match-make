@@ -9,7 +9,10 @@ class LoadResult {
 
   /// True when the primary save was unreadable and a backup/default was used.
   final bool recovered;
-  const LoadResult(this.data, {this.recovered = false});
+
+  /// True when no save existed at all (a brand-new install).
+  final bool firstLaunch;
+  const LoadResult(this.data, {this.recovered = false, this.firstLaunch = false});
 }
 
 /// Storage abstraction. A CloudSaveRepository can implement the same contract
@@ -42,7 +45,7 @@ class LocalSaveRepository implements SaveRepository {
     final hadPrimary = prefs.containsKey(_key);
     final backup = _decode(prefs.getString(_backupKey));
     if (backup != null) return LoadResult(backup, recovered: true);
-    return LoadResult(SaveData(), recovered: hadPrimary);
+    return LoadResult(SaveData(), recovered: hadPrimary, firstLaunch: !hadPrimary);
   }
 
   SaveData? _decode(String? raw) {
@@ -86,7 +89,7 @@ class MemorySaveRepository implements SaveRepository {
 
   @override
   Future<LoadResult> load() async {
-    if (raw == null) return LoadResult(SaveData());
+    if (raw == null) return LoadResult(SaveData(), firstLaunch: true);
     try {
       return LoadResult(SaveData.fromJson(jsonDecode(raw!)));
     } catch (_) {

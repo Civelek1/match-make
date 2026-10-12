@@ -7,6 +7,7 @@ class SaveStore {
   final SaveRepository repository;
   SaveData data;
   bool recoveredOnLoad = false;
+  bool firstLaunch = false;
   Future<void> _pending = Future.value();
 
   SaveStore(this.repository) : data = SaveData();
@@ -15,6 +16,7 @@ class SaveStore {
     final r = await repository.load();
     data = r.data;
     recoveredOnLoad = r.recovered;
+    firstLaunch = r.firstLaunch;
   }
 
   /// Serialises writes so rapid commits can't interleave.
