@@ -58,7 +58,7 @@ class _DebugPanel extends StatelessWidget {
                             }
                           }),
                           _chip('Reset Save', () async {
-                            await s.progress.resetProgress();
+                            await s.resetProgress();
                             if (context.mounted) showGameToast(context, 'Save reset');
                           }),
                           if (s.leaderboard is MockLeaderboardService)

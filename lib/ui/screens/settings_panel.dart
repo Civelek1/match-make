@@ -125,8 +125,7 @@ class SettingsPanel extends StatelessWidget {
       cancelLabel: s.loc.t('common.cancel'),
     );
     if (!ok) return;
-    await s.progress.resetProgress();
-    s.settings.reload();
+    await s.resetProgress();
     if (context.mounted) {
       showGameToast(context, s.loc.t('settings.reset_done'), icon: Icons.check_circle_rounded);
     }

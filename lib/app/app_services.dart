@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../audio/audio_service.dart';
 import '../data/content/game_content.dart';
+import '../economy/economy_service.dart';
 import '../haptics/haptics_service.dart';
 import '../leaderboard/leaderboard_service.dart';
 import '../localization/localization.dart';
@@ -26,6 +27,8 @@ class AppServices {
   final GameContent content;
   final SaveStore store;
   final ProgressService progress;
+  final EconomyService economy;
+  final DailyRewardService daily;
   final SettingsService settings;
   final ProfileService profile;
   final Localization loc;
@@ -39,6 +42,8 @@ class AppServices {
     required this.content,
     required this.store,
     required this.progress,
+    required this.economy,
+    required this.daily,
     required this.settings,
     required this.profile,
     required this.loc,
@@ -49,16 +54,20 @@ class AppServices {
     required this.navigator,
   });
 
-  factory AppServices.create({SaveRepository? repository, AudioService? audio}) {
+  factory AppServices.create({SaveRepository? repository, AudioService? audio, DateTime Function()? clock}) {
     final content = GameContent.standard();
     final store = SaveStore(repository ?? LocalSaveRepository());
+    final progress = ProgressService(content, store);
+    final economy = EconomyService(store, content, progress);
     final settings = SettingsService(store);
     final loc = Localization();
     settings.addListener(() => loc.language = settings.language);
     return AppServices._(
       content: content,
       store: store,
-      progress: ProgressService(content, store),
+      progress: progress,
+      economy: economy,
+      daily: DailyRewardService(store, economy, clock: clock),
       settings: settings,
       profile: ProfileService(store),
       loc: loc,
@@ -73,8 +82,20 @@ class AppServices {
   Future<void> load() async {
     await store.load();
     loc.language = settings.language;
+    economy.ensureStarterPack();
     progress.refresh();
     settings.reload();
+    economy.reload();
+    daily.reload();
+  }
+
+  /// Clears progression, coins and boosters; keeps settings and profile.
+  Future<void> resetProgress() async {
+    await progress.resetProgress();
+    economy.ensureStarterPack();
+    settings.reload();
+    economy.reload();
+    daily.reload();
   }
 
   String playerName() => profile.name.isEmpty ? loc.t('common.default_name') : profile.name;

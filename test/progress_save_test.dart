@@ -89,7 +89,7 @@ void main() {
     // Saving upgrades the format without losing anything.
     p.markTipSeen('obstacle_crate');
     await store.commit();
-    expect(repo.raw, contains('"v":2'));
+    expect(repo.raw, contains('"v":3'));
     final (p2, _, _) = await fresh(repo.raw);
     expect(p2.chapterStars(content.chapter('house')!), 11);
     expect(p2.hasSeenTip('obstacle_crate'), isTrue);

@@ -12,6 +12,7 @@ import '../art/tile_art.dart';
 import '../screens/settings_panel.dart';
 import '../theme/game_colors.dart';
 import '../widgets/confetti.dart';
+import '../widgets/economy_widgets.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
 import '../widgets/game_text.dart';
@@ -554,6 +555,11 @@ class WinOverlay extends StatelessWidget {
                   builder: (context, v, _) =>
                       GameText('${v.round()}', size: 36, color: Colors.white, stroke: GameColors.purpleDark),
                 ),
+                if (c.coinsEarned > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: CoinReward(amount: c.coinsEarned, size: 28),
+                  ),
                 if (o.newBest && !o.firstCompletion)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),

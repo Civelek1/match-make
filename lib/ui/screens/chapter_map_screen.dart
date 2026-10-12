@@ -11,6 +11,7 @@ import '../art/paint_kit.dart';
 import '../scenes/house_map_art.dart';
 import '../theme/chapter_icons.dart';
 import '../theme/game_colors.dart';
+import '../widgets/economy_widgets.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
 import '../widgets/game_text.dart';
@@ -115,6 +116,10 @@ class _ChapterMapScreenState extends State<ChapterMapScreen> {
                         CounterChip(icon: Icons.star_rounded, text: '${s.progress.chapterStars(chapter)}/${chapter.maxStars}'),
                       ],
                     ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(12, 6, 12, 0),
+                    child: Align(alignment: Alignment.centerRight, child: CoinChip()),
                   ),
                   const Spacer(),
                   _chapterStrip(context, chapter),

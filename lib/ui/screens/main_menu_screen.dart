@@ -10,6 +10,7 @@ import '../scenes/house_map_art.dart';
 import '../theme/chapter_icons.dart';
 import '../theme/game_colors.dart';
 import '../widgets/confetti.dart';
+import '../widgets/economy_widgets.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_text.dart';
 import '../widgets/game_widgets.dart';
@@ -78,29 +79,36 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            Pressable(
-                              onTap: () => s.navigator.go(AppScreen.profile, style: TransitionStyle.slideUp),
-                              child: Container(
-                                padding: const EdgeInsets.fromLTRB(4, 4, 14, 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.35),
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 2),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ProfileAvatar(avatarId: s.profile.avatarId, size: 40),
-                                    const SizedBox(width: 8),
-                                    ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 130),
-                                      child: GameText(s.playerName(), size: 16, strokeWidth: 3, maxLines: 1),
+                            Flexible(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Pressable(
+                                  onTap: () => s.navigator.go(AppScreen.profile, style: TransitionStyle.slideUp),
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(4, 4, 14, 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.35),
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 2),
                                     ),
-                                  ],
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ProfileAvatar(avatarId: s.profile.avatarId, size: 40),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: ConstrainedBox(
+                                            constraints: const BoxConstraints(maxWidth: 130),
+                                            child: GameText(s.playerName(), size: 16, strokeWidth: 3, maxLines: 1),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                            const Spacer(),
+                            const SizedBox(width: 8),
                             if (kDebugTools)
                               Padding(
                                 padding: const EdgeInsets.only(right: 8),
@@ -111,6 +119,8 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                   onTap: () => showDebugPanel(context),
                                 ),
                               ),
+                            const CoinChip(),
+                            const SizedBox(width: 8),
                             CounterChip(icon: Icons.star_rounded, text: '${s.progress.totalStars}'),
                           ],
                         ),
@@ -206,12 +216,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: GameColors.inkSoft,
-                        fontSize: 11,
-                        letterSpacing: 1.5,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w900, color: GameColors.inkSoft, fontSize: 11, letterSpacing: 1.5),
                     ),
                     Text(
                       name,
@@ -275,8 +280,7 @@ class _PulsingPlay extends StatefulWidget {
 }
 
 class _PulsingPlayState extends State<_PulsingPlay> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))
-    ..repeat(reverse: true);
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat(reverse: true);
 
   @override
   void dispose() {

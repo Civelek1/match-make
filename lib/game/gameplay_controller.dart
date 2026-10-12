@@ -54,6 +54,9 @@ class GameplayController extends ChangeNotifier implements BoardListener {
 
   PlayPhase phase = PlayPhase.intro;
   WinOutcome? outcome;
+
+  /// Coins granted for this win (shown on the result card).
+  int coinsEarned = 0;
   int displayScore = 0;
 
   /// -1 = no tutorial; 0 = make the move; 1 = objectives; 2 = scene.
@@ -309,6 +312,7 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     if (_disposed) return;
     board.timeScale = 1;
     outcome = services.progress.recordWin(level, session.finalScore, session.stars);
+    coinsEarned = services.economy.grantWinReward(outcome!);
     if (outcome!.firstCompletion) services.audio.play(Sfx.galleryUnlock);
     phase = PlayPhase.won;
     notifyListeners();
