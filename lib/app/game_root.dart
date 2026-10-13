@@ -29,6 +29,8 @@ class MatchMakeApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF9A3C)),
           splashFactory: NoSplash.splashFactory,
         ),
+        // Very large system text breaks the game's fixed-size HUD pieces.
+        builder: (context, child) => MediaQuery.withClampedTextScaling(maxScaleFactor: 1.15, child: child!),
         home: const GameRoot(),
       ),
     );

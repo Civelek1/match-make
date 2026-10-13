@@ -25,6 +25,7 @@ class _ChapterCompleteScreenState extends State<ChapterCompleteScreen> {
   void initState() {
     super.initState();
     final s = context.services;
+    s.audio.playMusic(MusicTrack.menu);
     s.audio.play(Sfx.levelComplete);
     s.haptics.success();
     s.progress.markChapterCelebrated(widget.chapterId);

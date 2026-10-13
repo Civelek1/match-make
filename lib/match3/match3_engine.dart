@@ -169,6 +169,9 @@ class Match3Engine {
         return;
       }
     }
+    // Out of attempts: keep the last board but make it playable.
+    _placeInitialDrops();
+    if (findAnyMove() == null) _shuffle();
   }
 
   /// Seeds the top row with the first keys (up to [maxDropsOnBoard]).
@@ -384,6 +387,14 @@ class Match3Engine {
 
   /// Debug / dead-board shuffle.
   ShuffleStep shuffle() => _shuffle();
+
+  /// Shuffle plus, in the rare last-resort case, the chain stages it had to
+  /// release — reported as hits so chain objectives stay completable.
+  List<BoardStep> shuffleSteps() => [
+    _shuffle(),
+    if (_released.isNotEmpty)
+      ClearStep(cleared: const [], created: const [], effects: const [], collected: const {}, score: 0, cascade: 0, obstacleHits: _released),
+  ];
 
   // ---------------------------------------------------------------------------
   // Resolution
@@ -610,7 +621,7 @@ class Match3Engine {
       steps.add(sink);
       _cascade(steps, null, const {});
     }
-    if (findAnyMove() == null) steps.add(_shuffle());
+    if (findAnyMove() == null) steps.addAll(shuffleSteps());
     return steps;
   }
 
@@ -810,7 +821,10 @@ class Match3Engine {
     return FallStep(moves, spawns);
   }
 
+  List<ObstacleHit> _released = const [];
+
   ShuffleStep _shuffle() {
+    _released = const [];
     // Only free pieces are shuffled; crates, chained pieces and keys stay put.
     final cells = [
       for (final p in board.positions)
@@ -843,9 +857,16 @@ class Match3Engine {
     }
     if (!ok) {
       // Last resort so a board can never dead-lock: release all chains.
+      final hits = <ObstacleHit>[];
       for (final p in board.positions) {
-        board.atPos(p)?.chain = 0;
+        final t = board.atPos(p);
+        if (t == null) continue;
+        for (var left = t.chain - 1; left >= 0; left--) {
+          hits.add(ObstacleHit(ObstacleKind.chain, p, left, tileId: t.id));
+        }
+        t.chain = 0;
       }
+      _released = hits;
     }
     return ShuffleStep([
       for (final p in board.positions)

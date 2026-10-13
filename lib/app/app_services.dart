@@ -20,6 +20,10 @@ const bool kDebugTools = kDebugMode || bool.fromEnvironment('MM_DEBUG');
 
 const String kGameVersion = '1.0.0';
 
+/// The leaderboard screen runs on [MockLeaderboardService] (sample players).
+/// Keep it off the main menu until a real backend is connected.
+const bool kLeaderboardEnabled = false;
+
 /// Composition root: every service is created here and passed down via
 /// [AppScope]. Swapping implementations (cloud save, real leaderboard) is a
 /// one-line change in [AppServices.create].

@@ -167,8 +167,11 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
                 final scoreBar = boosters.isEmpty ? 40.0 : 58.0;
                 const topBar = 64.0, objectives = 70.0, gaps = 18.0;
                 final rest = cons.maxHeight - topBar - objectives - scoreBar - gaps;
-                final boardSize = min(width - 12, rest * 0.66).clamp(200.0, 680.0);
-                final sceneH = max(120.0, rest - boardSize);
+                var boardSize = min(width - 12, rest * 0.66).clamp(200.0, 680.0);
+                // Short screens: give up board size before the column overflows.
+                if (rest - boardSize < 120) boardSize = max(160.0, rest - 120);
+                boardSize = min(boardSize, max(0.0, rest));
+                final sceneH = max(0.0, rest - boardSize);
                 return Center(
                   child: SizedBox(
                     width: width,
@@ -254,6 +257,14 @@ class _GameplayScreenState extends State<GameplayScreen> with WidgetsBindingObse
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 280),
+              // A fading-out card must not take taps (double-tapped buttons).
+              layoutBuilder: (current, previous) => Stack(
+                alignment: Alignment.center,
+                children: [
+                  for (final p in previous) IgnorePointer(child: p),
+                  ?current,
+                ],
+              ),
               transitionBuilder: (child, anim) => FadeTransition(
                 opacity: anim,
                 child: ScaleTransition(scale: Tween(begin: 0.92, end: 1.0).animate(anim), child: child),

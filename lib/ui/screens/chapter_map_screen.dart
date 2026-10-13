@@ -198,8 +198,10 @@ class _ChapterMapScreenState extends State<ChapterMapScreen> {
           ),
         ),
     ];
+    // Grows with the system text size so the card text never clips.
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
     return SizedBox(
-      height: 86,
+      height: 86 * max(1.0, textScale),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -95,7 +95,9 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 28),
+                const GameText('CiTu Studios', size: 14, strokeWidth: 3),
+                const SizedBox(height: 16),
               ],
             );
           },

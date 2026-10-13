@@ -62,8 +62,11 @@ void main() {
     services.navigator.back();
     await run(t, 0.9);
 
-    // Leaderboard loads mock data, and handles offline.
-    await tapText(t, 'RANKS');
+    // The mock leaderboard stays off the menu until a real backend exists,
+    // but the screen still loads data and handles offline.
+    expect(find.text('RANKS'), kLeaderboardEnabled ? findsWidgets : findsNothing);
+    services.navigator.go(AppScreen.leaderboard);
+    await run(t, 0.9);
     expect(find.byType(LeaderboardScreen), findsOneWidget);
     await run(t, 1);
     expect(find.textContaining('(YOU)'), findsWidgets);
@@ -136,5 +139,23 @@ void main() {
     services.navigator.go(AppScreen.playing, arg: 'entrance', force: true);
     await run(t, 1.5);
     expect(find.byType(GameplayScreen), findsNothing);
+  });
+
+  testWidgets('a name typed on the profile screen is kept when leaving with Back', (t) async {
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+
+    final services = AppServices.create(repository: MemorySaveRepository(), audio: SilentAudioService());
+    await t.pumpWidget(MatchMakeApp(services: services));
+    await run(t, 3.5);
+    services.navigator.go(AppScreen.profile);
+    await run(t, 0.9);
+    await t.enterText(find.byType(TextField), 'Ayşe');
+    await run(t, 0.2);
+    services.navigator.back();
+    await run(t, 0.9);
+    expect(services.profile.name, 'Ayşe');
+    expect(t.takeException(), isNull);
   });
 }

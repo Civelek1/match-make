@@ -1,4 +1,4 @@
-package com.matchmake.match_make
+package com.citustudios.matchmake
 
 import io.flutter.embedding.android.FlutterActivity
 

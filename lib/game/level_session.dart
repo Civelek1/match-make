@@ -96,7 +96,7 @@ class LevelSession {
   /// Shuffle booster. Never costs a move.
   TurnResult? useShuffle() {
     if (!isPlaying) return null;
-    return TurnResult([engine.shuffle()], false, const {});
+    return _consume(engine.shuffleSteps(), costsMove: false);
   }
 
   /// Start boosters: places specials before the first move.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../app/game_navigator.dart';
+import '../art/app_icon_art.dart';
 import '../theme/game_colors.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
@@ -89,10 +90,12 @@ class SettingsPanel extends StatelessWidget {
     );
   }
 
+  // MergeSemantics: screen readers announce "Music, on" instead of just "on".
   Widget _row(IconData icon, String label, Widget control) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      children: [
+    child: MergeSemantics(
+      child: Row(
+        children: [
         Container(
           width: 38,
           height: 38,
@@ -110,8 +113,9 @@ class SettingsPanel extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: GameColors.ink),
           ),
         ),
-        control,
-      ],
+          control,
+        ],
+      ),
     ),
   );
 
@@ -147,11 +151,23 @@ class SettingsPanel extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const GameText('MATCH MAKE', size: 30, color: GameColors.gold),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: const CustomPaint(size: Size(96, 96), painter: AppIconPainter()),
+                  ),
                   const SizedBox(height: 10),
+                  const GameText('MATCH MAKE', size: 30, color: GameColors.gold),
+                  GameText(s.loc.t('settings.studio'), size: 15, strokeWidth: 3),
+                  const SizedBox(height: 12),
                   BodyText(s.loc.t('settings.about_text')),
                   const SizedBox(height: 10),
-                  BodyText(s.loc.t('settings.version', {'v': kGameVersion}), color: GameColors.inkSoft, size: 13),
+                  BodyText(s.loc.t('settings.privacy'), color: GameColors.inkSoft, size: 13),
+                  const SizedBox(height: 10),
+                  BodyText(
+                    '${s.loc.t('settings.version', {'v': kGameVersion})} · © 2026 CiTu Studios',
+                    color: GameColors.inkSoft,
+                    size: 13,
+                  ),
                 ],
               ),
             ),

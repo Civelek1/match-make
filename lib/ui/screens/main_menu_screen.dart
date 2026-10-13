@@ -174,15 +174,17 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Expanded(
-                              child: _MenuTile(
-                                icon: Icons.emoji_events_rounded,
-                                label: loc.t('menu.leaderboard'),
-                                tone: ButtonTone.orange,
-                                onTap: () => s.navigator.go(AppScreen.leaderboard, style: TransitionStyle.slideUp),
+                            if (kLeaderboardEnabled) ...[
+                              Expanded(
+                                child: _MenuTile(
+                                  icon: Icons.emoji_events_rounded,
+                                  label: loc.t('menu.leaderboard'),
+                                  tone: ButtonTone.orange,
+                                  onTap: () => s.navigator.go(AppScreen.leaderboard, style: TransitionStyle.slideUp),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
+                              const SizedBox(width: 10),
+                            ],
                             Expanded(
                               child: _MenuTile(
                                 icon: Icons.photo_library_rounded,

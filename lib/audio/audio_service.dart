@@ -56,6 +56,11 @@ class GameAudioService implements AudioService {
   GameAudioService(this.settings) {
     settings.addListener(_onSettings);
     try {
+      // Don't request audio focus: otherwise every sound effect takes focus
+      // from the music player (which then pauses) and from other apps.
+      unawaited(
+        _safe(() => AudioPlayer.global.setAudioContext(AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers).build())),
+      );
       for (var i = 0; i < 6; i++) {
         _sfxPool.add(AudioPlayer()..setReleaseMode(ReleaseMode.stop));
       }

@@ -685,7 +685,8 @@ class WinOverlay extends StatelessWidget {
     final loc = s.loc;
     final o = c.outcome!;
     final level = c.level;
-    final last = s.content.isLastInChapter(level.id);
+    // The chapter celebration only follows the win that completes the chapter.
+    final last = s.content.isLastInChapter(level.id) && o.chapterCompletedNow;
     final next = s.content.nextLevel(level.id);
     return Stack(
       children: [

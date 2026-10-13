@@ -420,6 +420,9 @@ class GameplayController extends ChangeNotifier implements BoardListener {
 
   Future<void> _celebrateWin() async {
     phase = PlayPhase.celebrating;
+    // Save the win first: the app may be closed during the celebration.
+    outcome = services.progress.recordWin(level, session.finalScore, session.stars);
+    coinsEarned = services.economy.grantWinReward(outcome!);
     notifyListeners();
     restoration.completeAll();
     board.timeScale = 0.6;
@@ -431,8 +434,6 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     await Future<void>.delayed(const Duration(milliseconds: 1700));
     if (_disposed) return;
     board.timeScale = 1;
-    outcome = services.progress.recordWin(level, session.finalScore, session.stars);
-    coinsEarned = services.economy.grantWinReward(outcome!);
     if (outcome!.firstCompletion) services.audio.play(Sfx.galleryUnlock);
     phase = PlayPhase.won;
     notifyListeners();

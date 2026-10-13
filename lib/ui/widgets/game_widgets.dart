@@ -245,7 +245,7 @@ class LanguageSelector extends StatelessWidget {
               onTap: () => onChanged(code),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 decoration: BoxDecoration(
                   color: value == code ? GameColors.blue : Colors.white,
                   borderRadius: BorderRadius.circular(14),

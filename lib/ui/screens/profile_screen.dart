@@ -16,25 +16,33 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late final TextEditingController _name = TextEditingController(text: context.services.profile.name);
+  // Kept from initState: dispose() can't look up inherited services.
+  late final _profile = context.services.profile;
+  late final TextEditingController _name = TextEditingController(text: _profile.name);
   final _focus = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    _profile;
     _focus.addListener(() {
       if (!_focus.hasFocus) _commit();
     });
   }
 
   void _commit() {
-    final p = context.services.profile;
-    if (_name.text.trim() != p.name) p.name = _name.text;
+    if (_name.text.trim() != _profile.name) _profile.name = _name.text;
   }
 
   @override
   void dispose() {
-    _commit();
+    // Listeners rebuild widgets, which isn't allowed while the tree is being
+    // torn down: save right after this frame instead.
+    final name = _name.text;
+    final profile = _profile;
+    Future.microtask(() {
+      if (name.trim() != profile.name) profile.name = name;
+    });
     _name.dispose();
     _focus.dispose();
     super.dispose();

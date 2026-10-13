@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../app/app_services.dart';
 import '../theme/game_colors.dart';
 import 'game_button.dart';
 import 'game_text.dart';
@@ -63,7 +64,13 @@ class GamePanel extends StatelessWidget {
             Positioned(
               top: title == null ? -12 : 8,
               right: -10,
-              child: GameIconButton(icon: Icons.close_rounded, tone: ButtonTone.red, size: 44, onTap: onClose),
+              child: GameIconButton(
+                icon: Icons.close_rounded,
+                tone: ButtonTone.red,
+                size: 44,
+                semanticLabel: context.services.loc.t('common.close'),
+                onTap: onClose,
+              ),
             ),
         ],
       ),

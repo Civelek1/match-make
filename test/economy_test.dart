@@ -166,6 +166,22 @@ void main() {
       expect(w.daily.isCollected(0), isTrue);
     });
 
+    test('turning the clock back gives no extra rewards and keeps the streak', () async {
+      final w = await _World.create();
+      w.daily.claim();
+      w.now = DateTime(2026, 3, 11, 9);
+      w.daily.claim();
+      final coins = w.economy.coins;
+      w.now = DateTime(2026, 3, 10, 9); // clock moved back a day
+      expect(w.daily.canClaim, isFalse);
+      expect(w.daily.claim(), isNull);
+      w.now = DateTime(2026, 3, 11, 20);
+      expect(w.daily.claim(), isNull);
+      expect(w.economy.coins, coins);
+      w.now = DateTime(2026, 3, 12, 9);
+      expect(w.daily.todayIndex, 2, reason: 'the streak continues');
+    });
+
     test('day 7 loops back to day 1 and state survives reload', () async {
       final w = await _World.create();
       for (var d = 0; d < 7; d++) {

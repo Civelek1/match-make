@@ -148,7 +148,9 @@ class DailyRewardService extends ChangeNotifier {
 
   int get _today => dayNumber(clock());
 
-  bool get canClaim => _d.lastDay != _today;
+  /// Only a later day unlocks the next claim, so turning the clock back (or
+  /// flying west) can't hand out extra rewards or break the streak.
+  bool get canClaim => _today > _d.lastDay;
 
   bool get _continuing => _d.lastDay == _today - 1;
 
