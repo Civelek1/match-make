@@ -354,14 +354,47 @@ void paintTile(Canvas canvas, Rect r, TileVisual v, SpecialKind special) {
       ..strokeWidth = r.width * 0.045
       ..color = _darken(color, 0.35),
   );
-  // Gloss.
+  // Inner volume: a soft shade pooling at the bottom, a glossy cap on top
+  // and a bright specular spot where the key light (upper left) hits.
+  final b = shape.getBounds();
   canvas.save();
   canvas.clipPath(shape);
+  canvas.drawRect(
+    b,
+    Paint()
+      ..shader = ui.Gradient.linear(
+        b.topCenter,
+        b.bottomCenter,
+        [Colors.transparent, Colors.transparent, _darken(color, 0.45).withValues(alpha: 0.45)],
+        const [0, 0.55, 1],
+      ),
+  );
   canvas.drawOval(
-    Rect.fromLTWH(r.left + r.width * 0.2, r.top + r.height * 0.1, r.width * 0.6, r.height * 0.3),
-    Paint()..color = Colors.white.withValues(alpha: 0.38),
+    Rect.fromLTWH(b.left + b.width * 0.16, b.top + b.height * 0.06, b.width * 0.68, b.height * 0.36),
+    Paint()
+      ..shader = ui.Gradient.linear(
+        b.topCenter,
+        Offset(b.center.dx, b.top + b.height * 0.42),
+        [Colors.white.withValues(alpha: 0.55), Colors.white.withValues(alpha: 0.05)],
+      ),
   );
   canvas.restore();
+  canvas.drawOval(
+    Rect.fromCenter(center: b.topLeft + Offset(b.width * 0.3, b.height * 0.22), width: b.width * 0.16, height: b.height * 0.1),
+    Paint()..color = Colors.white.withValues(alpha: 0.85),
+  );
+  // Rim light along the upper edge.
+  canvas.drawPath(
+    shape,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = r.width * 0.022
+      ..shader = ui.Gradient.linear(
+        b.topCenter,
+        b.center,
+        [Colors.white.withValues(alpha: 0.7), Colors.white.withValues(alpha: 0)],
+      ),
+  );
 
   if (special.isRocket) {
     _paintRocketStripes(canvas, r, shape, special == SpecialKind.rocketH);

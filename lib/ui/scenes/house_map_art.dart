@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../art/lighting.dart';
 import '../art/paint_kit.dart';
 import 'location_map_art.dart';
 
@@ -373,7 +374,15 @@ class _MapPainter extends CustomPainter {
   _MapPainter(this.art, this.completed, this.t, this.celebrate) : super(repaint: t);
 
   @override
-  void paint(Canvas canvas, Size size) => art.paint(canvas, size, completed, t.value, celebrate: celebrate);
+  void paint(Canvas canvas, Size size) {
+    // Maps use a 360×640 design space: buildings recede toward its middle.
+    final vp = Pk.vanish;
+    Pk.vanish = const Offset(180, 260);
+    art.paint(canvas, size, completed, t.value, celebrate: celebrate);
+    Pk.vanish = vp;
+    final total = art.nodes.length;
+    Lighting.gradeRect(canvas, Offset.zero & size, total == 0 ? 0 : completed.length / total);
+  }
 
   @override
   bool shouldRepaint(_MapPainter old) => old.completed.length != completed.length || old.art != art || old.celebrate != celebrate;

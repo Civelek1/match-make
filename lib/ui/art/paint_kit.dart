@@ -21,12 +21,51 @@ class Pk {
   static Color light(Color c, [double t = 0.25]) => Color.lerp(c, Colors.white, t)!;
   static Color alpha(Color c, double a) => c.withValues(alpha: (c.a * a).clamp(0.0, 1.0));
 
-  /// Vertical-gradient rounded rect with optional outline.
+  /// Rounded box lit from above: a bright bevel along the top edge, the base
+  /// colour, then a darker bottom. Corners round with the box size so large
+  /// furniture never looks sharp-edged.
+  ///
+  /// Boxes big enough to read as furniture or buildings are extruded toward
+  /// [vanish], so their side (and, below the vanishing point, top) faces
+  /// show: a light one-point perspective that makes the scene feel 3D.
   static void box(Canvas c, Rect r, Color top, {Color? bottom, double radius = 3, Color? outline, double ow = 1.5}) {
-    final rr = RRect.fromRectAndRadius(r, Radius.circular(radius));
-    c.drawRRect(rr, Paint()..shader = ui.Gradient.linear(r.topCenter, r.bottomCenter, [top, bottom ?? dark(top, 0.15)]));
+    final rad = max(radius, min(r.width, r.height) * 0.12).clamp(0.0, min(r.width, r.height) / 2);
+    final rr = RRect.fromRectAndRadius(r, Radius.circular(rad));
+    final depth = min(r.width, r.height) >= 22 ? (min(r.width, r.height) * 0.11).clamp(0.0, 7.0) : 0.0;
+    if (depth > 0) {
+      final toVp = vanish - r.center;
+      final len = toVp.distance;
+      if (len > 1) {
+        // Sweep the rounded box toward the vanishing point: smooth sides,
+        // no corner spikes.
+        final s = toVp / len * depth;
+        final side = Paint()..color = dark(bottom ?? top, 0.32);
+        const steps = 5;
+        for (var i = steps; i >= 1; i--) {
+          c.drawRRect(rr.shift(s * (i / steps)), side);
+        }
+        if (s.dy < 0) {
+          // Top face, lit by the key light: the swept part above the box.
+          c.save();
+          c.clipRect(Rect.fromLTRB(r.left - depth, r.top + s.dy - 1, r.right + depth, r.top + rad));
+          final lit = Paint()..color = light(top, 0.22);
+          for (var i = steps; i >= 1; i--) {
+            c.drawRRect(rr.shift(s * (i / steps)), lit);
+          }
+          c.restore();
+        }
+      }
+    }
+    c.drawRRect(
+      rr,
+      Paint()
+        ..shader = ui.Gradient.linear(r.topCenter, r.bottomCenter, [light(top, 0.16), top, bottom ?? dark(top, 0.2)], const [0, 0.22, 1]),
+    );
     if (outline != null) c.drawRRect(rr, stroke(outline, ow));
   }
+
+  /// Vanishing point used by [box] extrusion (scene design space).
+  static Offset vanish = const Offset(200, 96);
 
   static void gradientRect(Canvas c, Rect r, Color top, Color bottom) {
     c.drawRect(r, Paint()..shader = ui.Gradient.linear(r.topCenter, r.bottomCenter, [top, bottom]));

@@ -22,6 +22,12 @@ enum PK {
   banner, torch, snowman, sailboat, anchor, column, spotlight,
 }
 
+/// Light sources: their glow must not be shaded like a solid object.
+const emissiveProps = {
+  PK.chandelier, PK.pendant, PK.lantern, PK.floorLamp, PK.lamppost, PK.torch, PK.spotlight, PK.stringLights,
+  PK.neonSign, PK.discoBall, PK.stage, PK.champagneTower, PK.fountain, PK.poolWater, PK.hotTub, PK.shoreline,
+};
+
 /// Props hung on walls pop from their centre; everything else grows from the floor.
 const wallProps = {
   PK.window, PK.curtains, PK.painting, PK.shelf, PK.pendant, PK.chandelier, PK.screen, PK.bottleShelf,

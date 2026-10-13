@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../../restoration/restoration_state.dart';
+import '../art/lighting.dart';
 import '../art/paint_kit.dart';
 import 'attic_scene.dart';
 import 'bathroom_scene.dart';
@@ -235,6 +236,7 @@ class _ScenePainter extends CustomPainter {
     if (art != null) {
       try {
         art!.paint(canvas, f);
+        Lighting.grade(canvas, f.overall);
       } catch (e) {
         // Broken art must never break the level; show a neutral backdrop.
         canvas.drawRect(Offset.zero & ds, Paint()..color = const Color(0xFFB9E4F5));

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../art/lighting.dart';
 import '../art/paint_kit.dart';
 import 'prop_kit.dart';
 import 'room_kit.dart';
@@ -123,6 +124,7 @@ class Backdrop {
           c.drawLine(Offset(i * 55.0, horizon), Offset(i * 55.0 - 30, 240), Pk.stroke(Colors.black.withValues(alpha: 0.08), 1.5));
         }
       }
+      Lighting.outdoor(c, horizon, ov);
       return;
     }
     RoomKit.backWall(c, horizon, Pk.mix(topN, topR, ov), Pk.dark(Pk.mix(topN, topR, ov), 0.08));
@@ -144,6 +146,7 @@ class Backdrop {
       case FloorStyle.stone:
         Pk.gradientRect(c, floorRect, fa, fb);
     }
+    Lighting.room(c, horizon, Pk.mix(topN, topR, ov), ov);
   }
 
   /// Dirt, weeds, cobwebs and dust that fade as the location is restored.
@@ -200,6 +203,18 @@ class PropScene extends SceneArt {
         return px.r.bottom.compareTo(py.r.bottom);
       });
 
+    // Contact shadows sit on the floor, under every standing prop.
+    for (final (o, k) in items) {
+      final p = o.props[k];
+      final s = o.stageFor(k);
+      if (wallProps.contains(p.kind) || f.stage(o.id) < s) continue;
+      final pop = f.pop(o.id, s).clamp(0.0, 1.0);
+      if (pop > 0.01) Lighting.contactShadow(c, p.r, strength: pop);
+    }
+
+    // Props share one layer so each can be shaded for volume right after
+    // it is drawn, without touching the backdrop behind it.
+    c.saveLayer(const Rect.fromLTWH(-40, -40, 480, 320), Paint());
     for (final (o, k) in items) {
       final p = o.props[k];
       final s = o.stageFor(k);
@@ -208,10 +223,12 @@ class PropScene extends SceneArt {
         continue;
       }
       final pop = f.pop(o.id, s);
-      final pivot = wallProps.contains(p.kind) ? p.r.center : p.r.bottomCenter;
+      final wall = wallProps.contains(p.kind);
+      final pivot = wall ? p.r.center : p.r.bottomCenter;
       Pk.scaled(c, pivot, pop, () {
         try {
           PropKit.paint(c, p.kind, p.r, p.a, p.b, t);
+          if (!emissiveProps.contains(p.kind)) Lighting.volume(c, p.r, wall: wall);
         } catch (_) {
           // A broken prop must never take the whole scene down.
         }
@@ -222,6 +239,7 @@ class PropScene extends SceneArt {
         Pk.sparkle(c, p.r.topRight + const Offset(-3, 3), 3.5 * polish * tw, Colors.white);
       }
     }
+    c.restore();
     backdrop.neglect(c, ov, t);
   }
 
