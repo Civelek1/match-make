@@ -40,7 +40,7 @@ Telefonda doğrudan denemek için: `flutter build apk --release --split-per-abi`
 ## 3. Play Console
 
 1. **Uygulama oluştur:** Ad "Match Make", varsayılan dil Türkçe (veya İngilizce), Oyun, Ücretsiz.
-2. **Mağaza girişi:** `store/listing/tr.md` ve `en.md` metinleri; ikon `store/play_icon_512.png`; öne çıkan görsel `store/feature_graphic.png`; ekran görüntüleri `store/screenshots/`.
+2. **Mağaza girişi:** `store/listing/tr.md` ve `en.md` metinleri; ikon `store/play_icon_512.png`; öne çıkan görsel `store/feature_graphic_tr.png` / `_en.png`; ekran görüntüleri `store/screenshots/`.
 3. **Gizlilik politikası URL'si:** `docs/privacy-policy.html` herkese açık bir adreste yayınlanmalı (ör. GitHub Pages: depo ayarları → Pages → `docs/` klasörü). Önce sayfadaki iletişim e-postasını doldurun.
 4. **Veri güvenliği formu:** "Uygulama kullanıcı verisi toplamıyor veya paylaşmıyor." Oyun internet izni bile istemez; ilerleme yalnızca cihazda saklanır.
 5. **İçerik derecelendirmesi (IARC anketi):** Şiddet, kumar, kullanıcı etkileşimi, konum paylaşımı yok → genelde "3+ / PEGI 3" çıkar.

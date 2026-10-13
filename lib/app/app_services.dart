@@ -16,7 +16,8 @@ import 'game_navigator.dart';
 
 /// Development tools are compiled in only for debug builds or when built with
 /// `--dart-define=MM_DEBUG=true`. Never visible in normal release builds.
-const bool kDebugTools = kDebugMode || bool.fromEnvironment('MM_DEBUG');
+/// MM_HIDE_DEBUG hides the tools in debug builds (store screenshots).
+const bool kDebugTools = (kDebugMode && !bool.fromEnvironment('MM_HIDE_DEBUG')) || bool.fromEnvironment('MM_DEBUG');
 
 const String kGameVersion = '1.0.0';
 

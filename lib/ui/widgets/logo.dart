@@ -8,6 +8,10 @@ import '../art/paint_kit.dart';
 import '../art/tile_art.dart';
 import '../theme/game_colors.dart';
 
+/// Named explicitly so the logo looks the same everywhere (and in rendered
+/// store art); platforms without Roboto fall back to their system font.
+const kLogoFont = 'Roboto';
+
 /// MATCH MAKE logo: "MATCH" spelled on real game-piece shapes (matching),
 /// "MAKE" on a nailed wooden plank (building / restoration).
 class MatchMakeLogo extends StatefulWidget {
@@ -61,6 +65,12 @@ class _LogoPainter extends CustomPainter {
     final w = size.width;
     final tile = w / 5.6;
     final gap = (w - tile * 5) / 6;
+    // While the shine sweeps, draw the logo into its own layer so the
+    // srcATop shine only lands on the logo, never on what's behind it (web).
+    final cycle = (time % 4.0) / 1.2;
+    final shine = cycle < 1 && time > 1.3;
+    final bounds = Rect.fromLTWH(-tile, -tile, w + tile * 2, size.height + tile * 2);
+    if (shine) canvas.saveLayer(bounds, Paint());
 
     // MATCH tiles.
     for (var i = 0; i < 5; i++) {
@@ -124,12 +134,11 @@ class _LogoPainter extends CustomPainter {
     }
 
     // Shine sweep across everything every few seconds.
-    final cycle = (time % 4.0) / 1.2;
-    if (cycle < 1 && time > 1.3) {
+    if (shine) {
       final x = -w * 0.3 + cycle * w * 1.6;
-      canvas.saveLayer(Offset.zero & size, Paint()..blendMode = BlendMode.srcATop);
+      canvas.saveLayer(bounds, Paint()..blendMode = BlendMode.srcATop);
       canvas.drawRect(
-        Offset.zero & size,
+        bounds,
         Paint()
           ..shader = ui.Gradient.linear(
             Offset(x - 40, 0),
@@ -138,6 +147,7 @@ class _LogoPainter extends CustomPainter {
             [0, 0.5, 1],
           ),
       );
+      canvas.restore();
       canvas.restore();
     }
     // Sparkles.
@@ -165,6 +175,7 @@ class _LogoPainter extends CustomPainter {
       text: TextSpan(
         text: s,
         style: TextStyle(
+          fontFamily: kLogoFont,
           fontSize: size,
           fontWeight: FontWeight.w900,
           letterSpacing: size * 0.04,
@@ -180,7 +191,13 @@ class _LogoPainter extends CustomPainter {
     final fillTp = TextPainter(
       text: TextSpan(
         text: s,
-        style: TextStyle(fontSize: size, fontWeight: FontWeight.w900, color: color, letterSpacing: size * 0.04),
+        style: TextStyle(
+          fontFamily: kLogoFont,
+          fontSize: size,
+          fontWeight: FontWeight.w900,
+          color: color,
+          letterSpacing: size * 0.04,
+        ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();

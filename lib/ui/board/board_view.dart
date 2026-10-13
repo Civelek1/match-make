@@ -12,6 +12,7 @@ import '../art/obstacle_art.dart';
 import '../art/paint_kit.dart';
 import '../art/tile_art.dart';
 import '../theme/game_colors.dart';
+import '../widgets/logo.dart';
 
 /// Callbacks from the board to the gameplay layer during playback.
 abstract class BoardListener {
@@ -482,6 +483,7 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
       text: TextSpan(
         text: text,
         style: TextStyle(
+          fontFamily: kLogoFont,
           fontSize: _cell * 0.42,
           fontWeight: FontWeight.w900,
           color: Colors.white,
