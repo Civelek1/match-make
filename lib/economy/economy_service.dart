@@ -175,5 +175,13 @@ class DailyRewardService extends ChangeNotifier {
     return reward;
   }
 
+  /// Debug: pretend the last claim was yesterday, so today's reward is
+  /// claimable and the streak continues.
+  void debugNextDay() {
+    _d.lastDay = _today - 1;
+    _store.commit();
+    notifyListeners();
+  }
+
   void reload() => notifyListeners();
 }

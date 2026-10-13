@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../economy/economy_config.dart';
 import '../../leaderboard/leaderboard_service.dart';
 import '../theme/game_colors.dart';
 import '../widgets/game_button.dart';
@@ -57,6 +58,13 @@ class _DebugPanel extends StatelessWidget {
                               s.progress.debugComplete(l.id);
                             }
                           }),
+                          _chip('+1000 Coins', () => s.economy.addCoins(1000)),
+                          _chip('+5 Each Booster', () {
+                            for (final b in BoosterKind.values) {
+                              s.economy.addBooster(b, 5);
+                            }
+                          }),
+                          _chip('Daily: Next Day', s.daily.debugNextDay),
                           _chip('Reset Save', () async {
                             await s.resetProgress();
                             if (context.mounted) showGameToast(context, 'Save reset');
