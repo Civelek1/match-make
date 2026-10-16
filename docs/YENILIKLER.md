@@ -66,6 +66,6 @@ Okul bahçesi, sınıf, fen laboratuvarı, spor salonu, müzik sınıfı. Şekil
 
 | Seviyeler | Bölümler | Durum |
 |---|---|---|
-| 76–100 | Hayvanat Bahçesi, Akvaryum, Lunapark, Kitapçı, Gözlemevi | Son kontroller |
+| 76–100 | Hayvanat Bahçesi, Akvaryum, Lunapark, Kitapçı, Gözlemevi | Eklendi ✓ |
 | 101–125 | Japon Bahçesi, Orman Kampı, Sirk, Çöl Vahası, Korsan Gemisi | Çizimler yarıda |
 | 126–150 | Buz Sarayı, Kaplıca, Uzay Üssü, Büyük Otel, Saray (final) | Son kontroller |
