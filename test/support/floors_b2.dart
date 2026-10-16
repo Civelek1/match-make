@@ -11,7 +11,7 @@ const floorsB2 = <String, double>{
   'aquarium_coral': 0.42,
   'aquarium_tunnel': 0.4,
   'aquarium_jelly': 0.42,
-  'aquarium_touch': 0.35,
+  'aquarium_touch': 0.34,
   'funfair_arch': 0.52,
   'funfair_carousel': 0.45,
   'funfair_wheel': 0.42,

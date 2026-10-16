@@ -2023,7 +2023,7 @@ final Map<String, SceneArt Function()> batch2Scenes = {
       ObjectiveProps('b2_fish', [Prop.custom(_fish, _r(150, 36, 40, 24), _orange, _white), Prop.custom(_fish, _r(214, 58, 34, 20), _gold, _blue)]),
       ObjectiveProps('b2_bubbles', [Prop.custom(_bubbles, _r(124, 40, 16, 80), _aqua, _white), Prop.custom(_bubbles, _r(262, 30, 16, 80), _aqua, _white)]),
       ObjectiveProps('ice', [Prop(PK.bench, _r(16, 180, 76, 28), _teal, _steel), Prop(PK.plant, _r(324, 168, 30, 44), _teal, _leaf)]),
-      ObjectiveProps('gates', [Prop(PK.door, _r(356, 104, 36, 68), _teal, _gold), Prop.custom(_bookStack, _r(300, 196, 30, 30), _teal, _orange)]),
+      ObjectiveProps('gates', [Prop(PK.door, _r(356, 104, 36, 68), _teal, _gold), Prop.custom(_helmet, _r(296, 172, 40, 50), _brass, _aqua)]),
     ],
   ),
   // ------------------------------------------------------------ FUNFAIR

@@ -43,7 +43,7 @@ const funfairLevels = <LevelData>[
       ObjectiveData(id: 'lights', tileTypeId: 'spotlight', target: 13),
       ObjectiveData(id: 'gates', tileTypeId: 'key', target: 2),
     ],
-    starThresholds: [22000, 29000],
+    starThresholds: [20500, 26500],
   ),
   LevelData(
     id: 'funfair_carousel',
@@ -73,7 +73,7 @@ const funfairLevels = <LevelData>[
       ObjectiveData(id: 'b2_treats', tileTypeId: 'b2_candy', target: 14),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 7),
     ],
-    starThresholds: [23000, 30000],
+    starThresholds: [22000, 31500],
   ),
   LevelData(
     id: 'funfair_wheel',
@@ -104,7 +104,7 @@ const funfairLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'chests', tileTypeId: 'key', target: 2),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [21000, 28500],
   ),
   LevelData(
     id: 'funfair_stalls',
@@ -135,7 +135,7 @@ const funfairLevels = <LevelData>[
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 5),
       ObjectiveData(id: 'chests', tileTypeId: 'key', target: 2),
     ],
-    starThresholds: [22000, 28500],
+    starThresholds: [24000, 28000],
   ),
   LevelData(
     id: 'funfair_coaster',
@@ -166,6 +166,6 @@ const funfairLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'gates', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [22000, 28500],
+    starThresholds: [23000, 31000],
   ),
 ];

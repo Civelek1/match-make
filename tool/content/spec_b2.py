@@ -2035,7 +2035,7 @@ ZOO = [
        '##....##'],  # octagon
       [('gates', 'b2_paw', 15), ('tickets', 'ticket', 15), ('sign', 'sign', 15), ('hedges', 'b2_leaf', 15),
        ('fountain', 'fountain', 14), ('tree', 'tree', 14), ('crates', 'crate', 6)],
-      [24000, 31000], 0.55,
+      [21500, 33000], 0.55,
       ('ZOO GATE', 'HAYVANAT KAPISI'),
       ('Open the zoo gates for visitors.', 'Hayvanat bahçesinin kapılarını ziyaretçilere aç.'),
       (0xFFBFE8A8, 0xFF6FB85A, 0xFF5A7A3A, 0xFFFFB347),
@@ -2061,7 +2061,7 @@ ZOO = [
        '..####..'],  # H
       [('b2_giraffes', 'b2_paw', 13), ('tree', 'tree', 13), ('hay', 'hay', 13), ('fence', 'fence', 13),
        ('trough', 'water', 12), ('crates', 'crate', 6)],
-      [20000, 26000], 0.45,
+      [16500, 24000], 0.45,
       ('GIRAFFE YARD', 'ZÜRAFA BAHÇESİ'),
       ('Give the giraffes a sunny yard.', 'Zürafalara güneşli bir bahçe hazırla.'),
       (0xFFFFE3A8, 0xFFE8A85A, 0xFF8B5E3C, 0xFFFFC93C),
@@ -2086,7 +2086,7 @@ ZOO = [
        '###..###'],  # funnel
       [('b2_penguins', 'b2_bird', 15), ('b2_ice_rocks', 'snowflake', 15), ('b2_floes', 'wave', 14),
        ('eggs', 'b2_egg', 14), ('b2_slide', 'ski', 14), ('ice', 'ice', 6)],
-      [22000, 28500], 0.45,
+      [24000, 33500], 0.45,
       ('PENGUIN POOL', 'PENGUEN GÖLÜ'),
       ('Chill the pool for the penguins.', 'Penguenler için havuzu serinlet.'),
       (0xFFDFF6FF, 0xFF8FD0F0, 0xFF3A6E9A, 0xFF4FD6E8),
@@ -2111,7 +2111,7 @@ ZOO = [
        '...##...'],  # twin rooms
       [('b2_reptiles', 'b2_paw', 13), ('b2_terrariums', 'b2_leaf', 13), ('lamps', 'torch', 12), ('b2_insects', 'b2_bee', 12),
        ('eggs', 'b2_egg', 11), ('chains', 'chain', 5), ('crates', 'crate', 4)],
-      [23000, 30000], 0.40,
+      [20000, 27500], 0.40,
       ('REPTILE HOUSE', 'SÜRÜNGEN EVİ'),
       ('Warm up the reptile house.', 'Sürüngen evini ısıt.'),
       (0xFFCDEBB0, 0xFF5E9A4A, 0xFF3A5A2A, 0xFFFF9A3C),
@@ -2138,7 +2138,7 @@ ZOO = [
        '########'],  # heart
       [('animals', 'b2_rabbit', 15), ('hens', 'hen', 15), ('hay', 'hay', 15), ('grass', 'grass', 14),
        ('trough', 'water', 14), ('eggs', 'b2_egg', 14), ('gates', 'key', 3)],
-      [21000, 27500], 0.35,
+      [22000, 27500], 0.35,
       ('PETTING FARM', 'MİNİ ÇİFTLİK'),
       ('Make a cosy farm for gentle animals.', 'Sevimli hayvanlar için şirin bir çiftlik kur.'),
       (0xFFD9F2B8, 0xFF7CC860, 0xFF8B5E3C, 0xFFFF7AB6),
@@ -2168,7 +2168,7 @@ AQUARIUM = [
        '........'],  # U
       [('tickets', 'ticket', 15), ('b2_tanks', 'fish', 15), ('statues', 'b2_diver', 14), ('posters', 'photo', 15),
        ('b2_bubbles', 'b2_bubble', 14), ('ice', 'ice', 6)],
-      [23000, 30000], 0.55,
+      [22000, 28500], 0.55,
       ('ENTRANCE HALL', 'GİRİŞ SALONU'),
       ('Welcome guests to the aquarium.', 'Akvaryuma gelen misafirleri karşıla.'),
       (0xFFD6F4FF, 0xFF5CC0E8, 0xFF1E5F8A, 0xFF4FD6E8),
@@ -2193,7 +2193,7 @@ AQUARIUM = [
        '...ii...'],  # window panes
       [('b2_coral', 'plants', 15), ('b2_fish', 'fish', 15), ('b2_bubbles', 'b2_bubble', 14), ('b2_divers', 'b2_diver', 14),
        ('seats', 'b2_drop', 14), ('ice', 'ice', 12)],
-      [23000, 30000], 0.42,
+      [20000, 28000], 0.42,
       ('CORAL TANK', 'MERCAN TANKI'),
       ('Bring the coral reef back to life.', 'Mercan resifini yeniden canlandır.'),
       (0xFFC6F0FF, 0xFF2EA6D8, 0xFF1E4F7A, 0xFFFF7F6B),
@@ -2219,7 +2219,7 @@ AQUARIUM = [
        '........'],  # hourglass
       [('b2_sharks', 'fish', 12), ('lights', 'b2_drop', 12), ('b2_rays', 'b2_tide', 12), ('anchors', 'anchor', 11),
        ('b2_bubbles', 'b2_bubble', 11), ('ice', 'ice', 6), ('chains', 'chain', 4)],
-      [20000, 26000], 0.40,
+      [23000, 28500], 0.40,
       ('SHARK TUNNEL', 'CAM TÜNEL'),
       ('Walk beneath the sharks again.', 'Köpekbalıklarının altından yeniden yürü.'),
       (0xFFB8E8FF, 0xFF1E7FC0, 0xFF143E6A, 0xFF8FD0FF),
@@ -2245,7 +2245,7 @@ AQUARIUM = [
        '###..###'],  # diamond
       [('b2_jellyfish', 'b2_jelly', 14), ('b2_tanks', 'b2_drop', 13), ('lights', 'b2_bubble', 13), ('b2_fish', 'fish', 13),
        ('seats', 'b2_tide', 12), ('ice', 'ice', 12)],
-      [21000, 27500], 0.42,
+      [20000, 26000], 0.42,
       ('JELLYFISH ROOM', 'DENİZANALARI'),
       ('Light up the glowing jellyfish.', 'Parlayan denizanalarını aydınlat.'),
       (0xFF4A3A8A, 0xFF1A1440, 0xFF6B4BD6, 0xFFFF7AD9, True),
@@ -2270,7 +2270,7 @@ AQUARIUM = [
        '##....##'],  # plus
       [('b2_starfish', 'b2_star', 16), ('pool', 'wave', 16), ('b2_fish', 'fish', 15), ('b2_rays', 'b2_tide', 15),
        ('b2_bubbles', 'b2_bubble', 14), ('ice', 'ice', 10), ('gates', 'key', 3)],
-      [21000, 27500], 0.35,
+      [24000, 32500], 0.34,
       ('TOUCH POOL', 'KEŞİF HAVUZU'),
       ('Let little hands meet sea stars.', 'Minik eller deniz yıldızlarıyla tanışsın.'),
       (0xFFD8F8F0, 0xFF4FC8C0, 0xFF1F6F6A, 0xFFFF9A3C),
@@ -2282,7 +2282,7 @@ AQUARIUM = [
           ('b2_fish', [P('@fish', 150, 36, 40, 24, '_orange', '_white'), P('@fish', 214, 58, 34, 20, '_gold', '_blue')]),
           ('b2_bubbles', [P('@bubbles', 124, 40, 16, 80, '_aqua', '_white'), P('@bubbles', 262, 30, 16, 80, '_aqua', '_white')]),
           ('ice', [P('bench', 16, 180, 76, 28, '_teal', '_steel'), P('plant', 324, 168, 30, 44, '_teal', '_leaf')]),
-          ('gates', [P('door', 356, 104, 36, 68, '_teal', '_gold'), P('@bookStack', 300, 196, 30, 30, '_teal', '_orange')]),
+          ('gates', [P('door', 356, 104, 36, 68, '_teal', '_gold'), P('@helmet', 296, 172, 40, 50, '_brass', '_aqua')]),
       ])),
 ]
 
@@ -2300,7 +2300,7 @@ FUNFAIR = [
        '..####..'],  # arch
       [('b2_arch', 'sign', 14), ('tickets', 'ticket', 14), ('b2_balloons', 'party', 13), ('b2_treats', 'b2_candy', 13),
        ('ice_cream', 'icecream', 13), ('lights', 'spotlight', 13), ('gates', 'key', 2)],
-      [22000, 29000], 0.52,
+      [20500, 26500], 0.52,
       ('ENTRANCE ARCH', 'GİRİŞ KEMERİ'),
       ('Light up the funfair entrance.', 'Lunaparkın girişini ışıklandır.'),
       (0xFFFFE0F0, 0xFFFF8AB8, 0xFFB03A6A, 0xFFFFC93C),
@@ -2326,7 +2326,7 @@ FUNFAIR = [
        '##....##'],  # octagon
       [('b2_carousel', 'b2_wheel', 15), ('b2_horses', 'b2_toy', 15), ('b2_organ', 'music', 14), ('lights', 'spotlight', 14),
        ('b2_treats', 'b2_candy', 14), ('chains', 'chain', 7)],
-      [23000, 30000], 0.45,
+      [22000, 31500], 0.45,
       ('CAROUSEL', 'ATLIKARINCA'),
       ('Set the carousel horses prancing.', 'Atlıkarıncanın atlarını yeniden döndür.'),
       (0xFFFFE8C8, 0xFFFFA86B, 0xFF9A4A2E, 0xFFFF6B8B),
@@ -2352,7 +2352,7 @@ FUNFAIR = [
        '........'],  # ring
       [('b2_ferris', 'b2_wheel', 12), ('tickets', 'ticket', 12), ('juice_bar', 'juice', 11), ('b2_treats', 'b2_candy', 11),
        ('b2_prizes', 'b2_prize', 11), ('chains', 'chain', 4), ('chests', 'key', 2)],
-      [21000, 27500], 0.42,
+      [21000, 28500], 0.42,
       ('FERRIS WHEEL', 'DÖNME DOLAP'),
       ('Get the big wheel turning again.', 'Dev çarkı yeniden döndür.'),
       (0xFFD8EEFF, 0xFF7CB8F0, 0xFF2E4A8A, 0xFFFF6B8B),
@@ -2377,7 +2377,7 @@ FUNFAIR = [
        '##......'],  # zigzag
       [('b2_stalls', 'b2_tent', 16), ('b2_prizes', 'b2_prize', 15), ('b2_games', 'b2_dice', 15), ('b2_toys', 'b2_toy', 15),
        ('b2_balloons', 'party', 14), ('crates', 'crate', 5), ('chests', 'key', 2)],
-      [22000, 28500], 0.42,
+      [24000, 28000], 0.42,
       ('GAME STALLS', 'OYUN STANTLARI'),
       ('Win prizes at the game stalls.', 'Oyun stantlarında ödüller kazan.'),
       (0xFFFFF0C8, 0xFFFFB84A, 0xFFA05A1E, 0xFFE0533F),
@@ -2402,7 +2402,7 @@ FUNFAIR = [
        '###.....'],  # staircase
       [('b2_coaster', 'b2_wheel', 15), ('tickets', 'ticket', 14), ('b2_treats', 'b2_candy', 14), ('lights', 'spotlight', 14),
        ('juice_bar', 'juice', 13), ('chains', 'chain', 4), ('gates', 'key', 3)],
-      [22000, 28500], 0.36,
+      [23000, 31000], 0.36,
       ('ROLLER COASTER', 'HIZ TRENİ'),
       ('Send the coaster flying once more.', 'Hız trenini yeniden uçur.'),
       (0xFFFFD8C8, 0xFFE06A5A, 0xFF8A2E3A, 0xFFFFE066),
@@ -2432,7 +2432,7 @@ BOOKSHOP = [
        '##....##'],  # T
       [('b2_shopfront', 'b2_shop', 14), ('awning', 'awning', 14), ('sign', 'sign', 14), ('books', 'book', 13),
        ('b2_book_cart', 'b2_books', 13), ('bench', 'chair', 13), ('chains', 'chain', 4)],
-      [20000, 26000], 0.52,
+      [20500, 26500], 0.52,
       ('SHOP FRONT', 'DÜKKAN ÖNÜ'),
       ('Polish the bookshop windows.', 'Kitapçının vitrinlerini parlat.'),
       (0xFFFFE8D0, 0xFFE0906A, 0xFF7A3A2A, 0xFF45A7F5),
@@ -2458,7 +2458,7 @@ BOOKSHOP = [
        '........'],  # L
       [('sofas', 'furniture', 14), ('shelves', 'b2_books', 14), ('books', 'book', 14), ('lamps', 'lantern', 13),
        ('decor', 'b2_bookmark', 13), ('windows', 'window', 13), ('chains', 'chain', 7)],
-      [21000, 27500], 0.44,
+      [21000, 27000], 0.44,
       ('READING NOOK', 'OKUMA KÖŞESİ'),
       ('Make a cosy corner for readers.', 'Okurlar için sıcak bir köşe hazırla.'),
       (0xFFFFE6C8, 0xFFD9905A, 0xFF6E3A22, 0xFFFFB347),
@@ -2483,7 +2483,7 @@ BOOKSHOP = [
        '.....c..'],  # E
       [('b2_picture_books', 'b2_story', 13), ('b2_toys', 'b2_toy', 13), ('b2_crayons', 'b2_pen', 13), ('b2_puzzles', 'b2_puzzle', 12),
        ('shelves', 'shelves', 12), ('chains', 'chain', 3), ('crates', 'crate', 3)],
-      [21000, 27500], 0.44,
+      [21500, 29000], 0.44,
       ("KIDS' CORNER", 'ÇOCUK KÖŞESİ'),
       ('Fill the kids corner with colour.', 'Çocuk köşesini renklerle doldur.'),
       (0xFFFFF0F8, 0xFFFFA8D0, 0xFF8A4AB0, 0xFF5BCB4B),
@@ -2509,7 +2509,7 @@ BOOKSHOP = [
        '........'],  # slope
       [('menu_board', 'menu', 15), ('b2_espresso', 'b2_cafe', 15), ('baking', 'pie', 14), ('b2_cups', 'decor_cup', 14),
        ('books', 'b2_books', 14), ('chains', 'chain', 7)],
-      [22000, 28500], 0.40,
+      [21000, 28500], 0.40,
       ('CAFÉ COUNTER', 'KAFE TEZGÂHI'),
       ('Brew coffee among the books.', 'Kitapların arasında kahve demle.'),
       (0xFFF6E0C8, 0xFFB8805A, 0xFF5A3A2A, 0xFFFF9A3C),
@@ -2534,7 +2534,7 @@ BOOKSHOP = [
        '........'],  # two floors
       [('b2_rare_books', 'b2_books', 15), ('scrolls', 'scroll', 14), ('globes', 'globe', 14), ('clocks', 'hourglass', 14),
        ('display_cases', 'b2_bookmark', 14), ('chains', 'chain', 7), ('chests', 'key', 2)],
-      [22000, 28500], 0.35,
+      [22500, 28000], 0.35,
       ('RARE BOOKS', 'NADİR KİTAPLAR'),
       ('Unlock the oldest books in town.', 'Şehrin en eski kitaplarının kilidini aç.'),
       (0xFFE8D8C0, 0xFF8A5A3A, 0xFF4A2A1A, 0xFFFFC93C),
@@ -2564,7 +2564,7 @@ OBSERVATORY = [
        '........'],  # pyramid
       [('b2_path', 'b2_hike', 14), ('tree', 'tree', 14), ('fence', 'fence', 14), ('bench', 'bench', 13),
        ('grass', 'grass', 13), ('lights', 'b2_star', 13), ('chains', 'chain', 4)],
-      [21000, 27500], 0.50,
+      [20000, 27500], 0.50,
       ('HILLTOP PATH', 'TEPE YOLU'),
       ('Light the path up to the stars.', 'Yıldızlara çıkan yolu aydınlat.'),
       (0xFF6A5AB8, 0xFF2A2468, 0xFF8A6AE6, 0xFFFFE066, True),
@@ -2590,7 +2590,7 @@ OBSERVATORY = [
        '........'],  # dome
       [('b2_telescope', 'b2_satellite', 16), ('b2_dome', 'b2_moon', 15), ('maps', 'compass', 15), ('globes', 'globe', 15),
        ('b2_lenses', 'b2_lens', 14), ('ice', 'ice', 8), ('chains', 'chain', 4)],
-      [25000, 32500], 0.42,
+      [23500, 31000], 0.42,
       ('GREAT DOME', 'KUBBE ODASI'),
       ('Aim the great telescope skyward.', 'Büyük teleskobu gökyüzüne çevir.'),
       (0xFF4A4A9A, 0xFF1E1E50, 0xFF6B6BD6, 0xFFFFC93C, True),
@@ -2616,7 +2616,7 @@ OBSERVATORY = [
        '........'],  # ring
       [('b2_projector', 'b2_lens', 14), ('b2_planets', 'b2_radar', 14), ('b2_stars', 'b2_star', 14), ('b2_rockets', 'b2_rocket', 13),
        ('seats', 'b2_moon', 13), ('ice', 'ice', 6), ('doors', 'key', 2)],
-      [22000, 28500], 0.42,
+      [20500, 26000], 0.42,
       ('PLANETARIUM', 'PLANETARYUM'),
       ('Fill the dome with a sky of stars.', 'Kubbeyi yıldızlı bir gökle doldur.'),
       (0xFF3A2A7A, 0xFF120E30, 0xFF8A5CE6, 0xFF8ED8FF, True),
@@ -2643,7 +2643,7 @@ OBSERVATORY = [
        '###..###'],  # diamond
       [('maps', 'scroll', 13), ('books', 'book', 13), ('b2_constellations', 'b2_star', 13), ('clocks', 'hourglass', 13),
        ('globes', 'b2_moon', 12), ('chains', 'chain', 6), ('crates', 'crate', 4)],
-      [20000, 26000], 0.40,
+      [22000, 29500], 0.40,
       ('MAP LIBRARY', 'GÖK HARİTALARI'),
       ('Sort the old star charts.', 'Eski gök haritalarını düzenle.'),
       (0xFF4A5AA8, 0xFF1E2458, 0xFF8B5E3C, 0xFFFFC93C, True),
@@ -2669,7 +2669,7 @@ OBSERVATORY = [
        '##....##'],  # arrow
       [('b2_telescope', 'b2_satellite', 15), ('b2_stars', 'b2_star', 15), ('b2_rockets', 'b2_rocket', 14), ('lights', 'lantern', 14),
        ('maps', 'compass', 14), ('ice', 'ice', 6), ('gates', 'key', 3)],
-      [20000, 26000], 0.30,
+      [23500, 29000], 0.30,
       ('ROOFTOP DECK', 'ÇATI TERASI'),
       ('Watch the night sky from the roof.', 'Çatıdan gece gökyüzünü izle.'),
       (0xFF3A3A8A, 0xFF101030, 0xFF8A6AE6, 0xFFFFE066, True),

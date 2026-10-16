@@ -43,7 +43,7 @@ const bookshopLevels = <LevelData>[
       ObjectiveData(id: 'bench', tileTypeId: 'chair', target: 13),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
     ],
-    starThresholds: [20000, 26000],
+    starThresholds: [20500, 26500],
   ),
   LevelData(
     id: 'bookshop_nook',
@@ -74,7 +74,7 @@ const bookshopLevels = <LevelData>[
       ObjectiveData(id: 'windows', tileTypeId: 'window', target: 13),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 7),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [21000, 27000],
   ),
   LevelData(
     id: 'bookshop_kids',
@@ -105,7 +105,7 @@ const bookshopLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 3),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 3),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [21500, 29000],
   ),
   LevelData(
     id: 'bookshop_cafe',
@@ -135,7 +135,7 @@ const bookshopLevels = <LevelData>[
       ObjectiveData(id: 'books', tileTypeId: 'b2_books', target: 14),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 7),
     ],
-    starThresholds: [22000, 28500],
+    starThresholds: [21000, 28500],
   ),
   LevelData(
     id: 'bookshop_rare',
@@ -166,6 +166,6 @@ const bookshopLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 7),
       ObjectiveData(id: 'chests', tileTypeId: 'key', target: 2),
     ],
-    starThresholds: [22000, 28500],
+    starThresholds: [22500, 28000],
   ),
 ];

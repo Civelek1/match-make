@@ -43,7 +43,7 @@ const zooLevels = <LevelData>[
       ObjectiveData(id: 'tree', tileTypeId: 'tree', target: 14),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 6),
     ],
-    starThresholds: [24000, 31000],
+    starThresholds: [21500, 33000],
   ),
   LevelData(
     id: 'zoo_giraffes',
@@ -73,7 +73,7 @@ const zooLevels = <LevelData>[
       ObjectiveData(id: 'trough', tileTypeId: 'water', target: 12),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 6),
     ],
-    starThresholds: [20000, 26000],
+    starThresholds: [16500, 24000],
   ),
   LevelData(
     id: 'zoo_penguins',
@@ -103,7 +103,7 @@ const zooLevels = <LevelData>[
       ObjectiveData(id: 'b2_slide', tileTypeId: 'ski', target: 14),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
     ],
-    starThresholds: [22000, 28500],
+    starThresholds: [24000, 33500],
   ),
   LevelData(
     id: 'zoo_reptiles',
@@ -134,7 +134,7 @@ const zooLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 5),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 4),
     ],
-    starThresholds: [23000, 30000],
+    starThresholds: [20000, 27500],
   ),
   LevelData(
     id: 'zoo_petting',
@@ -165,6 +165,6 @@ const zooLevels = <LevelData>[
       ObjectiveData(id: 'eggs', tileTypeId: 'b2_egg', target: 14),
       ObjectiveData(id: 'gates', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [22000, 27500],
   ),
 ];

@@ -43,7 +43,7 @@ const observatoryLevels = <LevelData>[
       ObjectiveData(id: 'lights', tileTypeId: 'b2_star', target: 13),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [20000, 27500],
   ),
   LevelData(
     id: 'observatory_dome',
@@ -74,7 +74,7 @@ const observatoryLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 8),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
     ],
-    starThresholds: [25000, 32500],
+    starThresholds: [23500, 31000],
   ),
   LevelData(
     id: 'observatory_planetarium',
@@ -105,7 +105,7 @@ const observatoryLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
       ObjectiveData(id: 'doors', tileTypeId: 'key', target: 2),
     ],
-    starThresholds: [22000, 28500],
+    starThresholds: [20500, 26000],
   ),
   LevelData(
     id: 'observatory_library',
@@ -136,7 +136,7 @@ const observatoryLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 6),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 4),
     ],
-    starThresholds: [20000, 26000],
+    starThresholds: [22000, 29500],
   ),
   LevelData(
     id: 'observatory_roof',
@@ -167,6 +167,6 @@ const observatoryLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
       ObjectiveData(id: 'gates', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [20000, 26000],
+    starThresholds: [23500, 29000],
   ),
 ];

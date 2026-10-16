@@ -42,7 +42,7 @@ const aquariumLevels = <LevelData>[
       ObjectiveData(id: 'b2_bubbles', tileTypeId: 'b2_bubble', target: 14),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
     ],
-    starThresholds: [23000, 30000],
+    starThresholds: [22000, 28500],
   ),
   LevelData(
     id: 'aquarium_coral',
@@ -72,7 +72,7 @@ const aquariumLevels = <LevelData>[
       ObjectiveData(id: 'seats', tileTypeId: 'b2_drop', target: 14),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 12),
     ],
-    starThresholds: [23000, 30000],
+    starThresholds: [20000, 28000],
   ),
   LevelData(
     id: 'aquarium_tunnel',
@@ -103,7 +103,7 @@ const aquariumLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
     ],
-    starThresholds: [20000, 26000],
+    starThresholds: [23000, 28500],
   ),
   LevelData(
     id: 'aquarium_jelly',
@@ -133,7 +133,7 @@ const aquariumLevels = <LevelData>[
       ObjectiveData(id: 'seats', tileTypeId: 'b2_tide', target: 12),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 12),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [20000, 26000],
   ),
   LevelData(
     id: 'aquarium_touch',
@@ -164,6 +164,6 @@ const aquariumLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 10),
       ObjectiveData(id: 'gates', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [21000, 27500],
+    starThresholds: [24000, 32500],
   ),
 ];
