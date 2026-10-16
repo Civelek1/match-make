@@ -1,5 +1,5 @@
 // Generates the original procedural placeholder sounds (no longer shipped: the
-// game now uses licensed audio, see assets/audio/CREDITS.md). Writes to
+// game now uses licensed audio, see docs/AUDIO_CREDITS.md). Writes to
 // build/audio_placeholders/ so it never overwrites the real assets:
 //   dart run tool/generate_audio.dart
 import 'dart:io';

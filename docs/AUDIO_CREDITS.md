@@ -33,4 +33,4 @@ Music Jingles. Trimmed, normalized to about -18 dB RMS, 3 ms fade-in, mono 22.05
 | sfx_unlock | interface-sounds/confirmation_004 |
 | sfx_locked | interface-sounds/back_003 |
 
-To swap a sound, drop a new file with the same name here (see `AudioAssets`).
+To swap a sound, drop a new file with the same name into assets/audio (see `AudioAssets`).
