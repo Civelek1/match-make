@@ -1,3 +1,6 @@
+// Plays every level once (start, two moves, win) and opens every chapter
+// map and chapter-complete screen. Slow (~4 min):
+//   flutter test tool/content/playthrough_test.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:match_make/app/app_services.dart';
@@ -62,8 +65,10 @@ void main() {
     }
     // ignore: avoid_print
     print('PLAYTHROUGH levels=${s.progress.levelsCompleted} coins=${s.economy.coins} problems=${problems.length}');
-    // ignore: avoid_print
-    for (final p in problems.take(30)) print('PROBLEM $p');
+    for (final p in problems.take(30)) {
+      // ignore: avoid_print
+      print('PROBLEM $p');
+    }
     expect(problems, isEmpty);
   }, timeout: const Timeout(Duration(minutes: 20)));
 }
