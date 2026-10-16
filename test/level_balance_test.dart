@@ -131,7 +131,7 @@ void main() {
   });
 
   test('special piece moves are always accepted', () {
-    final s = LevelSession(content.level('attic')!, seed: 1);
+    final s = LevelSession(content.level('bathroom')!, seed: 1);
     s.engine.board.at(0, 0)!.special = SpecialKind.bomb;
     final r = s.trySwap(const Pos(0, 0), const Pos(1, 0));
     expect(r!.consumedMove, isTrue);
