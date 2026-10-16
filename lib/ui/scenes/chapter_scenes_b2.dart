@@ -501,18 +501,27 @@ void _paintShark(Canvas c, Rect r, Color a, Color b, double t) {
 
 void _paintRay(Canvas c, Rect r, Color a, Color b, double t) {
   final w = r.width, h = r.height;
-  final flap = sin(t * 2 + r.left) * h * 0.12;
-  c.drawLine(Offset(r.center.dx, r.bottom - h * 0.32), Offset(r.center.dx + sin(t * 2) * w * 0.05, r.bottom), Pk.stroke(Pk.dark(a, 0.2), 2));
+  final cx = r.center.dx, cy = r.top + h * 0.42;
+  final flap = sin(t * 2 + r.left) * h * 0.1;
+  final tail = Path()
+    ..moveTo(cx, cy + h * 0.2)
+    ..quadraticBezierTo(cx + sin(t * 2 + r.left) * w * 0.08, r.bottom - h * 0.2, cx + w * 0.04, r.bottom);
+  c.drawPath(tail, Pk.stroke(Pk.dark(a, 0.25), 1.6));
   final body = Path()
-    ..moveTo(r.center.dx, r.top)
-    ..quadraticBezierTo(r.right - w * 0.1, r.top + h * 0.1 + flap, r.right, r.center.dy + flap)
-    ..quadraticBezierTo(r.center.dx + w * 0.2, r.center.dy + h * 0.1, r.center.dx, r.bottom - h * 0.3)
-    ..quadraticBezierTo(r.center.dx - w * 0.2, r.center.dy + h * 0.1, r.left, r.center.dy + flap)
-    ..quadraticBezierTo(r.left + w * 0.1, r.top + h * 0.1 + flap, r.center.dx, r.top)
+    ..moveTo(cx, r.top + h * 0.06)
+    ..quadraticBezierTo(cx + w * 0.22, r.top + h * 0.02, r.right, cy - h * 0.04 + flap)
+    ..quadraticBezierTo(cx + w * 0.2, cy + h * 0.12, cx, cy + h * 0.24)
+    ..quadraticBezierTo(cx - w * 0.2, cy + h * 0.12, r.left, cy - h * 0.04 + flap)
+    ..quadraticBezierTo(cx - w * 0.22, r.top + h * 0.02, cx, r.top + h * 0.06)
     ..close();
   c.drawPath(body, Pk.fill(a));
+  c.drawOval(Rect.fromCenter(center: Offset(cx, cy - h * 0.02), width: w * 0.22, height: h * 0.36), Pk.fill(Pk.light(a, 0.12)));
   for (var i = 0; i < 6; i++) {
-    c.drawCircle(Offset(r.center.dx + (Pk.rand(i) - 0.5) * w * 0.5, r.top + h * (0.22 + Pk.rand(i + 3) * 0.3)), w * 0.025, Pk.fill(b));
+    final s = i.isEven ? 1.0 : -1.0;
+    c.drawCircle(Offset(cx + s * w * (0.16 + (i ~/ 2) * 0.09), cy - h * 0.02 + (i ~/ 2) * h * 0.03), w * 0.022, Pk.fill(b));
+  }
+  for (final s in [-1.0, 1.0]) {
+    c.drawCircle(Offset(cx + s * w * 0.06, r.top + h * 0.16), w * 0.025, Pk.fill(_ink));
   }
 }
 
@@ -1574,6 +1583,11 @@ void _penguinCove(Canvas c, double ov, double t) {
   Pk.poly(c, const [Offset(0, 150), Offset(0, 90), Offset(30, 74), Offset(70, 96), Offset(100, 150)], Pk.fill(cliff));
   Pk.poly(c, const [Offset(400, 150), Offset(400, 62), Offset(350, 48), Offset(300, 86), Offset(262, 150)], Pk.fill(shade));
   Pk.poly(c, const [Offset(400, 150), Offset(400, 82), Offset(362, 70), Offset(320, 100), Offset(300, 150)], Pk.fill(cliff));
+  final berg = Pk.mix(const Color(0xFFB4BAC0), const Color(0xFFF4FBFF), ov);
+  final bergShade = Pk.mix(const Color(0xFF9CA4AC), const Color(0xFFCDEBFA), ov);
+  Pk.poly(c, const [Offset(120, 150), Offset(150, 104), Offset(176, 116), Offset(204, 86), Offset(250, 150)], Pk.fill(berg));
+  Pk.poly(c, const [Offset(204, 86), Offset(250, 150), Offset(214, 150), Offset(196, 112)], Pk.fill(bergShade));
+  Pk.poly(c, const [Offset(236, 150), Offset(262, 118), Offset(292, 150)], Pk.fill(bergShade));
   final water = Pk.mix(const Color(0xFF7FA3AE), const Color(0xFF2EB6E0), ov);
   final pool = Rect.fromLTWH(96, 170, 208, 58);
   c.drawOval(pool.inflate(5), Pk.fill(Pk.mix(const Color(0xFFB8B4AA), const Color(0xFFF2FBFF), ov)));
@@ -1969,7 +1983,7 @@ final Map<String, SceneArt Function()> batch2Scenes = {
       ObjectiveProps('b2_fish', [Prop.custom(_fish, _r(100, 44, 46, 28), _orange, _white), Prop.custom(_fish, _r(236, 70, 40, 24), _gold, _blue), Prop.custom(_fish, _r(326, 32, 34, 20), _pink, _aqua)]),
       ObjectiveProps('b2_divers', [Prop.custom(_diver, _r(168, 26, 70, 42), _orange, _steel)]),
       ObjectiveProps('b2_bubbles', [Prop.custom(_bubbles, _r(64, 30, 20, 120), _aqua, _white), Prop.custom(_bubbles, _r(284, 20, 20, 120), _aqua, _white)]),
-      ObjectiveProps('b2_coral', [Prop.custom(_coralProp, _r(20, 92, 60, 66), _coral, _gold), Prop.custom(_weed, _r(172, 96, 52, 62), _leaf, _teal), Prop.custom(_coralProp, _r(310, 86, 62, 72), _pink, _white)]),
+      ObjectiveProps('b2_coral', [Prop.custom(_coralProp, _r(86, 84, 70, 76), _coral, _gold), Prop.custom(_weed, _r(176, 98, 50, 60), _leaf, _teal), Prop.custom(_coralProp, _r(246, 80, 70, 80), _pink, _white)]),
       ObjectiveProps('seats', [Prop(PK.bench, _r(50, 190, 110, 30), _coral, _steel), Prop(PK.bench, _r(240, 192, 110, 30), _coral, _steel)]),
       ObjectiveProps('ice', [Prop(PK.railing, _r(0, 158, 400, 22), _steel, _aqua), Prop(PK.plant, _r(182, 184, 36, 48), _navy, _leaf)]),
     ],
@@ -1979,7 +1993,7 @@ final Map<String, SceneArt Function()> batch2Scenes = {
     scenery: _sharkTunnel,
     objectives: [
       ObjectiveProps('b2_sharks', [Prop.custom(_shark, _r(40, 40, 116, 46), _grey, _white), Prop.custom(_shark, _r(244, 70, 96, 38), _grey, _white)]),
-      ObjectiveProps('b2_rays', [Prop.custom(_ray, _r(168, 30, 70, 50), _sand, _cream), Prop.custom(_ray, _r(300, 18, 52, 38), _stone, _white)]),
+      ObjectiveProps('b2_rays', [Prop.custom(_ray, _r(162, 92, 70, 52), _grey, _white), Prop.custom(_ray, _r(300, 18, 56, 42), _teal, _cream)]),
       ObjectiveProps('b2_bubbles', [Prop.custom(_bubbles, _r(136, 40, 16, 110), _aqua, _white), Prop.custom(_bubbles, _r(252, 34, 16, 110), _aqua, _white)]),
       ObjectiveProps('anchors', [Prop(PK.anchor, _r(52, 112, 34, 46), _grey, _gold), Prop(PK.crates, _r(330, 128, 42, 30), _darkWood, _gold)]),
       ObjectiveProps('lights', [Prop(PK.pendant, _r(186, 6, 28, 30), _steel, _aqua), Prop(PK.spotlight, _r(70, 60, 32, 50), _steel, _aqua), Prop(PK.spotlight, _r(298, 60, 32, 50), _steel, _aqua)]),
@@ -2005,7 +2019,7 @@ final Map<String, SceneArt Function()> batch2Scenes = {
     objectives: [
       ObjectiveProps('pool', [Prop.custom(_touchPool, _r(104, 136, 192, 64), _stone, _aqua)]),
       ObjectiveProps('b2_starfish', [Prop.custom(_starfishWall, _r(30, 112, 24, 24), _orange, _gold), Prop.custom(_starfishWall, _r(352, 104, 28, 28), _coral, _cream), Prop.custom(_starfish, _r(70, 206, 24, 24), _purple, _gold)]),
-      ObjectiveProps('b2_rays', [Prop.custom(_ray, _r(40, 28, 70, 50), _teal, _cream), Prop.custom(_ray, _r(300, 36, 56, 40), _sand, _white)]),
+      ObjectiveProps('b2_rays', [Prop.custom(_ray, _r(40, 28, 74, 56), _teal, _cream), Prop.custom(_ray, _r(296, 34, 60, 44), _grey, _white)]),
       ObjectiveProps('b2_fish', [Prop.custom(_fish, _r(150, 36, 40, 24), _orange, _white), Prop.custom(_fish, _r(214, 58, 34, 20), _gold, _blue)]),
       ObjectiveProps('b2_bubbles', [Prop.custom(_bubbles, _r(124, 40, 16, 80), _aqua, _white), Prop.custom(_bubbles, _r(262, 30, 16, 80), _aqua, _white)]),
       ObjectiveProps('ice', [Prop(PK.bench, _r(16, 180, 76, 28), _teal, _steel), Prop(PK.plant, _r(324, 168, 30, 44), _teal, _leaf)]),
@@ -2022,7 +2036,7 @@ final Map<String, SceneArt Function()> batch2Scenes = {
       ObjectiveProps('tickets', [Prop.custom(_booth, _r(16, 92, 66, 78), _cream, _red)]),
       ObjectiveProps('b2_balloons', [Prop.custom(_balloons, _r(88, 108, 32, 64), _red, _pink), Prop.custom(_balloons, _r(284, 104, 34, 66), _blue, _gold)]),
       ObjectiveProps('b2_treats', [Prop.custom(_popcorn, _r(326, 112, 56, 70), _red, _gold)]),
-      ObjectiveProps('ice_cream', [Prop.custom(_iceCart, _r(30, 176, 70, 54), _white, _pink)]),
+      ObjectiveProps('ice_cream', [Prop.custom(_iceCart, _r(166, 176, 68, 54), _white, _pink)]),
       ObjectiveProps('lights', [Prop(PK.lamppost, _r(132, 152, 16, 78), _navy, _lampGlow), Prop(PK.lamppost, _r(254, 152, 16, 78), _navy, _lampGlow), Prop.custom(_bunting, _r(0, 14, 400, 34), _red, _gold)]),
     ],
   ),
@@ -2082,9 +2096,9 @@ final Map<String, SceneArt Function()> batch2Scenes = {
     backdrop: const Backdrop.outdoor(groundN: Color(0xFFA8A296), groundR: Color(0xFFD9D2C3), horizon: 152, floor: FloorStyle.stone, topR: Color(0xFF8ED0FF)),
     scenery: _shopFacade,
     objectives: [
-      ObjectiveProps('b2_shopfront', [Prop.custom(_shopWindow, _r(34, 62, 116, 74), _navy, _red), Prop.custom(_shopWindow, _r(250, 62, 116, 74), _navy, _blue)]),
+      ObjectiveProps('b2_shopfront', [Prop.custom(_shopWindow, _r(36, 72, 112, 64), _navy, _red), Prop.custom(_shopWindow, _r(252, 72, 112, 64), _navy, _blue)]),
       ObjectiveProps('awning', [Prop(PK.awning, _r(26, 42, 132, 24), _red, _cream), Prop(PK.awning, _r(242, 42, 132, 24), _red, _cream)]),
-      ObjectiveProps('sign', [Prop(PK.sign, _r(140, 6, 120, 26), _navy, _gold), Prop.custom(_hangSign, _r(228, 56, 46, 40), _cream, _red)]),
+      ObjectiveProps('sign', [Prop(PK.sign, _r(140, 6, 120, 26), _navy, _gold), Prop.custom(_hangSign, _r(182, 34, 46, 36), _cream, _red)]),
       ObjectiveProps('chains', [Prop(PK.door, _r(172, 70, 56, 82), _navy, _gold), Prop(PK.plant, _r(150, 118, 22, 36), _terracotta, _leaf), Prop(PK.plant, _r(228, 118, 22, 36), _terracotta, _leaf)]),
       ObjectiveProps('b2_book_cart', [Prop.custom(_bookCart, _r(50, 160, 74, 56), _wood, _red), Prop.custom(_bookCart, _r(278, 162, 74, 56), _wood, _blue)]),
       ObjectiveProps('books', [Prop.custom(_bookStack, _r(130, 186, 30, 38), _red, _blue), Prop.custom(_bookStack, _r(244, 190, 28, 34), _leaf, _gold)]),
@@ -2205,7 +2219,7 @@ final Map<String, SceneArt Function()> batch2Scenes = {
       ObjectiveProps('b2_telescope', [Prop.custom(_telescope, _r(146, 104, 108, 104), _white, _brass), Prop.custom(_telescope, _r(60, 150, 56, 60), _steel, _brass)]),
       ObjectiveProps('b2_rockets', [Prop.custom(_rocket, _r(336, 118, 38, 92), _white, _red)]),
       ObjectiveProps('maps', [Prop(PK.table, _r(252, 176, 76, 36), _wood, _cream), Prop.custom(_orrery, _r(270, 140, 36, 38), _brass, _aqua)]),
-      ObjectiveProps('ice', [Prop(PK.railing, _r(0, 154, 400, 24), _steel, _sky), Prop(PK.lounger, _r(92, 204, 70, 32), _navy, _lampGlow)]),
+      ObjectiveProps('ice', [Prop(PK.railing, _r(0, 154, 400, 24), _steel, _sky), Prop(PK.rug, _r(124, 210, 150, 24), _navy, _gold)]),
     ],
   ),
 };

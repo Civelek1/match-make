@@ -584,18 +584,27 @@ void _paintShark(Canvas c, Rect r, Color a, Color b, double t) {
 
 void _paintRay(Canvas c, Rect r, Color a, Color b, double t) {
   final w = r.width, h = r.height;
-  final flap = sin(t * 2 + r.left) * h * 0.12;
-  c.drawLine(Offset(r.center.dx, r.bottom - h * 0.32), Offset(r.center.dx + sin(t * 2) * w * 0.05, r.bottom), Pk.stroke(Pk.dark(a, 0.2), 2));
+  final cx = r.center.dx, cy = r.top + h * 0.42;
+  final flap = sin(t * 2 + r.left) * h * 0.1;
+  final tail = Path()
+    ..moveTo(cx, cy + h * 0.2)
+    ..quadraticBezierTo(cx + sin(t * 2 + r.left) * w * 0.08, r.bottom - h * 0.2, cx + w * 0.04, r.bottom);
+  c.drawPath(tail, Pk.stroke(Pk.dark(a, 0.25), 1.6));
   final body = Path()
-    ..moveTo(r.center.dx, r.top)
-    ..quadraticBezierTo(r.right - w * 0.1, r.top + h * 0.1 + flap, r.right, r.center.dy + flap)
-    ..quadraticBezierTo(r.center.dx + w * 0.2, r.center.dy + h * 0.1, r.center.dx, r.bottom - h * 0.3)
-    ..quadraticBezierTo(r.center.dx - w * 0.2, r.center.dy + h * 0.1, r.left, r.center.dy + flap)
-    ..quadraticBezierTo(r.left + w * 0.1, r.top + h * 0.1 + flap, r.center.dx, r.top)
+    ..moveTo(cx, r.top + h * 0.06)
+    ..quadraticBezierTo(cx + w * 0.22, r.top + h * 0.02, r.right, cy - h * 0.04 + flap)
+    ..quadraticBezierTo(cx + w * 0.2, cy + h * 0.12, cx, cy + h * 0.24)
+    ..quadraticBezierTo(cx - w * 0.2, cy + h * 0.12, r.left, cy - h * 0.04 + flap)
+    ..quadraticBezierTo(cx - w * 0.22, r.top + h * 0.02, cx, r.top + h * 0.06)
     ..close();
   c.drawPath(body, Pk.fill(a));
+  c.drawOval(Rect.fromCenter(center: Offset(cx, cy - h * 0.02), width: w * 0.22, height: h * 0.36), Pk.fill(Pk.light(a, 0.12)));
   for (var i = 0; i < 6; i++) {
-    c.drawCircle(Offset(r.center.dx + (Pk.rand(i) - 0.5) * w * 0.5, r.top + h * (0.22 + Pk.rand(i + 3) * 0.3)), w * 0.025, Pk.fill(b));
+    final s = i.isEven ? 1.0 : -1.0;
+    c.drawCircle(Offset(cx + s * w * (0.16 + (i ~/ 2) * 0.09), cy - h * 0.02 + (i ~/ 2) * h * 0.03), w * 0.022, Pk.fill(b));
+  }
+  for (final s in [-1.0, 1.0]) {
+    c.drawCircle(Offset(cx + s * w * 0.06, r.top + h * 0.16), w * 0.025, Pk.fill(_ink));
   }
 }
 
@@ -1657,6 +1666,11 @@ void _penguinCove(Canvas c, double ov, double t) {
   Pk.poly(c, const [Offset(0, 150), Offset(0, 90), Offset(30, 74), Offset(70, 96), Offset(100, 150)], Pk.fill(cliff));
   Pk.poly(c, const [Offset(400, 150), Offset(400, 62), Offset(350, 48), Offset(300, 86), Offset(262, 150)], Pk.fill(shade));
   Pk.poly(c, const [Offset(400, 150), Offset(400, 82), Offset(362, 70), Offset(320, 100), Offset(300, 150)], Pk.fill(cliff));
+  final berg = Pk.mix(const Color(0xFFB4BAC0), const Color(0xFFF4FBFF), ov);
+  final bergShade = Pk.mix(const Color(0xFF9CA4AC), const Color(0xFFCDEBFA), ov);
+  Pk.poly(c, const [Offset(120, 150), Offset(150, 104), Offset(176, 116), Offset(204, 86), Offset(250, 150)], Pk.fill(berg));
+  Pk.poly(c, const [Offset(204, 86), Offset(250, 150), Offset(214, 150), Offset(196, 112)], Pk.fill(bergShade));
+  Pk.poly(c, const [Offset(236, 150), Offset(262, 118), Offset(292, 150)], Pk.fill(bergShade));
   final water = Pk.mix(const Color(0xFF7FA3AE), const Color(0xFF2EB6E0), ov);
   final pool = Rect.fromLTWH(96, 170, 208, 58);
   c.drawOval(pool.inflate(5), Pk.fill(Pk.mix(const Color(0xFFB8B4AA), const Color(0xFFF2FBFF), ov)));
@@ -2035,7 +2049,7 @@ ZOO = [
           ('tree', [P('tree', 0, 52, 46, 104, '_leaf', '_orange'), P('tree', 356, 50, 44, 104, '_leaf', '_pink')]),
           ('crates', [P('crates', 70, 184, 52, 40, '_wood', '_gold'), P('crates', 262, 188, 48, 38, '_wood', '_leaf')]),
       ])),
-    L('zoo_giraffes', 77, 27, 'mediumHard',
+    L('zoo_giraffes', 77, 30, 'mediumHard',
       ['b2_paw', 'fence', 'hay', 'b2_leaf', 'water', 'tree'],
       ['..####..',
        '..####..',
@@ -2060,7 +2074,7 @@ ZOO = [
           ('trough', [P('trough', 206, 190, 76, 28, '_wood', '_aqua')]),
           ('crates', [P('crates', 318, 182, 58, 44, '_wood', '_gold')]),
       ])),
-    L('zoo_penguins', 78, 26, 'mediumHard',
+    L('zoo_penguins', 78, 29, 'mediumHard',
       ['snowflake', 'ski', 'b2_bird', 'rod', 'wave', 'b2_egg'],
       ['........',
        '.i....i.',
@@ -2073,7 +2087,7 @@ ZOO = [
       [('b2_penguins', 'b2_bird', 15), ('b2_ice_rocks', 'snowflake', 15), ('b2_floes', 'wave', 14),
        ('eggs', 'b2_egg', 14), ('b2_slide', 'ski', 14), ('ice', 'ice', 6)],
       [22000, 28500], 0.45,
-      ('PENGUIN POOL', 'PENGUEN HAVUZU'),
+      ('PENGUIN POOL', 'PENGUEN GÖLÜ'),
       ('Chill the pool for the penguins.', 'Penguenler için havuzu serinlet.'),
       (0xFFDFF6FF, 0xFF8FD0F0, 0xFF3A6E9A, 0xFF4FD6E8),
       dict(backdrop=outdoor(0xFFB9B6AE, 0xFFF4FAFF, 150, 'sand', topR=0xFF8FD0FF), scenery='_penguinCove', props=[
@@ -2085,7 +2099,7 @@ ZOO = [
           ('eggs', [P('@nest', 20, 200, 50, 26, '_straw', '_cream'), P('@nest', 350, 214, 44, 22, '_straw', '_cream')]),
           ('ice', [P('@penguin', 96, 196, 24, 34, '_ink', '_gold'), P('snowman', 270, 156, 20, 46, '_white', '_red')]),
       ])),
-    L('zoo_reptiles', 79, 27, 'mediumHard',
+    L('zoo_reptiles', 79, 30, 'mediumHard',
       ['b2_paw', 'fence', 'torch', 'b2_leaf', 'b2_bee', 'b2_egg'],
       ['..l##l..',
        '...##...',
@@ -2095,9 +2109,9 @@ ZOO = [
        '...##...',
        '.l.##.l.',
        '...##...'],  # twin rooms
-      [('b2_reptiles', 'b2_paw', 15), ('b2_terrariums', 'b2_leaf', 15), ('lamps', 'torch', 14), ('b2_insects', 'b2_bee', 14),
-       ('eggs', 'b2_egg', 13), ('chains', 'chain', 6), ('crates', 'crate', 4)],
-      [23000, 30000], 0.42,
+      [('b2_reptiles', 'b2_paw', 13), ('b2_terrariums', 'b2_leaf', 13), ('lamps', 'torch', 12), ('b2_insects', 'b2_bee', 12),
+       ('eggs', 'b2_egg', 11), ('chains', 'chain', 5), ('crates', 'crate', 4)],
+      [23000, 30000], 0.40,
       ('REPTILE HOUSE', 'SÜRÜNGEN EVİ'),
       ('Warm up the reptile house.', 'Sürüngen evini ısıt.'),
       (0xFFCDEBB0, 0xFF5E9A4A, 0xFF3A5A2A, 0xFFFF9A3C),
@@ -2112,7 +2126,7 @@ ZOO = [
                       P('plant', 244, 112, 32, 40, '_terracotta', '_leaf')]),
           ('crates', [P('crates', 300, 186, 62, 42, '_wood', '_leaf')]),
       ])),
-    L('zoo_petting', 80, 28, 'hard',
+    L('zoo_petting', 80, 23, 'hard',
       ['hen', 'b2_rabbit', 'hay', 'grass', 'water', 'b2_egg'],
       ['#..##..#',
        '.c....c.',
@@ -2122,8 +2136,8 @@ ZOO = [
        '##....##',
        '###..###',
        '########'],  # heart
-      [('animals', 'b2_rabbit', 14), ('hens', 'hen', 14), ('hay', 'hay', 14), ('grass', 'grass', 13),
-       ('trough', 'water', 13), ('eggs', 'b2_egg', 13), ('gates', 'key', 2)],
+      [('animals', 'b2_rabbit', 15), ('hens', 'hen', 15), ('hay', 'hay', 15), ('grass', 'grass', 14),
+       ('trough', 'water', 14), ('eggs', 'b2_egg', 14), ('gates', 'key', 3)],
       [21000, 27500], 0.35,
       ('PETTING FARM', 'MİNİ ÇİFTLİK'),
       ('Make a cosy farm for gentle animals.', 'Sevimli hayvanlar için şirin bir çiftlik kur.'),
@@ -2142,7 +2156,7 @@ ZOO = [
 
 # ============================================================================= AQUARIUM
 AQUARIUM = [
-    L('aquarium_hall', 81, 26, 'mediumHard',
+    L('aquarium_hall', 81, 27, 'mediumHard',
       ['b2_diver', 'ticket', 'fish', 'b2_tide', 'photo', 'b2_bubble'],
       ['##....##',
        '##.ii.##',
@@ -2167,7 +2181,7 @@ AQUARIUM = [
           ('ice', [P('bench', 140, 186, 120, 30, '_blue', '_steel'), P('plant', 364, 140, 30, 44, '_teal', '_leaf'),
                    P('plant', 120, 140, 30, 44, '_teal', '_leaf')]),
       ])),
-    L('aquarium_coral', 82, 27, 'mediumHard',
+    L('aquarium_coral', 82, 28, 'mediumHard',
       ['b2_diver', 'b2_drop', 'fish', 'plants', 'wave', 'b2_bubble'],
       ['i..ii..i',
        '.##..##.',
@@ -2179,7 +2193,7 @@ AQUARIUM = [
        '...ii...'],  # window panes
       [('b2_coral', 'plants', 15), ('b2_fish', 'fish', 15), ('b2_bubbles', 'b2_bubble', 14), ('b2_divers', 'b2_diver', 14),
        ('seats', 'b2_drop', 14), ('ice', 'ice', 12)],
-      [23000, 30000], 0.46,
+      [23000, 30000], 0.42,
       ('CORAL TANK', 'MERCAN TANKI'),
       ('Bring the coral reef back to life.', 'Mercan resifini yeniden canlandır.'),
       (0xFFC6F0FF, 0xFF2EA6D8, 0xFF1E4F7A, 0xFFFF7F6B),
@@ -2188,12 +2202,12 @@ AQUARIUM = [
                        P('@fish', 326, 32, 34, 20, '_pink', '_aqua')]),
           ('b2_divers', [P('@diver', 168, 26, 70, 42, '_orange', '_steel')]),
           ('b2_bubbles', [P('@bubbles', 64, 30, 20, 120, '_aqua', '_white'), P('@bubbles', 284, 20, 20, 120, '_aqua', '_white')]),
-          ('b2_coral', [P('@coralProp', 20, 92, 60, 66, '_coral', '_gold'), P('@weed', 172, 96, 52, 62, '_leaf', '_teal'),
-                        P('@coralProp', 310, 86, 62, 72, '_pink', '_white')]),
+          ('b2_coral', [P('@coralProp', 86, 84, 70, 76, '_coral', '_gold'), P('@weed', 176, 98, 50, 60, '_leaf', '_teal'),
+                        P('@coralProp', 246, 80, 70, 80, '_pink', '_white')]),
           ('seats', [P('bench', 50, 190, 110, 30, '_coral', '_steel'), P('bench', 240, 192, 110, 30, '_coral', '_steel')]),
           ('ice', [P('railing', 0, 158, 400, 22, '_steel', '_aqua'), P('plant', 182, 184, 36, 48, '_navy', '_leaf')]),
       ])),
-    L('aquarium_tunnel', 83, 26, 'mediumHard',
+    L('aquarium_tunnel', 83, 32, 'mediumHard',
       ['anchor', 'b2_drop', 'fish', 'b2_tide', 'wave', 'b2_bubble'],
       ['i......i',
        '#.l..l.#',
@@ -2203,15 +2217,15 @@ AQUARIUM = [
        '##.ii.##',
        '#.l..l.#',
        '........'],  # hourglass
-      [('b2_sharks', 'fish', 13), ('lights', 'b2_drop', 13), ('b2_rays', 'b2_tide', 13), ('anchors', 'anchor', 12),
-       ('b2_bubbles', 'b2_bubble', 12), ('ice', 'ice', 6), ('chains', 'chain', 4)],
-      [20000, 26000], 0.44,
-      ('SHARK TUNNEL', 'KÖPEKBALIĞI YOLU'),
+      [('b2_sharks', 'fish', 12), ('lights', 'b2_drop', 12), ('b2_rays', 'b2_tide', 12), ('anchors', 'anchor', 11),
+       ('b2_bubbles', 'b2_bubble', 11), ('ice', 'ice', 6), ('chains', 'chain', 4)],
+      [20000, 26000], 0.40,
+      ('SHARK TUNNEL', 'CAM TÜNEL'),
       ('Walk beneath the sharks again.', 'Köpekbalıklarının altından yeniden yürü.'),
       (0xFFB8E8FF, 0xFF1E7FC0, 0xFF143E6A, 0xFF8FD0FF),
       dict(backdrop=indoor(0xFF6E8088, 0xFF2E7FB8, 0xFF6E6E70, 0xFF3A4A7A, 0xFF5E5E60, 0xFF2B3A67, 'carpet'), scenery='_sharkTunnel', props=[
           ('b2_sharks', [P('@shark', 40, 40, 116, 46, '_grey', '_white'), P('@shark', 244, 70, 96, 38, '_grey', '_white')]),
-          ('b2_rays', [P('@ray', 168, 30, 70, 50, '_sand', '_cream'), P('@ray', 300, 18, 52, 38, '_stone', '_white')]),
+          ('b2_rays', [P('@ray', 162, 92, 70, 52, '_grey', '_white'), P('@ray', 300, 18, 56, 42, '_teal', '_cream')]),
           ('b2_bubbles', [P('@bubbles', 136, 40, 16, 110, '_aqua', '_white'), P('@bubbles', 252, 34, 16, 110, '_aqua', '_white')]),
           ('anchors', [P('anchor', 52, 112, 34, 46, '_grey', '_gold'), P('crates', 330, 128, 42, 30, '_darkWood', '_gold')]),
           ('lights', [P('pendant', 186, 6, 28, 30, '_steel', '_aqua'), P('spotlight', 70, 60, 32, 50, '_steel', '_aqua'),
@@ -2219,7 +2233,7 @@ AQUARIUM = [
           ('ice', [P('bench', 146, 192, 108, 28, '_steel', '_navy'), P('@coralProp', 102, 116, 36, 44, '_coral', '_gold')]),
           ('chains', [P('railing', 0, 172, 120, 24, '_steel', '_aqua'), P('railing', 280, 172, 120, 24, '_steel', '_aqua')]),
       ])),
-    L('aquarium_jelly', 84, 27, 'mediumHard',
+    L('aquarium_jelly', 84, 25, 'mediumHard',
       ['b2_diver', 'b2_drop', 'fish', 'b2_tide', 'b2_jelly', 'b2_bubble'],
       ['###..###',
        '##.ii.##',
@@ -2232,7 +2246,7 @@ AQUARIUM = [
       [('b2_jellyfish', 'b2_jelly', 14), ('b2_tanks', 'b2_drop', 13), ('lights', 'b2_bubble', 13), ('b2_fish', 'fish', 13),
        ('seats', 'b2_tide', 12), ('ice', 'ice', 12)],
       [21000, 27500], 0.42,
-      ('JELLYFISH ROOM', 'DENİZANASI ODASI'),
+      ('JELLYFISH ROOM', 'DENİZANALARI'),
       ('Light up the glowing jellyfish.', 'Parlayan denizanalarını aydınlat.'),
       (0xFF4A3A8A, 0xFF1A1440, 0xFF6B4BD6, 0xFFFF7AD9, True),
       dict(backdrop=indoor(0xFF4A4E58, 0xFF27306A, 0xFF3E3E44, 0xFF1E2448, 0xFF34343A, 0xFF161A38, 'tiles', night=True), scenery='_jellyRoom', props=[
@@ -2244,7 +2258,7 @@ AQUARIUM = [
           ('seats', [P('bench', 108, 188, 78, 28, '_purple', '_steel'), P('bench', 218, 192, 78, 28, '_purple', '_steel')]),
           ('ice', [P('rug', 96, 208, 210, 26, '_navy', '_aqua'), P('plant', 362, 168, 28, 40, '_navy', '_teal')]),
       ])),
-    L('aquarium_touch', 85, 27, 'hard',
+    L('aquarium_touch', 85, 22, 'hard',
       ['b2_star', 'b2_drop', 'fish', 'b2_tide', 'wave', 'b2_bubble'],
       ['##.ii.##',
        '##....##',
@@ -2254,17 +2268,17 @@ AQUARIUM = [
        'i......i',
        '##....##',
        '##....##'],  # plus
-      [('b2_starfish', 'b2_star', 14), ('pool', 'wave', 14), ('b2_fish', 'fish', 13), ('b2_rays', 'b2_tide', 13),
-       ('b2_bubbles', 'b2_bubble', 12), ('ice', 'ice', 10), ('gates', 'key', 2)],
+      [('b2_starfish', 'b2_star', 16), ('pool', 'wave', 16), ('b2_fish', 'fish', 15), ('b2_rays', 'b2_tide', 15),
+       ('b2_bubbles', 'b2_bubble', 14), ('ice', 'ice', 10), ('gates', 'key', 3)],
       [21000, 27500], 0.35,
-      ('TOUCH POOL', 'DOKUNMA HAVUZU'),
+      ('TOUCH POOL', 'KEŞİF HAVUZU'),
       ('Let little hands meet sea stars.', 'Minik eller deniz yıldızlarıyla tanışsın.'),
       (0xFFD8F8F0, 0xFF4FC8C0, 0xFF1F6F6A, 0xFFFF9A3C),
       dict(backdrop=indoor(0xFFA8B0AE, 0xFFE6FAF4, 0xFF8E9696, 0xFFFFF1DA, 0xFF7E8686, 0xFFF2D59A, 'tiles'), scenery='_touchMural', props=[
           ('pool', [P('@touchPool', 104, 136, 192, 64, '_stone', '_aqua')]),
           ('b2_starfish', [P('@starfishWall', 30, 112, 24, 24, '_orange', '_gold'), P('@starfishWall', 352, 104, 28, 28, '_coral', '_cream'),
                            P('@starfish', 70, 206, 24, 24, '_purple', '_gold')]),
-          ('b2_rays', [P('@ray', 40, 28, 70, 50, '_teal', '_cream'), P('@ray', 300, 36, 56, 40, '_sand', '_white')]),
+          ('b2_rays', [P('@ray', 40, 28, 74, 56, '_teal', '_cream'), P('@ray', 296, 34, 60, 44, '_grey', '_white')]),
           ('b2_fish', [P('@fish', 150, 36, 40, 24, '_orange', '_white'), P('@fish', 214, 58, 34, 20, '_gold', '_blue')]),
           ('b2_bubbles', [P('@bubbles', 124, 40, 16, 80, '_aqua', '_white'), P('@bubbles', 262, 30, 16, 80, '_aqua', '_white')]),
           ('ice', [P('bench', 16, 180, 76, 28, '_teal', '_steel'), P('plant', 324, 168, 30, 44, '_teal', '_leaf')]),
@@ -2274,7 +2288,7 @@ AQUARIUM = [
 
 # ============================================================================= FUNFAIR
 FUNFAIR = [
-    L('funfair_arch', 86, 26, 'mediumHard',
+    L('funfair_arch', 86, 30, 'mediumHard',
       ['party', 'ticket', 'sign', 'b2_candy', 'icecream', 'spotlight'],
       ['..l..l..',
        '........',
@@ -2284,8 +2298,8 @@ FUNFAIR = [
        'c.####.c',
        '..####..',
        '..####..'],  # arch
-      [('b2_arch', 'sign', 15), ('tickets', 'ticket', 15), ('b2_balloons', 'party', 14), ('b2_treats', 'b2_candy', 14),
-       ('ice_cream', 'icecream', 14), ('lights', 'spotlight', 14), ('gates', 'key', 2)],
+      [('b2_arch', 'sign', 14), ('tickets', 'ticket', 14), ('b2_balloons', 'party', 13), ('b2_treats', 'b2_candy', 13),
+       ('ice_cream', 'icecream', 13), ('lights', 'spotlight', 13), ('gates', 'key', 2)],
       [22000, 29000], 0.52,
       ('ENTRANCE ARCH', 'GİRİŞ KEMERİ'),
       ('Light up the funfair entrance.', 'Lunaparkın girişini ışıklandır.'),
@@ -2296,11 +2310,11 @@ FUNFAIR = [
           ('tickets', [P('@booth', 16, 92, 66, 78, '_cream', '_red')]),
           ('b2_balloons', [P('@balloons', 88, 108, 32, 64, '_red', '_pink'), P('@balloons', 284, 104, 34, 66, '_blue', '_gold')]),
           ('b2_treats', [P('@popcorn', 326, 112, 56, 70, '_red', '_gold')]),
-          ('ice_cream', [P('@iceCart', 30, 176, 70, 54, '_white', '_pink')]),
+          ('ice_cream', [P('@iceCart', 166, 176, 68, 54, '_white', '_pink')]),
           ('lights', [P('lamppost', 132, 152, 16, 78, '_navy', '_lampGlow'), P('lamppost', 254, 152, 16, 78, '_navy', '_lampGlow'),
                       P('@bunting', 0, 14, 400, 34, '_red', '_gold')]),
       ])),
-    L('funfair_carousel', 87, 27, 'mediumHard',
+    L('funfair_carousel', 87, 26, 'mediumHard',
       ['b2_wheel', 'b2_toy', 'juice', 'b2_candy', 'music', 'spotlight'],
       ['##....##',
        '#.l..l.#',
@@ -2326,7 +2340,7 @@ FUNFAIR = [
           ('b2_treats', [P('@popcorn', 320, 132, 54, 66, '_pink', '_white'), P('@balloons', 372, 120, 26, 62, '_gold', '_red')]),
           ('chains', [P('fence', 0, 202, 110, 26, '_white', '_white'), P('fence', 290, 204, 110, 26, '_white', '_white')]),
       ])),
-    L('funfair_wheel', 88, 27, 'mediumHard',
+    L('funfair_wheel', 88, 32, 'mediumHard',
       ['b2_wheel', 'ticket', 'juice', 'b2_candy', 'music', 'b2_prize'],
       ['........',
        '.l....l.',
@@ -2336,8 +2350,8 @@ FUNFAIR = [
        '..#..#..',
        '........',
        '........'],  # ring
-      [('b2_ferris', 'b2_wheel', 14), ('tickets', 'ticket', 14), ('juice_bar', 'juice', 13), ('b2_treats', 'b2_candy', 13),
-       ('b2_prizes', 'b2_prize', 13), ('chains', 'chain', 4), ('chests', 'key', 3)],
+      [('b2_ferris', 'b2_wheel', 12), ('tickets', 'ticket', 12), ('juice_bar', 'juice', 11), ('b2_treats', 'b2_candy', 11),
+       ('b2_prizes', 'b2_prize', 11), ('chains', 'chain', 4), ('chests', 'key', 2)],
       [21000, 27500], 0.42,
       ('FERRIS WHEEL', 'DÖNME DOLAP'),
       ('Get the big wheel turning again.', 'Dev çarkı yeniden döndür.'),
@@ -2351,7 +2365,7 @@ FUNFAIR = [
           ('chains', [P('bench', 148, 198, 104, 28, '_red', '_gold')]),
           ('chests', [P('crates', 90, 186, 50, 40, '_darkWood', '_gold')]),
       ])),
-    L('funfair_stalls', 89, 27, 'mediumHard',
+    L('funfair_stalls', 89, 25, 'mediumHard',
       ['party', 'b2_toy', 'b2_dice', 'b2_candy', 'b2_tent', 'b2_prize'],
       ['..c...##',
        '......##',
@@ -2361,8 +2375,8 @@ FUNFAIR = [
        '....c.##',
        '##......',
        '##......'],  # zigzag
-      [('b2_stalls', 'b2_tent', 15), ('b2_prizes', 'b2_prize', 14), ('b2_games', 'b2_dice', 14), ('b2_toys', 'b2_toy', 14),
-       ('b2_balloons', 'party', 13), ('crates', 'crate', 5), ('chests', 'key', 2)],
+      [('b2_stalls', 'b2_tent', 16), ('b2_prizes', 'b2_prize', 15), ('b2_games', 'b2_dice', 15), ('b2_toys', 'b2_toy', 15),
+       ('b2_balloons', 'party', 14), ('crates', 'crate', 5), ('chests', 'key', 2)],
       [22000, 28500], 0.42,
       ('GAME STALLS', 'OYUN STANTLARI'),
       ('Win prizes at the game stalls.', 'Oyun stantlarında ödüller kazan.'),
@@ -2376,7 +2390,7 @@ FUNFAIR = [
           ('crates', [P('crates', 214, 188, 52, 38, '_wood', '_gold'), P('barrel', 360, 200, 28, 30, '_darkWood', '_gold')]),
           ('chests', [P('crates', 150, 194, 52, 36, '_gold', '_red')]),
       ])),
-    L('funfair_coaster', 90, 28, 'hard',
+    L('funfair_coaster', 90, 25, 'hard',
       ['b2_wheel', 'ticket', 'juice', 'b2_candy', 'b2_tent', 'spotlight'],
       ['....####',
        '.....###',
@@ -2387,8 +2401,8 @@ FUNFAIR = [
        '##..l...',
        '###.....'],  # staircase
       [('b2_coaster', 'b2_wheel', 15), ('tickets', 'ticket', 14), ('b2_treats', 'b2_candy', 14), ('lights', 'spotlight', 14),
-       ('juice_bar', 'juice', 13), ('chains', 'chain', 4), ('gates', 'key', 2)],
-      [22000, 28500], 0.33,
+       ('juice_bar', 'juice', 13), ('chains', 'chain', 4), ('gates', 'key', 3)],
+      [22000, 28500], 0.36,
       ('ROLLER COASTER', 'HIZ TRENİ'),
       ('Send the coaster flying once more.', 'Hız trenini yeniden uçur.'),
       (0xFFFFD8C8, 0xFFE06A5A, 0xFF8A2E3A, 0xFFFFE066),
@@ -2406,7 +2420,7 @@ FUNFAIR = [
 
 # ============================================================================= BOOKSHOP
 BOOKSHOP = [
-    L('bookshop_front', 91, 26, 'mediumHard',
+    L('bookshop_front', 91, 28, 'mediumHard',
       ['chair', 'b2_books', 'sign', 'book', 'awning', 'b2_shop'],
       ['.l....l.',
        '........',
@@ -2423,16 +2437,16 @@ BOOKSHOP = [
       ('Polish the bookshop windows.', 'Kitapçının vitrinlerini parlat.'),
       (0xFFFFE8D0, 0xFFE0906A, 0xFF7A3A2A, 0xFF45A7F5),
       dict(backdrop=outdoor(0xFFA8A296, 0xFFD9D2C3, 152, 'stone', topR=0xFF8ED0FF), scenery='_shopFacade', props=[
-          ('b2_shopfront', [P('@shopWindow', 34, 62, 116, 74, '_navy', '_red'), P('@shopWindow', 250, 62, 116, 74, '_navy', '_blue')]),
+          ('b2_shopfront', [P('@shopWindow', 36, 72, 112, 64, '_navy', '_red'), P('@shopWindow', 252, 72, 112, 64, '_navy', '_blue')]),
           ('awning', [P('awning', 26, 42, 132, 24, '_red', '_cream'), P('awning', 242, 42, 132, 24, '_red', '_cream')]),
-          ('sign', [P('sign', 140, 6, 120, 26, '_navy', '_gold'), P('@hangSign', 228, 56, 46, 40, '_cream', '_red')]),
+          ('sign', [P('sign', 140, 6, 120, 26, '_navy', '_gold'), P('@hangSign', 182, 34, 46, 36, '_cream', '_red')]),
           ('chains', [P('door', 172, 70, 56, 82, '_navy', '_gold'), P('plant', 150, 118, 22, 36, '_terracotta', '_leaf'),
                       P('plant', 228, 118, 22, 36, '_terracotta', '_leaf')]),
           ('b2_book_cart', [P('@bookCart', 50, 160, 74, 56, '_wood', '_red'), P('@bookCart', 278, 162, 74, 56, '_wood', '_blue')]),
           ('books', [P('@bookStack', 130, 186, 30, 38, '_red', '_blue'), P('@bookStack', 244, 190, 28, 34, '_leaf', '_gold')]),
           ('bench', [P('bench', 166, 196, 70, 28, '_darkWood', '_gold'), P('lamppost', 364, 124, 16, 90, '_navy', '_lampGlow')]),
       ])),
-    L('bookshop_nook', 92, 27, 'mediumHard',
+    L('bookshop_nook', 92, 29, 'mediumHard',
       ['furniture', 'b2_books', 'b2_bookmark', 'book', 'window', 'lantern'],
       ['.l..####',
        '....####',
@@ -2457,7 +2471,7 @@ BOOKSHOP = [
           ('decor', [P('rug', 104, 196, 192, 34, '_red', '_gold'), P('plant', 56, 160, 32, 48, '_terracotta', '_leaf')]),
           ('chains', [P('@ladder', 78, 34, 40, 140, '_wood', '_brass'), P('clock', 262, 44, 24, 56, '_darkWood', '_gold')]),
       ])),
-    L('bookshop_kids', 93, 27, 'mediumHard',
+    L('bookshop_kids', 93, 28, 'mediumHard',
       ['b2_story', 'b2_toy', 'b2_dice', 'b2_pen', 'b2_puzzle', 'shelves'],
       ['..l...c.',
        '....####',
@@ -2467,8 +2481,8 @@ BOOKSHOP = [
        '....####',
        '..l.####',
        '.....c..'],  # E
-      [('b2_picture_books', 'b2_story', 14), ('b2_toys', 'b2_toy', 14), ('b2_crayons', 'b2_pen', 14), ('b2_puzzles', 'b2_puzzle', 13),
-       ('shelves', 'shelves', 13), ('chains', 'chain', 4), ('crates', 'crate', 4)],
+      [('b2_picture_books', 'b2_story', 13), ('b2_toys', 'b2_toy', 13), ('b2_crayons', 'b2_pen', 13), ('b2_puzzles', 'b2_puzzle', 12),
+       ('shelves', 'shelves', 12), ('chains', 'chain', 3), ('crates', 'crate', 3)],
       [21000, 27500], 0.44,
       ("KIDS' CORNER", 'ÇOCUK KÖŞESİ'),
       ('Fill the kids corner with colour.', 'Çocuk köşesini renklerle doldur.'),
@@ -2483,7 +2497,7 @@ BOOKSHOP = [
           ('chains', [P('@beanbag', 300, 180, 62, 46, '_purple', '_gold'), P('@bunting', 0, 4, 400, 26, '_pink', '_sky')]),
           ('crates', [P('crates', 248, 136, 46, 40, '_red', '_gold'), P('toolbox', 166, 202, 40, 28, '_blue', '_gold')]),
       ])),
-    L('bookshop_cafe', 94, 27, 'mediumHard',
+    L('bookshop_cafe', 94, 25, 'mediumHard',
       ['menu', 'b2_books', 'juice', 'pie', 'b2_cafe', 'decor_cup'],
       ['####.l..',
        '###....l',
@@ -2508,7 +2522,7 @@ BOOKSHOP = [
           ('chains', [P('roundTable', 128, 148, 70, 42, '_cream', '_red'), P('chair', 100, 150, 26, 44, '_wood', '_red'),
                       P('chair', 200, 152, 26, 44, '_wood', '_red')]),
       ])),
-    L('bookshop_rare', 95, 27, 'hard',
+    L('bookshop_rare', 95, 26, 'hard',
       ['b2_story', 'b2_books', 'b2_bookmark', 'globe', 'scroll', 'hourglass'],
       ['.l....l.',
        '..L..L..',
@@ -2520,8 +2534,8 @@ BOOKSHOP = [
        '........'],  # two floors
       [('b2_rare_books', 'b2_books', 15), ('scrolls', 'scroll', 14), ('globes', 'globe', 14), ('clocks', 'hourglass', 14),
        ('display_cases', 'b2_bookmark', 14), ('chains', 'chain', 7), ('chests', 'key', 2)],
-      [22000, 28500], 0.32,
-      ('RARE BOOKS ROOM', 'NADİR KİTAPLAR'),
+      [22000, 28500], 0.35,
+      ('RARE BOOKS', 'NADİR KİTAPLAR'),
       ('Unlock the oldest books in town.', 'Şehrin en eski kitaplarının kilidini aç.'),
       (0xFFE8D8C0, 0xFF8A5A3A, 0xFF4A2A1A, 0xFFFFC93C),
       dict(backdrop=indoor(0xFF8E857A, 0xFFB8946A, 0xFF7D7064, 0xFF8A2B2B, 0xFF6E6254, 0xFF6E2020, 'carpet'), scenery='_rareWall', props=[
@@ -2564,7 +2578,7 @@ OBSERVATORY = [
           ('grass', [P('bush', 70, 196, 64, 32, '_green', '_lampGlow'), P('flowerbed', 286, 222, 90, 16, '_lilac', '_white')]),
           ('chains', [P('@telescope', 20, 160, 52, 62, '_white', '_brass'), P('@rock', 210, 214, 50, 22, '_stone', '_leaf')]),
       ])),
-    L('observatory_dome', 97, 27, 'mediumHard',
+    L('observatory_dome', 97, 25, 'mediumHard',
       ['b2_star', 'b2_moon', 'b2_satellite', 'globe', 'compass', 'b2_lens'],
       ['##....##',
        '#.j..j.#',
@@ -2577,7 +2591,7 @@ OBSERVATORY = [
       [('b2_telescope', 'b2_satellite', 16), ('b2_dome', 'b2_moon', 15), ('maps', 'compass', 15), ('globes', 'globe', 15),
        ('b2_lenses', 'b2_lens', 14), ('ice', 'ice', 8), ('chains', 'chain', 4)],
       [25000, 32500], 0.42,
-      ('TELESCOPE DOME', 'TELESKOP KUBBESİ'),
+      ('GREAT DOME', 'KUBBE ODASI'),
       ('Aim the great telescope skyward.', 'Büyük teleskobu gökyüzüne çevir.'),
       (0xFF4A4A9A, 0xFF1E1E50, 0xFF6B6BD6, 0xFFFFC93C, True),
       dict(backdrop=indoor(0xFF5A5E68, 0xFF3A4A8A, 0xFF5E5A54, 0xFF6E6A80, 0xFF4E4A44, 0xFF56526A, 'tiles', night=True), scenery='_domeInterior', props=[
@@ -2590,7 +2604,7 @@ OBSERVATORY = [
           ('ice', [P('rug', 120, 206, 160, 26, '_navy', '_gold')]),
           ('chains', [P('railing', 0, 150, 70, 22, '_steel', '_navy'), P('railing', 330, 150, 70, 22, '_steel', '_navy')]),
       ])),
-    L('observatory_planetarium', 98, 27, 'mediumHard',
+    L('observatory_planetarium', 98, 30, 'mediumHard',
       ['b2_star', 'b2_moon', 'beacon', 'b2_rocket', 'b2_radar', 'b2_lens'],
       ['..i..i..',
        'i......i',
@@ -2617,7 +2631,7 @@ OBSERVATORY = [
           ('ice', [P('rug', 150, 200, 100, 30, '_navy', '_aqua')]),
           ('doors', [P('door', 14, 98, 40, 74, '_purple', '_gold')]),
       ])),
-    L('observatory_library', 99, 27, 'mediumHard',
+    L('observatory_library', 99, 30, 'mediumHard',
       ['b2_star', 'b2_moon', 'b2_bookmark', 'book', 'scroll', 'hourglass'],
       ['###..###',
        '##l..l##',
@@ -2630,7 +2644,7 @@ OBSERVATORY = [
       [('maps', 'scroll', 13), ('books', 'book', 13), ('b2_constellations', 'b2_star', 13), ('clocks', 'hourglass', 13),
        ('globes', 'b2_moon', 12), ('chains', 'chain', 6), ('crates', 'crate', 4)],
       [20000, 26000], 0.40,
-      ('STAR MAP LIBRARY', 'GÖK HARİTALARI'),
+      ('MAP LIBRARY', 'GÖK HARİTALARI'),
       ('Sort the old star charts.', 'Eski gök haritalarını düzenle.'),
       (0xFF4A5AA8, 0xFF1E2458, 0xFF8B5E3C, 0xFFFFC93C, True),
       dict(backdrop=indoor(0xFF6E6E78, 0xFF34407A, 0xFF7D7064, 0xFF8B5E3C, 0xFF6E6254, 0xFF6E4B3A, 'planks', night=True), scenery='_starLibrary', props=[
@@ -2643,7 +2657,7 @@ OBSERVATORY = [
           ('chains', [P('table', 150, 150, 100, 40, '_wood', '_cream'), P('@ladder', 70, 30, 36, 140, '_wood', '_brass')]),
           ('crates', [P('@scrolls', 40, 184, 38, 46, '_terracotta', '_gold'), P('crates', 316, 188, 56, 40, '_darkWood', '_gold')]),
       ])),
-    L('observatory_roof', 100, 28, 'hard',
+    L('observatory_roof', 100, 23, 'hard',
       ['b2_star', 'b2_moon', 'b2_satellite', 'b2_rocket', 'compass', 'lantern'],
       ['###..###',
        '##.jj.##',
@@ -2653,8 +2667,8 @@ OBSERVATORY = [
        '##....##',
        '##....##',
        '##....##'],  # arrow
-      [('b2_telescope', 'b2_satellite', 14), ('b2_stars', 'b2_star', 14), ('b2_rockets', 'b2_rocket', 13), ('lights', 'lantern', 13),
-       ('maps', 'compass', 13), ('ice', 'ice', 6), ('gates', 'key', 2)],
+      [('b2_telescope', 'b2_satellite', 15), ('b2_stars', 'b2_star', 15), ('b2_rockets', 'b2_rocket', 14), ('lights', 'lantern', 14),
+       ('maps', 'compass', 14), ('ice', 'ice', 6), ('gates', 'key', 3)],
       [20000, 26000], 0.30,
       ('ROOFTOP DECK', 'ÇATI TERASI'),
       ('Watch the night sky from the roof.', 'Çatıdan gece gökyüzünü izle.'),
@@ -2668,7 +2682,7 @@ OBSERVATORY = [
           ('b2_telescope', [P('@telescope', 146, 104, 108, 104, '_white', '_brass'), P('@telescope', 60, 150, 56, 60, '_steel', '_brass')]),
           ('b2_rockets', [P('@rocket', 336, 118, 38, 92, '_white', '_red')]),
           ('maps', [P('table', 252, 176, 76, 36, '_wood', '_cream'), P('@orrery', 270, 140, 36, 38, '_brass', '_aqua')]),
-          ('ice', [P('railing', 0, 154, 400, 24, '_steel', '_sky'), P('lounger', 92, 204, 70, 32, '_navy', '_lampGlow')]),
+          ('ice', [P('railing', 0, 154, 400, 24, '_steel', '_sky'), P('rug', 124, 210, 150, 24, '_navy', '_gold')]),
       ])),
 ]
 
