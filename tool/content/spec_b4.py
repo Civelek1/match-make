@@ -123,6 +123,7 @@ const _emerald = Color(0xFF2EC27E);
 const _mint = Color(0xFF7FE0C8);
 const _maple = Color(0xFFE8603C);
 const _night = Color(0xFF1E2448);
+const _terracotta = Color(0xFFE07A4F);
 
 Paint _vgrad(Rect r, Color top, Color bottom) =>
     Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [top, bottom]).createShader(r);
@@ -1906,7 +1907,300 @@ def _placeholder(objectives):
     )
 
 
-SCENES = {}
+def _c(v):
+    return f'Color(0x{v:08X})'
+
+
+def indoor(topN, topR, gN, gR, fN, fR, floor='checker', night=False):
+    extra = ', night: true' if night else ''
+    return (f'const Backdrop.indoor(topN: {_c(topN)}, topR: {_c(topR)}, groundN: {_c(gN)}, groundR: {_c(gR)}, '
+            f'floorAltN: {_c(fN)}, floorAltR: {_c(fR)}, floor: FloorStyle.{floor}{extra})')
+
+
+def outdoor(gN, gR, horizon=146, floor='sand', night=False, skyline=False, topN=None, topR=None, bottomN=None, bottomR=None):
+    s = f'const Backdrop.outdoor(groundN: {_c(gN)}, groundR: {_c(gR)}, horizon: {horizon}, floor: FloorStyle.{floor}'
+    for k, v in (('topN', topN), ('topR', topR), ('bottomN', bottomN), ('bottomR', bottomR)):
+        if v is not None:
+            s += f', {k}: {_c(v)}'
+    if night:
+        s += ', night: true'
+    if skyline:
+        s += ', skyline: true'
+    return s + ')'
+
+
+def S(backdrop, scenery, *props):
+    return dict(backdrop=backdrop, scenery=scenery, props=list(props))
+
+
+_SNOW = (0xFFB9B6AE, 0xFFF4FAFF)
+_NIGHT_SKY = dict(topN=0xFF4A4E66, topR=0xFF1E2A5E, bottomN=0xFF6E7290, bottomR=0xFF3A4A8A)
+
+SCENES = {
+    # ------------------------------------------------------------------ ICE PALACE
+    'ice_palace_gate': S(
+        outdoor(*_SNOW, horizon=148, topR=0xFF7FC8FF, bottomR=0xFFE6F6FF), '_iceGateScenery',
+        ('gates', [('@iceGate', 150, 58, 100, 92, '_iceBlue', '_aqua')]),
+        ('b4_ice_towers', [('@iceTower', 54, 22, 52, 126, '_ice', '_aqua'), ('@iceTower', 294, 22, 52, 126, '_ice', '_aqua')]),
+        ('b4_icicles', [('@icicles', 0, 93, 150, 16, '_iceBlue', '_white'), ('@icicles', 250, 93, 150, 16, '_iceBlue', '_white')]),
+        ('snowmen', [('snowman', 16, 150, 34, 66, '_white', '_red'), ('snowman', 352, 160, 30, 58, '_white', '_blue')]),
+        ('lights', [('lamppost', 124, 112, 16, 84, '_navy', '_cyan'), ('lamppost', 260, 112, 16, 84, '_navy', '_cyan')]),
+        ('ice', [('path', 150, 152, 110, 82, '_iceBlue', '_white'), ('@crystal', 70, 178, 44, 40, '_frost', '_aqua'),
+                 ('@crystal', 290, 188, 46, 40, '_lilac', '_white'), ('@pineTree', 0, 66, 40, 84, '_pine', '_white')]),
+    ),
+    'ice_palace_throne': S(
+        indoor(0xFFA4AAB4, 0xFFCFE6FF, 0xFF9A9EA6, 0xFFE8F6FF, 0xFF84888F, 0xFFB8DCF5), '_iceHall',
+        ('b4_throne', [('@throne', 158, 80, 84, 98, '_frost', '_iceBlue')]),
+        ('shields', [('@shield', 104, 28, 30, 38, '_frost', '_white'), ('@shield', 266, 28, 30, 38, '_frost', '_white')]),
+        ('chandeliers', [('chandelier', 168, 0, 64, 40, '_iceBlue', '_white')]),
+        ('b4_icicles', [('@icicles', 0, 0, 150, 18, '_iceBlue', '_white'), ('@icicles', 250, 0, 150, 18, '_iceBlue', '_white')]),
+        ('b4_ice_columns', [('column', 50, 48, 30, 124, '_ice', '_aqua'), ('column', 320, 48, 30, 124, '_ice', '_aqua')]),
+        ('ice', [('rug', 120, 190, 160, 40, '_frost', '_white'), ('@crystal', 8, 140, 36, 36, '_frost', '_aqua'),
+                 ('@crystal', 356, 140, 36, 36, '_lilac', '_white')]),
+        ('chains', [('banner', 96, 80, 36, 54, '_aqua', '_white'), ('banner', 268, 80, 36, 54, '_aqua', '_white')]),
+    ),
+    'ice_palace_ballroom': S(
+        indoor(0xFFA8A2B4, 0xFFE6DCFF, 0xFF9A96A6, 0xFFF4F0FF, 0xFF84808F, 0xFFCFC2F5), '_iceHall',
+        ('chandeliers', [('chandelier', 56, 0, 60, 38, '_lilac', '_white'), ('chandelier', 165, 0, 70, 44, '_white', '_iceBlue'),
+                         ('chandelier', 284, 0, 60, 38, '_lilac', '_white')]),
+        ('staircase', [('stairs', 150, 78, 100, 94, '_white', '_purple')]),
+        ('piano', [('piano', 16, 124, 104, 62, '_white', '_gold')]),
+        ('champagne', [('champagneTower', 336, 132, 44, 46, '_aqua', '_gold'), ('champagneTower', 288, 144, 34, 36, '_lilac', '_gold')]),
+        ('decor', [('vase', 124, 136, 22, 36, '_lilac', '_white'), ('vase', 254, 136, 22, 36, '_lilac', '_white')]),
+        ('ice', [('rug', 100, 186, 200, 42, '_lilac', '_white'), ('mirror', 38, 46, 34, 48, '_white', '_iceBlue'),
+                 ('mirror', 328, 46, 34, 48, '_white', '_iceBlue')]),
+    ),
+    'ice_palace_garden': S(
+        outdoor(*_SNOW, horizon=146, topR=0xFF8FD0FF), '_snowHills',
+        ('snowmen', [('snowman', 40, 150, 30, 58, '_white', '_red'), ('snowman', 318, 168, 32, 62, '_white', '_purple')]),
+        ('hedges', [('hedge', 6, 128, 96, 30, '_pine', '_white'), ('hedge', 298, 128, 96, 30, '_pine', '_white')]),
+        ('b4_ice_sculptures', [('@iceSwan', 96, 142, 50, 50, '_iceBlue', '_gold'), ('@iceSwan', 254, 142, 50, 50, '_iceBlue', '_gold')]),
+        ('fountain', [('fountain', 150, 134, 100, 60, '_iceBlue', '_white')]),
+        ('tree', [('@pineTree', 0, 48, 46, 100, '_pine', '_white'), ('@pineTree', 354, 54, 46, 94, '_pine', '_white'),
+                  ('@pineTree', 116, 72, 30, 70, '_pine', '_white')]),
+        ('ice', [('pond', 140, 198, 120, 34, '_iceBlue', '_white')]),
+        ('gates', [('gate', 168, 84, 64, 52, '_navy', '_aqua')]),
+    ),
+    'ice_palace_balcony': S(
+        outdoor(0xFF8A8E9A, 0xFFDDEBFF, horizon=152, night=True, **_NIGHT_SKY), '_auroraBalcony',
+        ('b4_aurora', [('@aurora', 0, 6, 230, 70, '_mint', '_cyan'), ('@aurora', 170, 16, 230, 64, '_emerald', '_lilac')]),
+        ('b4_icicles', [('@icicles', 0, 0, 400, 16, '_iceBlue', '_white')]),
+        ('b4_telescope', [('@telescope', 300, 122, 56, 64, '_navy', '_gold')]),
+        ('seats', [('bench', 50, 168, 80, 34, '_white', '_white'), ('chair', 140, 166, 28, 44, '_frost', '_white')]),
+        ('lamps', [('lantern', 40, 14, 22, 42, '_navy', '_lampGlow'), ('lantern', 338, 14, 22, 42, '_navy', '_lampGlow')]),
+        ('ice', [('@crystal', 6, 152, 36, 40, '_frost', '_aqua'), ('@snowDrift', 340, 196, 56, 30, '_white', '_aqua')]),
+        ('chains', [('stringLights', 70, 18, 260, 24, '_gold', '_pink'), ('table', 198, 180, 60, 30, '_white', '_red')]),
+    ),
+    # ------------------------------------------------------------------ HOT SPRINGS
+    'hot_springs_path': S(
+        outdoor(0xFFA89A80, 0xFFC9B48A, horizon=140, floor='stone'), '_mountainPath',
+        ('b4_stone_steps', [('@stoneSteps', 140, 132, 120, 104, '_stone', '_moss'), ('@torii', 158, 72, 84, 68, '_red', '_ebony')]),
+        ('b4_signposts', [('@signpost', 70, 128, 40, 70, '_wood', '_white'), ('tree', 282, 60, 60, 84, '_blossom', '_pink')]),
+        ('lights', [('@stoneLantern', 110, 118, 24, 54, '_stone', '_lampGlow'), ('@stoneLantern', 266, 118, 24, 54, '_stone', '_lampGlow')]),
+        ('b4_bamboo', [('@bamboo', 0, 30, 64, 150, '_bambooGreen', '_leaf'), ('@bamboo', 336, 30, 64, 150, '_bambooGreen', '_leaf')]),
+        ('b4_stream', [('@stream', 250, 172, 150, 66, '_aqua', '_stone')]),
+        ('crates', [('@rocks', 18, 192, 60, 36, '_stone', '_moss'), ('@rocks', 300, 138, 40, 24, '_darkStone', '_moss')]),
+    ),
+    'hot_springs_baths': S(
+        outdoor(0xFF9A948A, 0xFFC9C2B3, horizon=132, floor='stone'), '_onsenYard',
+        ('b4_stone_tubs', [('@onsenPool', 100, 156, 210, 70, '_aqua', '_stone'), ('@onsenPool', 302, 134, 90, 40, '_teal', '_darkStone')]),
+        ('towels', [('towels', 24, 150, 46, 36, '_white', '_aqua')]),
+        ('toiletries', [('@bucket', 76, 172, 24, 26, '_wood', '_darkWood'), ('@bucket', 16, 198, 26, 28, '_wood', '_darkWood')]),
+        ('plants', [('tree', 0, 36, 74, 100, '_maple', '_gold'), ('bush', 342, 182, 54, 40, '_leaf', '_pink')]),
+        ('crates', [('@rocks', 304, 194, 46, 32, '_darkStone', '_moss'), ('@rocks', 232, 122, 40, 22, '_stone', '_moss')]),
+        ('ice', [('@steam', 150, 90, 100, 70, '_white', '_white'), ('@stoneLantern', 80, 108, 22, 48, '_stone', '_lampGlow')]),
+    ),
+    'hot_springs_steam': S(
+        indoor(0xFF9A8C7A, 0xFFE8B880, 0xFF8D7F6E, 0xFFC98A52, 0xFF7E7060, 0xFFB9763F, floor='planks'), '_cedarRoom',
+        ('b4_benches', [('@tieredBench', 18, 108, 150, 64, '_cedar', '_white'), ('towels', 118, 186, 50, 34, '_white', '_orange')]),
+        ('b4_heaters', [('@saunaStove', 290, 104, 64, 70, '_darkSteel', '_stone'), ('pendant', 222, 0, 26, 40, '_darkWood', '_gold')]),
+        ('b4_buckets', [('@bucket', 196, 148, 30, 32, '_wood', '_brass'), ('@bucket', 236, 188, 34, 36, '_wood', '_brass')]),
+        ('herbs', [('@herbBundle', 48, 28, 26, 48, '_leaf', '_darkWood'), ('@herbBundle', 96, 24, 26, 50, '_moss', '_darkWood'),
+                   ('@herbBundle', 300, 26, 26, 48, '_leaf', '_darkWood')]),
+        ('crates', [('@logPile', 18, 178, 70, 52, '_darkWood', '_wood')]),
+        ('lockers', [('cabinet', 360, 100, 36, 72, '_cedar', '_brass')]),
+    ),
+    'hot_springs_tea': S(
+        outdoor(0xFFA7AE8C, 0xFF7CC85A, horizon=142), '_teaGardenBack',
+        ('b4_tea_sets', [('rug', 18, 186, 124, 30, '_red', '_gold'), ('@teaSet', 48, 174, 64, 44, '_mint', '_wood')]),
+        ('flowers', [('flowerbed', 4, 148, 84, 24, '_blossom', '_gold'), ('flowerbed', 150, 150, 74, 22, '_pink', '_white')]),
+        ('b4_bridge', [('@archBridge', 246, 136, 136, 50, '_red', '_gold')]),
+        ('b4_koi_pond', [('@koiPond', 220, 140, 176, 44, '_aqua', '_orange')]),
+        ('tree', [('tree', 0, 22, 100, 126, '_blossom', '_pink'), ('tree', 96, 50, 64, 94, '_blossom', '_white')]),
+        ('crates', [('@rocks', 196, 178, 40, 26, '_stone', '_moss'), ('@rocks', 358, 194, 38, 26, '_stone', '_moss')]),
+        ('chains', [('@stoneLantern', 158, 168, 26, 58, '_stone', '_lampGlow'), ('@bamboo', 360, 40, 40, 108, '_bambooGreen', '_leaf')]),
+    ),
+    'hot_springs_terrace': S(
+        outdoor(0xFF6E625A, 0xFF9A6A44, horizon=152, floor='stone', night=True,
+                topN=0xFF4A4E66, topR=0xFF1E1A40, bottomN=0xFF6E6A80, bottomR=0xFF4A3A6E), '_terraceNight',
+        ('lights', [('@paperLantern', 40, 10, 24, 44, '_red', '_flame'), ('@paperLantern', 188, 10, 24, 44, '_paper', '_flame'),
+                    ('@paperLantern', 336, 10, 24, 44, '_red', '_flame')]),
+        ('b4_low_tables', [('@lowTable', 60, 176, 90, 40, '_darkWood', '_red'), ('@lowTable', 170, 188, 86, 40, '_darkWood', '_purple')]),
+        ('b4_tea_sets', [('@teaSet', 22, 196, 44, 30, '_white', '_wood')]),
+        ('hot_tub', [('@onsenPool', 270, 170, 124, 52, '_teal', '_darkStone')]),
+        ('lamps', [('@stoneLantern', 20, 118, 26, 58, '_stone', '_lampGlow'), ('@stoneLantern', 300, 108, 24, 54, '_stone', '_lampGlow')]),
+        ('crates', [('@bonsai', 130, 128, 40, 34, '_leaf', '_terracotta'), ('@bonsai', 240, 130, 36, 30, '_leaf', '_terracotta')]),
+        ('chains', [('@skyLantern', 100, 50, 16, 20, '_paper', '_flame'), ('@skyLantern', 250, 36, 18, 22, '_paper', '_flame'),
+                    ('@skyLantern', 300, 72, 14, 18, '_paper', '_flame')]),
+    ),
+    # ------------------------------------------------------------------ SPACE BASE
+    'space_base_pad': S(
+        outdoor(0xFF8A8A8E, 0xFFB8B4C8, horizon=152, night=True), '_moonBase',
+        ('b4_rocket', [('@rocket', 150, 10, 100, 168, '_white', '_red')]),
+        ('b4_radar_dish', [('@radarDish', 28, 96, 70, 70, '_steel', '_cyan')]),
+        ('b4_solar_panels', [('@solarPanel', 286, 136, 90, 40, '_blue', '_cyan'), ('@solarPanel', 12, 178, 84, 38, '_blue', '_cyan')]),
+        ('b4_antennas', [('@antenna', 110, 78, 22, 96, '_steel', '_ruby'), ('@antenna', 362, 60, 26, 90, '_steel', '_ruby')]),
+        ('ice', [('@crystal', 262, 198, 40, 34, '_iceBlue', '_cyan'), ('@crystal', 112, 202, 30, 26, '_frost', '_white')]),
+        ('cargo', [('@cargoPod', 314, 192, 60, 36, '_orange', '_white'), ('@rover', 190, 194, 64, 40, '_white', '_ruby')]),
+    ),
+    'space_base_control': S(
+        indoor(0xFF9EA4AA, 0xFFD6E2F0, 0xFF7D7F86, 0xFF9AA8BC, 0xFF6E7078, 0xFF7A88A0, floor='tiles'), '_panelWall',
+        ('monitor', [('screen', 132, 18, 136, 70, '_navy', '_cyan'), ('screen', 104, 104, 46, 26, '_navy', '_mint'),
+                     ('screen', 250, 104, 46, 26, '_navy', '_mint')]),
+        ('b4_star_map', [('@starMap', 296, 24, 84, 54, '_steel', '_gold')]),
+        ('b4_radar_dish', [('@radarScope', 34, 22, 58, 58, '_darkSteel', '_emerald')]),
+        ('consoles', [('@controlDesk', 12, 128, 150, 52, '_steel', '_cyan'), ('@controlDesk', 238, 128, 150, 52, '_steel', '_cyan')]),
+        ('b4_launch_button', [('@launchButton', 180, 142, 40, 48, '_ruby', '_white')]),
+        ('chains', [('chair', 66, 166, 30, 50, '_navy', '_cyan'), ('chair', 304, 166, 30, 50, '_navy', '_cyan')]),
+    ),
+    'space_base_greenhouse': S(
+        indoor(0xFF9EA49A, 0xFFDFF2E0, 0xFF8A8E80, 0xFF9AD27A, 0xFF7A7E70, 0xFF7ABA5A), '_greenDome',
+        ('plants', [('@plantRack', 12, 92, 76, 80, '_steel', '_leaf'), ('@plantRack', 312, 92, 76, 80, '_steel', '_leaf')]),
+        ('flowers', [('flowerbed', 88, 198, 66, 24, '_pink', '_gold'), ('flowerbed', 248, 200, 66, 24, '_red', '_white')]),
+        ('b4_solar_panels', [('@growLight', 110, 0, 70, 50, '_darkSteel', '_purple'), ('@growLight', 220, 0, 70, 50, '_darkSteel', '_purple')]),
+        ('b4_water_tanks', [('@waterTank', 98, 110, 34, 64, '_steel', '_aqua')]),
+        ('b4_fruit_trees', [('tree', 146, 64, 76, 110, '_leaf', '_orange'), ('tree', 234, 78, 64, 96, '_leaf', '_red')]),
+        ('ice', [('planter', 16, 186, 60, 40, '_steel', '_leaf'), ('planter', 324, 186, 60, 40, '_steel', '_leaf')]),
+        ('b4_seed_pods', [('@seedPod', 160, 192, 36, 40, '_steel', '_leaf'), ('@seedPod', 206, 196, 36, 40, '_steel', '_leaf')]),
+    ),
+    'space_base_quarters': S(
+        indoor(0xFFA0A4AC, 0xFFE6EAF4, 0xFF8A8E96, 0xFFB8C4DC, 0xFF7A7E86, 0xFF9AA8C4, floor='carpet'), '_panelWall',
+        ('b4_bunks', [('@bunk', 14, 70, 122, 106, '_steel', '_blue')]),
+        ('lockers', [('cabinet', 144, 100, 40, 72, '_steel', '_cyan'), ('cabinet', 188, 100, 40, 72, '_steel', '_cyan')]),
+        ('consoles', [('console', 248, 134, 62, 42, '_darkSteel', '_cyan'), ('screen', 252, 70, 56, 38, '_navy', '_mint')]),
+        ('bathroom', [('shower', 330, 70, 56, 102, '_steel', '_cyan')]),
+        ('b4_portholes', [('@porthole', 152, 24, 40, 40, '_steel', '_blue'), ('@porthole', 200, 24, 40, 40, '_steel', '_blue')]),
+        ('chains', [('rug', 120, 190, 150, 36, '_blue', '_white'), ('plant', 300, 186, 28, 44, '_steel', '_leaf')]),
+        ('crates', [('luggage', 40, 186, 46, 44, '_orange', '_steel')]),
+    ),
+    'space_base_deck': S(
+        indoor(0xFF5A5E6E, 0xFF2E3A66, 0xFF4A4E5A, 0xFF3A4A7A, 0xFF3E424C, 0xFF2A3660, floor='tiles'), '_panorama',
+        ('b4_telescopes', [('@bigTelescope', 8, 92, 76, 80, '_white', '_purple')]),
+        ('b4_star_map', [('@starMap', 344, 22, 48, 46, '_steel', '_gold')]),
+        ('b4_satellites', [('@satellite', 96, 22, 52, 36, '_steel', '_blue'), ('@satellite', 260, 34, 44, 32, '_steel', '_blue')]),
+        ('b4_portholes', [('@porthole', 12, 20, 44, 44, '_steel', '_blue')]),
+        ('b4_shuttle', [('@shuttle', 300, 118, 92, 60, '_white', '_ruby')]),
+        ('chains', [('sofa', 120, 136, 160, 52, '_purple', '_cyan'), ('rug', 110, 194, 180, 36, '_navy', '_cyan')]),
+        ('cargo', [('@cargoPod', 22, 188, 56, 36, '_orange', '_white'), ('@cargoPod', 322, 194, 56, 34, '_orange', '_white')]),
+    ),
+    # ------------------------------------------------------------------ GRAND HOTEL
+    'grand_hotel_entrance': S(
+        outdoor(0xFFA8A296, 0xFFE6DCCB, horizon=150, floor='stone'), '_hotelFacade',
+        ('doors', [('@revolvingDoor', 170, 100, 60, 50, '_iceBlue', '_brass')]),
+        ('b4_canopy', [('@canopy', 144, 58, 112, 44, '_crimson', '_brass')]),
+        ('sign', [('sign', 150, 4, 100, 22, '_navy', '_gold')]),
+        ('hedges', [('@topiary', 104, 106, 30, 54, '_leaf', '_brass'), ('@topiary', 266, 106, 30, 54, '_leaf', '_brass'),
+                    ('hedge', 0, 156, 90, 30, '_leaf', '_pink'), ('hedge', 310, 156, 90, 30, '_leaf', '_pink')]),
+        ('lights', [('lamppost', 130, 122, 16, 90, '_navy', '_lampGlow'), ('lamppost', 254, 122, 16, 90, '_navy', '_lampGlow')]),
+        ('chains', [('@redCarpet', 140, 150, 120, 88, '_crimson', '_brass')]),
+        ('crates', [('@bellCart', 300, 164, 60, 60, '_red', '_brass'), ('luggage', 46, 184, 40, 40, '_navy', '_brass')]),
+    ),
+    'grand_hotel_lobby': S(
+        indoor(0xFFA59C8F, 0xFFFFE8C4, 0xFF9A948A, 0xFFF4EFE6, 0xFF7E7868, 0xFFC9A26A), '_lobbyHall',
+        ('b4_reception', [('@reception', 130, 120, 140, 56, '_darkWood', '_brass')]),
+        ('luggage', [('@bellCart', 84, 160, 56, 64, '_red', '_brass'), ('luggage', 336, 178, 44, 44, '_navy', '_brass')]),
+        ('chandeliers', [('chandelier', 160, 0, 80, 46, '_white', '_brass')]),
+        ('plants', [('plant', 74, 130, 28, 44, '_brass', '_leaf'), ('plant', 300, 130, 28, 44, '_brass', '_leaf')]),
+        ('b4_elevators', [('@elevator', 14, 50, 58, 122, '_brass', '_darkWood'), ('@elevator', 328, 50, 58, 122, '_brass', '_darkWood')]),
+        ('chains', [('painting', 172, 54, 56, 40, '_brass', '_blue'), ('rug', 140, 186, 120, 34, '_crimson', '_brass')]),
+        ('crates', [('sofa', 236, 182, 88, 44, '_crimson', '_cream')]),
+    ),
+    'grand_hotel_ballroom': S(
+        indoor(0xFFA59CA8, 0xFFFFE0EC, 0xFF8D877D, 0xFFC98A52, 0xFF7E7060, 0xFFB9763F, floor='planks'), '_ballroomWall',
+        ('chandeliers', [('chandelier', 66, 0, 64, 40, '_pink', '_brass'), ('chandelier', 270, 0, 64, 40, '_pink', '_brass')]),
+        ('stage', [('stage', 150, 96, 100, 76, '_darkWood', '_pink'), ('curtains', 140, 10, 120, 86, '_crimson', '_brass')]),
+        ('piano', [('piano', 262, 116, 100, 60, '_ebony', '_gold')]),
+        ('champagne', [('champagneTower', 28, 124, 44, 48, '_aqua', '_gold')]),
+        ('seats', [('chair', 84, 170, 28, 48, '_gold', '_crimson'), ('chair', 118, 176, 28, 48, '_gold', '_crimson'),
+                   ('chair', 300, 178, 28, 48, '_gold', '_crimson')]),
+        ('chains', [('mirror', 28, 40, 32, 44, '_brass', '_pink'), ('mirror', 340, 40, 32, 44, '_brass', '_pink')]),
+        ('ice', [('rug', 140, 186, 150, 40, '_crimson', '_brass')]),
+    ),
+    'grand_hotel_suite': S(
+        indoor(0xFFA59CA8, 0xFFF4ECFF, 0xFF8D877D, 0xFF6B4BA0, 0xFF7E7868, 0xFF55307F, floor='carpet'), '_suiteWall',
+        ('bed', [('bed', 118, 116, 170, 64, '_darkWood', '_purple'), ('rug', 112, 194, 176, 34, '_lilac', '_brass')]),
+        ('wardrobe', [('wardrobe', 14, 70, 64, 102, '_darkWood', '_brass')]),
+        ('lamps', [('floorLamp', 90, 114, 18, 58, '_brass', '_cream'), ('pendant', 196, 0, 28, 40, '_brass', '_brass')]),
+        ('books', [('bookshelf', 320, 70, 66, 102, '_darkWood', '_red'), ('painting', 92, 40, 32, 26, '_brass', '_blue')]),
+        ('bath', [('bathtub', 300, 182, 88, 44, '_white', '_brass')]),
+        ('chains', [('window', 142, 28, 116, 62, '_white', '_white'), ('curtains', 132, 18, 136, 82, '_purple', '_brass')]),
+        ('b4_jewelry', [('@jewelryBox', 40, 192, 40, 32, '_purple', '_brass')]),
+    ),
+    'grand_hotel_pool': S(
+        outdoor(0xFF8A8E9A, 0xFFC9D2E6, horizon=150, floor='stone', night=True, skyline=True,
+                topN=0xFF4A4E66, topR=0xFF2A1E5E, bottomN=0xFF6E7290, bottomR=0xFF8A4A9E), '_rooftopDeck',
+        ('pool', [('poolWater', 110, 168, 196, 50, '_aqua', '_white')]),
+        ('loungers', [('lounger', 8, 172, 80, 40, '_white', '_pink'), ('lounger', 318, 178, 76, 38, '_white', '_cyan')]),
+        ('cocktails', [('barCounter', 270, 110, 110, 46, '_ebony', '_pink'), ('neonSign', 290, 70, 80, 26, '_pink', '_cyan')]),
+        ('palms', [('palm', 4, 58, 60, 100, '_leaf', '_leaf'), ('palm', 214, 70, 50, 86, '_leaf', '_leaf')]),
+        ('towels', [('towels', 84, 138, 40, 26, '_pink', '_white')]),
+        ('chains', [('stringLights', 20, 14, 360, 24, '_gold', '_pink')]),
+        ('ice', [('umbrella', 40, 110, 64, 62, '_pink', '_white'), ('planter', 150, 130, 44, 28, '_steel', '_leaf')]),
+    ),
+    # ------------------------------------------------------------------ ROYAL PALACE
+    'royal_palace_gardens': S(
+        outdoor(0xFFA7AE8C, 0xFF6CC24A, horizon=140), '_palaceDistant',
+        ('flowers', [('flowerbed', 8, 198, 110, 30, '_pink', '_gold'), ('flowerbed', 282, 198, 110, 30, '_red', '_white')]),
+        ('hedges', [('hedge', 0, 140, 120, 30, '_leaf', '_pink'), ('hedge', 280, 140, 120, 30, '_leaf', '_pink')]),
+        ('fountain', [('fountain', 140, 144, 120, 72, '_aqua', '_white')]),
+        ('statues', [('statue', 112, 130, 28, 62, '_white', '_gold'), ('statue', 260, 130, 28, 62, '_white', '_gold')]),
+        ('tree', [('tree', 0, 46, 70, 96, '_leaf', '_red'), ('tree', 330, 46, 70, 96, '_leaf', '_red')]),
+        ('ice', [('@topiary', 126, 188, 26, 46, '_leaf', '_terracotta'), ('@topiary', 248, 188, 26, 46, '_leaf', '_terracotta')]),
+        ('crates', [('bench', 34, 166, 62, 28, '_white', '_white'), ('bench', 304, 166, 62, 28, '_white', '_white')]),
+    ),
+    'royal_palace_gate': S(
+        outdoor(0xFFA8A296, 0xFFE6DCCB, horizon=140, floor='stone'), '_palaceFront',
+        ('gates', [('@goldGate', 130, 46, 140, 102, '_gold', '_marble')]),
+        ('banners', [('banner', 48, 34, 34, 54, '_crimson', '_gold'), ('banner', 318, 34, 34, 54, '_crimson', '_gold')]),
+        ('b4_gilding', [('column', 98, 60, 22, 92, '_marble', '_gold'), ('column', 280, 60, 22, 92, '_marble', '_gold')]),
+        ('b4_guards', [('@guardBox', 28, 100, 44, 70, '_white', '_crimson'), ('@guardBox', 328, 100, 44, 70, '_white', '_crimson')]),
+        ('lights', [('lamppost', 86, 128, 16, 90, '_navy', '_lampGlow'), ('lamppost', 298, 128, 16, 90, '_navy', '_lampGlow')]),
+        ('chains', [('@redCarpet', 150, 148, 100, 90, '_crimson', '_gold')]),
+        ('chests', [('crates', 334, 190, 56, 40, '_wood', '_gold'), ('@jewelryBox', 18, 198, 40, 30, '_crimson', '_gold')]),
+    ),
+    'royal_palace_throne': S(
+        indoor(0xFFA59CA8, 0xFFF6E6FF, 0xFF8D877D, 0xFF6B3FA0, 0xFF7E7868, 0xFF55307F, floor='carpet'), '_throneHall',
+        ('b4_throne', [('@throne', 160, 80, 80, 96, '_crimson', '_gold')]),
+        ('curtains', [('curtains', 136, 8, 128, 100, '_crimson', '_gold')]),
+        ('shields', [('@shield', 46, 36, 30, 38, '_navy', '_gold'), ('@shield', 324, 36, 30, 38, '_navy', '_gold')]),
+        ('b4_crown', [('@crownCushion', 252, 116, 40, 60, '_crimson', '_gold')]),
+        ('b4_royal_orb', [('@orb', 112, 118, 32, 58, '_ruby', '_gold')]),
+        ('crates', [('rug', 130, 186, 140, 44, '_crimson', '_gold'), ('vase', 50, 136, 24, 40, '_purple', '_gold'),
+                    ('vase', 326, 136, 24, 40, '_purple', '_gold')]),
+        ('chains', [('chandelier', 40, 0, 50, 32, '_gold', '_white'), ('chandelier', 310, 0, 50, 32, '_gold', '_white')]),
+    ),
+    'royal_palace_library': S(
+        indoor(0xFFA59C8F, 0xFFF0DCC0, 0xFF8D7F6E, 0xFF8E3B3B, 0xFF7E7060, 0xFF6E2B2B, floor='carpet'), '_libraryWall',
+        ('books', [('bookshelf', 6, 30, 82, 142, '_darkWood', '_red'), ('bookshelf', 312, 30, 82, 142, '_darkWood', '_blue')]),
+        ('scrolls', [('table', 234, 186, 84, 32, '_wood', '_cream'), ('shelf', 244, 40, 60, 18, '_darkWood', '_cream')]),
+        ('clocks', [('clock', 270, 92, 26, 80, '_darkWood', '_gold'), ('@globeStand', 112, 152, 40, 56, '_blue', '_brass')]),
+        ('staircase', [('@rollingLadder', 52, 40, 40, 132, '_wood', '_brass')]),
+        ('chains', [('floorLamp', 98, 112, 18, 60, '_gold', '_cream'), ('rug', 130, 196, 140, 34, '_red', '_gold')]),
+        ('ice', [('@archWindow', 164, 14, 72, 86, '_darkWood', '_iceBlue')]),
+        ('b4_locked_tomes', [('@lectern', 170, 124, 60, 62, '_darkWood', '_gold')]),
+    ),
+    'royal_palace_ballroom': S(
+        indoor(0xFF8A82A0, 0xFFF2D6FF, 0xFF8D877D, 0xFFF4EFE6, 0xFF7E7868, 0xFFD9B8FF), '_grandHall',
+        ('b4_fireworks', [('@fireworks', 62, 30, 50, 50, '_gold', '_pink'), ('@fireworks', 176, 22, 50, 50, '_cyan', '_gold'),
+                          ('@fireworks', 288, 34, 50, 50, '_pink', '_white')]),
+        ('chandeliers', [('chandelier', 110, 0, 60, 40, '_white', '_gold'), ('chandelier', 230, 0, 60, 40, '_white', '_gold')]),
+        ('champagne', [('champagneTower', 8, 130, 40, 44, '_gold', '_white'), ('champagneTower', 344, 130, 44, 46, '_gold', '_white')]),
+        ('piano', [('piano', 56, 120, 96, 58, '_white', '_gold')]),
+        ('ice', [('rug', 110, 188, 180, 40, '_purple', '_gold')]),
+        ('chains', [('banner', 128, 40, 28, 56, '_crimson', '_gold'), ('banner', 240, 40, 28, 56, '_crimson', '_gold')]),
+        ('b4_crown_jewels', [('@crownCushion', 182, 116, 36, 58, '_crimson', '_gold'), ('@jewelryBox', 270, 150, 36, 28, '_purple', '_gold')]),
+    ),
+}
 
 
 # Balance table (tuned against level_balance_test): moves, target of every tile
