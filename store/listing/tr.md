@@ -4,15 +4,18 @@
 Match Make: Eşleştir ve Yenile
 
 ## Kısa açıklama (en fazla 80 karakter)
-Taşları eşleştir, harap mekânları adım adım yenile! 50 seviye, 10 mekân.
+Taşları eşleştir, harap mekânları yenile! 150 seviye, 30 mekân.
 
 ## Tam açıklama (en fazla 4000 karakter)
 Harap bir bahçe, tozlu bir şato, unutulmuş bir tiyatro… Hepsi senin ellerinde yeniden canlanmayı bekliyor!
 
 Match Make, eşleştirme bulmacasıyla mekân yenilemeyi birleştiren rahatlatıcı bir oyun. Her seviyede renkli taşları eşleştir, hedefleri topla ve ekranın üstündeki sahnenin gözünün önünde dönüşmesini izle. Kırık çitler boyanır, sönük lambalar yanar, boş odalar sıcacık bir yuvaya dönüşür.
 
-★ 10 MEKÂN, 50 SEVİYE
-Evden çiftliğe, restorandan sahil oteline, malikâneden şatoya, karlı dağ evinden limana, müzeden tiyatroya uzanan bir yolculuk.
+★ 30 MEKÂN, 150 SEVİYE
+Evden çiftliğe, şatodan limana, pastaneden hayvanat bahçesine, lunaparktan korsan gemisine, uzay üssünden saraya uzanan dev bir yolculuk.
+
+★ HER SEVİYE FARKLI
+Tahtalar hep aynı kare değil: L, U, T, artı, halka, kalp, merdiven ve daha nice şekil. Her seviyede yeni bir strateji!
 
 ★ GÜÇLÜ ÖZEL TAŞLAR
 4'lü eşleştir roket yap, L ve T şekliyle bomba oluştur, 5'li eşleştirmeyle renk bombasını patlat. İki özel taşı birleştir, dev kombolar yarat!

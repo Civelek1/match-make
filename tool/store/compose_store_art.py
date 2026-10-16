@@ -18,7 +18,7 @@ CAPTIONS = {
     'tr': {
         '01_menu': 'Mekânları yeniden canlandır!',
         '02_play': 'Eşleştir, patlat, yenile!',
-        '03_map': '10 mekân, 50 seviye',
+        '03_map': '30 mekân, 150 seviye',
         '04_keys': 'Anahtarları aşağı indir!',
         '05_gallery': 'Önce ve sonrası galerinde',
         '06_win': 'Yıldızları topla',
@@ -27,7 +27,7 @@ CAPTIONS = {
     'en': {
         '01_menu': 'Bring places back to life!',
         '02_play': 'Match, blast and restore!',
-        '03_map': '10 locations, 50 levels',
+        '03_map': '30 locations, 150 levels',
         '04_keys': 'Guide the keys down!',
         '05_gallery': 'Every before & after',
         '06_win': 'Collect the stars',

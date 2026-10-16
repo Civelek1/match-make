@@ -3,8 +3,14 @@
 A match-3 restoration puzzle built with Flutter (Android · iOS · web). Match pieces to
 collect objectives, and watch each location restore itself live above the board.
 
-**10 chapters, 50 levels:** House, Farm, Restaurant, Beach Resort, Mansion, Castle,
-Mountain Lodge, Harbor, Museum and Theater (five locations each).
+**30 chapters, 150 levels** (five locations each): House, Farm, Restaurant, Beach Resort,
+Mansion, Castle, Mountain Lodge, Harbor, Museum, Theater, then Bakery, Greenhouse,
+Vineyard, Train Station, School, Zoo, Aquarium, Funfair, Bookshop, Observatory, Japanese
+Garden, Forest Camp, Circus, Desert Oasis, Pirate Ship, Ice Palace, Hot Springs, Space
+Base, Grand Hotel and Royal Palace.
+
+* **Board shapes:** `#` in a level layout cuts a cell out of the board (L, U, T, rings,
+  hearts…); pieces and keys fall through the gaps.
 
 * **Mechanics:** rockets, bombs, colour bombs and their combos; crates, ice and chains;
   falling **keys** from level 26 (they sink one row per move and are collected at the

@@ -4,15 +4,18 @@
 Match Make: Match & Restore
 
 ## Short description (max 80 characters)
-Match pieces and restore run-down places step by step! 50 levels, 10 locations.
+Match pieces and restore run-down places! 150 levels, 30 locations.
 
 ## Full description (max 4000 characters)
 A neglected garden, a dusty castle, a forgotten theater… They are all waiting for you to bring them back to life!
 
 Match Make is a relaxing puzzle game that combines match-3 with restoring beautiful places. Match colorful pieces, collect the goals and watch the scene above the board transform before your eyes. Broken fences get painted, dim lamps light up and empty rooms become cozy homes.
 
-★ 10 LOCATIONS, 50 LEVELS
-A journey from a family house to a farm, a restaurant, a beach hotel, a mansion, a castle, a snowy lodge, a harbor, a museum and a grand theater.
+★ 30 LOCATIONS, 150 LEVELS
+A huge journey from a family house and a farm to a castle, a harbor, a bakery, a zoo, a funfair, a pirate ship, a space base and a royal palace.
+
+★ EVERY LEVEL IS DIFFERENT
+Boards aren't always squares: L, U, T, plus, ring, heart, staircase shapes and more. A new strategy every level!
 
 ★ POWERFUL SPECIAL PIECES
 Match 4 for a rocket, make an L or T for a bomb, match 5 for a color bomb. Swap two specials together for huge combos!
