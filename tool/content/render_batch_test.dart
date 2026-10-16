@@ -60,7 +60,15 @@ String _save(String lang, int doneThrough, {bool dailyReady = false}) {
       if (c.levelIds.every(done.contains)) c.id,
   ];
   final today = DailyRewardService.dayNumber(_now);
+  // Batches are built in isolation (earlier batches may be missing), so open
+  // every chapter and the levels being rendered directly.
+  final open = [
+    for (final l in content.allLevels)
+      if (l.number <= doneThrough + 1) l.id,
+  ];
   return jsonEncode({
+    'dbgChapters': [for (final c in content.chapters) c.id],
+    'dbgUnlocked': open,
     'v': 3,
     'levels': levels,
     'gallery': done,
