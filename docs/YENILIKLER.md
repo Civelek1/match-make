@@ -60,12 +60,12 @@ Okul bahçesi, sınıf, fen laboratuvarı, spor salonu, müzik sınıfı. Şekil
 - **Seviye rehberi:** Seviye ve bölüm eklemeyi resimlerle anlatan rehber eklendi: [SEVIYE_REHBERI.md](SEVIYE_REHBERI.md).
 - **Mağaza metinleri:** Yeni içeriğe göre güncellendi.
 
-## 5. Sırada ne var
+## 5. 76–150. seviyeler
 
-76–150. seviyeler (15 bölüm) büyük ölçüde hazırlandı ve yedek dallarda duruyor:
+Kalan 15 bölüm de eklendi; oyunda toplam **150 seviye, 30 mekân** var:
 
 | Seviyeler | Bölümler | Durum |
 |---|---|---|
 | 76–100 | Hayvanat Bahçesi, Akvaryum, Lunapark, Kitapçı, Gözlemevi | Eklendi ✓ |
-| 101–125 | Japon Bahçesi, Orman Kampı, Sirk, Çöl Vahası, Korsan Gemisi | Çizimler yarıda |
-| 126–150 | Buz Sarayı, Kaplıca, Uzay Üssü, Büyük Otel, Saray (final) | Son kontroller |
+| 101–125 | Japon Bahçesi, Orman Kampı, Sirk, Çöl Vahası, Korsan Gemisi | Eklendi ✓ |
+| 126–150 | Buz Sarayı, Kaplıca, Uzay Üssü, Büyük Otel, Saray (final) | Eklendi ✓ |
