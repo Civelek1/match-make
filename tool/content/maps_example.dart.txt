@@ -1,0 +1,33 @@
+import 'package:flutter/material.dart';
+
+import '../art/paint_kit.dart';
+import 'house_map_art.dart';
+import 'location_map_art.dart';
+
+/// Chapter maps for content batch 1 (hand-drawn; see LocationMapArt).
+final Map<String, ChapterMapArt> batch1Maps = {'example': _exampleMap};
+
+// Design space 360×640. Ground band starts at groundY. Buildings sit on it;
+// each level's MapSpot is a window (SpotKind.window) or a yard area on the
+// ground (SpotKind.yard) that lights up when its level is completed.
+void _exampleScenery(Canvas c, LocationMapArt art, double ov, double t) {
+  art.paintGround(c, ov);
+  final wall = Pk.mix(const Color(0xFFB5A99A), const Color(0xFFFFE3C2), ov);
+  Pk.shadow(c, const Offset(180, 452), 300, 18);
+  Pk.box(c, const Rect.fromLTWH(50, 230, 260, 220), wall, radius: 3);
+  Pk.poly(c, const [Offset(40, 236), Offset(180, 160), Offset(320, 236)], Pk.fill(Pk.mix(const Color(0xFF8C6A60), const Color(0xFFC8412F), ov)));
+}
+
+final _exampleMap = LocationMapArt(
+  style: MapStyle.custom,
+  scenery: _exampleScenery,
+  groundN: const Color(0xFFA8A296),
+  groundR: const Color(0xFFE6DCCB),
+  spots: const [
+    MapSpot('example_1', Offset(180, 530), Rect.fromLTWH(95, 490, 170, 84), SpotKind.yard, Color(0xFFD29A5A)),
+    MapSpot('example_2', Offset(100, 400), Rect.fromLTWH(70, 380, 60, 44), SpotKind.window, Color(0xFFFFD08A)),
+    MapSpot('example_3', Offset(260, 400), Rect.fromLTWH(230, 380, 60, 44), SpotKind.window, Color(0xFFB8D4FF)),
+    MapSpot('example_4', Offset(100, 290), Rect.fromLTWH(70, 270, 60, 44), SpotKind.window, Color(0xFFFF9A3C)),
+    MapSpot('example_5', Offset(260, 290), Rect.fromLTWH(230, 270, 60, 44), SpotKind.window, Color(0xFFE88A8A)),
+  ],
+);

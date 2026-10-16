@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'batch_1_theme.dart';
+import 'batch_2_theme.dart';
+import 'batch_3_theme.dart';
+import 'batch_4_theme.dart';
+
 class GameColors {
   static const ink = Color(0xFF3B2A5A); // text stroke / outlines
   static const inkSoft = Color(0xFF6B5A8A);
@@ -160,5 +165,6 @@ class EnvironmentTheme {
     'grand_stage': _t(0xFF2B1B3A, 0xFF12081C, 0xFFFFC93C, 0xFFFF4F7A, dark: true),
   };
 
-  static EnvironmentTheme of(String id) => _themes[id] ?? _chapterThemes[id] ?? _fallback;
+  static EnvironmentTheme of(String id) =>
+      _themes[id] ?? _chapterThemes[id] ?? batch1Themes[id] ?? batch2Themes[id] ?? batch3Themes[id] ?? batch4Themes[id] ?? _fallback;
 }

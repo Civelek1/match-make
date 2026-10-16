@@ -78,8 +78,9 @@ class Match3Engine {
        _rng = Random(seed);
 
   /// Layout legend:
-  /// `.` empty · `c`/`C`/`B` crate 1/2/3 · `i`/`I` ice 1/2 ·
-  /// `l`/`L` chain 1/2 · `j` ice 1 + chain 1 · `J` ice 2 + chain 1.
+  /// `.` empty · `#` no cell (shapes the board) · `c`/`C`/`B` crate 1/2/3 ·
+  /// `i`/`I` ice 1/2 · `l`/`L` chain 1/2 · `j` ice 1 + chain 1 ·
+  /// `J` ice 2 + chain 1.
   static ({int crate, int ice, int chain}) parseObstacle(String ch) => switch (ch) {
     'c' => (crate: 1, ice: 0, chain: 0),
     'C' => (crate: 2, ice: 0, chain: 0),
@@ -107,17 +108,29 @@ class Match3Engine {
     return m;
   }
 
+  static const voidChar = '#';
+
+  bool _layoutVoid(int x, int y) {
+    final rows = obstacles;
+    return rows != null && y < rows.length && x < rows[y].length && rows[y][x] == voidChar;
+  }
+
   ({int crate, int ice, int chain}) _layoutAt(int x, int y) {
     final rows = obstacles;
     if (rows == null || y >= rows.length || x >= rows[y].length) return (crate: 0, ice: 0, chain: 0);
     return parseObstacle(rows[y][x]);
   }
 
-  /// Builds a board from digit rows, e.g. ['0120', '1201']. For tests.
+  /// Builds a board from digit rows, e.g. ['0120', '1201'] (`#` = no cell).
+  /// For tests.
   factory Match3Engine.fromLayout(List<String> rows, {required int typeCount, Set<SpecialFeature>? specials, int? seed}) {
     final e = Match3Engine(width: rows.first.length, height: rows.length, typeCount: typeCount, specials: specials, seed: seed);
     for (var y = 0; y < rows.length; y++) {
       for (var x = 0; x < rows[y].length; x++) {
+        if (rows[y][x] == voidChar) {
+          e.board.voids[y * e.board.width + x] = true;
+          continue;
+        }
         e.board.put(x, y, e._newTile(int.parse(rows[y][x])));
       }
     }
@@ -148,6 +161,7 @@ class Match3Engine {
     for (var y = 0; y < board.height; y++) {
       for (var x = 0; x < board.width; x++) {
         final o = _layoutAt(x, y);
+        board.voids[y * board.width + x] = _layoutVoid(x, y);
         board.crates[y * board.width + x] = o.crate;
         board.ice[y * board.width + x] = o.ice;
       }
@@ -155,7 +169,7 @@ class Match3Engine {
     for (var attempt = 0; attempt < 500; attempt++) {
       for (var y = 0; y < board.height; y++) {
         for (var x = 0; x < board.width; x++) {
-          if (board.crateAt(x, y) > 0) {
+          if (board.isVoid(x, y) || board.crateAt(x, y) > 0) {
             board.put(x, y, null);
             continue;
           }
@@ -179,13 +193,24 @@ class Match3Engine {
     // Levels without keys must not touch the RNG, so their boards stay
     // exactly as they were before keys existed.
     if (dropsTotal == 0) return;
+    // Keys start on the top cell of a column (shaped boards: the first cell
+    // that exists from the top).
+    int? topOf(int x) {
+      for (var y = 0; y < board.height; y++) {
+        if (board.isVoid(x, y)) continue;
+        final t = board.at(x, y);
+        return t != null && !t.locked && !t.isSpecial ? y : null;
+      }
+      return null;
+    }
+
     final cols = [
       for (var x = 0; x < board.width; x++)
-        if (board.at(x, 0) case final t? when !t.locked && !t.isSpecial) x,
+        if (topOf(x) != null) x,
     ]..shuffle(_rng);
     final n = min(min(dropsTotal, maxDropsOnBoard), cols.length);
     for (final x in cols.take(n)) {
-      board.put(x, 0, _newDrop());
+      board.put(x, topOf(x)!, _newDrop());
     }
     if (n > 0 && findAnyMove() == null) _shuffle();
   }
@@ -364,6 +389,7 @@ class Match3Engine {
   /// Broom booster: sweeps row [y] as if a rocket crossed it.
   List<BoardStep>? sweepRow(int y) {
     if (y < 0 || y >= board.height) return null;
+    if (![for (var x = 0; x < board.width; x++) board.isVoid(x, y)].contains(false)) return null;
     final seed = _Seed()..effects.add(SpecialEffect(EffectKind.row, Pos(board.width ~/ 2, y)));
     for (var x = 0; x < board.width; x++) {
       seed.clear.add(Pos(x, y));
@@ -625,7 +651,8 @@ class Match3Engine {
     return steps;
   }
 
-  /// Swaps every key with the free piece below it. Null if none can move.
+  /// Swaps every key with the free piece below it (across any gap in the
+  /// board's shape). Null if none can move.
   SinkStep? _sinkKeys() {
     if (dropsTotal == 0) return null;
     final swaps = <(Pos, Pos)>[];
@@ -633,11 +660,15 @@ class Match3Engine {
       for (var x = 0; x < board.width; x++) {
         final k = board.at(x, y);
         if (k == null || !k.drop) continue;
-        final below = board.at(x, y + 1);
-        if (!board.isSlot(x, y + 1) || below == null || below.drop) continue;
-        board.put(x, y + 1, k);
+        var by = y + 1;
+        while (board.isVoid(x, by)) {
+          by++;
+        }
+        final below = board.at(x, by);
+        if (!board.isSlot(x, by) || below == null || below.drop) continue;
+        board.put(x, by, k);
         board.put(x, y, below);
-        swaps.add((Pos(x, y), Pos(x, y + 1)));
+        swaps.add((Pos(x, y), Pos(x, by)));
       }
     }
     return swaps.isEmpty ? null : SinkStep(swaps);

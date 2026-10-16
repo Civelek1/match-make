@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:match_make/data/content/game_content.dart';
 import 'package:match_make/localization/localization.dart';
-import 'package:match_make/localization/strings_en.dart';
-import 'package:match_make/localization/strings_tr.dart';
 import 'package:match_make/progression/progress_service.dart';
 import 'package:match_make/save/save_repository.dart';
 import 'package:match_make/save/save_store.dart';
@@ -46,11 +44,12 @@ void main() {
     expect(p.chapterStars(content.chapters.first), 10);
   });
 
-  test('all 50 levels unlock in order; a new chapter opens every 5 levels', () async {
+  test('every level unlocks in order; a new chapter opens every 5 levels', () async {
     final (p, _, _) = await fresh();
     final all = [for (final c in content.chapters) ...content.levelsOf(c.id)];
-    expect(all.length, 50);
-    expect([for (final l in all) l.number], [for (var i = 1; i <= 50; i++) i]);
+    expect(all.length, content.chapters.length * 5);
+    expect(all.length, content.allLevels.length);
+    expect([for (final l in all) l.number], [for (var i = 1; i <= all.length; i++) i]);
     for (var i = 0; i < all.length; i++) {
       expect(p.isUnlocked(all[i].id), isTrue, reason: '${all[i].id} should be open');
       for (final later in all.skip(i + 1)) {
@@ -62,8 +61,8 @@ void main() {
         expect(p.isChapterUnlocked(next), isTrue, reason: 'chapter ${next.id} after level ${all[i].number}');
       }
     }
-    expect(p.totalStars, 150);
-    expect(p.levelsCompleted, 50);
+    expect(p.totalStars, all.length * 3);
+    expect(p.levelsCompleted, all.length);
   });
 
   test('a version-1 Chapter 1 save keeps everything and opens the Farm', () async {
@@ -171,14 +170,18 @@ void main() {
   });
 
   test('every visible string key exists in both languages', () {
-    expect(stringsTr.keys.toSet().difference(stringsEn.keys.toSet()), isEmpty);
-    expect(stringsEn.keys.toSet().difference(stringsTr.keys.toSet()), isEmpty);
+    final en = Localization.supported['en']!, tr = Localization.supported['tr']!;
+    expect(tr.keys.toSet().difference(en.keys.toSet()), isEmpty);
+    expect(en.keys.toSet().difference(tr.keys.toSet()), isEmpty);
     final loc = Localization();
+    for (final c in content.chapters) {
+      expect(en.containsKey('chapter.${c.id}'), isTrue, reason: c.id);
+    }
     for (final l in content.allLevels) {
-      expect(stringsEn.containsKey(l.nameKey), isTrue);
-      expect(stringsEn.containsKey(l.descKey), isTrue);
+      expect(en.containsKey(l.nameKey), isTrue, reason: l.nameKey);
+      expect(en.containsKey(l.descKey), isTrue, reason: l.descKey);
       for (final o in l.objectives) {
-        expect(stringsEn.containsKey(o.nameKey), isTrue, reason: o.nameKey);
+        expect(en.containsKey(o.nameKey), isTrue, reason: o.nameKey);
       }
     }
     loc.language = 'tr';

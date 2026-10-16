@@ -6,6 +6,10 @@ import 'package:flutter/scheduler.dart';
 import '../art/lighting.dart';
 import '../art/paint_kit.dart';
 import 'location_map_art.dart';
+import 'maps_b1.dart';
+import 'maps_b2.dart';
+import 'maps_b3.dart';
+import 'maps_b4.dart';
 
 /// Chapter-map artwork contract so future chapters (Farm, Barn...) can plug in
 /// their own illustrated map without touching screens.
@@ -29,7 +33,7 @@ ChapterMapArt? chapterMapArtFor(String id) => switch (id) {
   'harbor' => harborMap,
   'museum' => museumMap,
   'theater' => theaterMap,
-  _ => null,
+  _ => batch1Maps[id] ?? batch2Maps[id] ?? batch3Maps[id] ?? batch4Maps[id],
 };
 
 /// Maps design coordinates onto a box (contain or cover).

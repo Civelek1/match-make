@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/level_data.dart';
 import '../../match3/board.dart';
+import 'batch_1_tiles.dart';
+import 'batch_2_tiles.dart';
+import 'batch_3_tiles.dart';
+import 'batch_4_tiles.dart';
 import 'obstacle_art.dart';
 
 /// Visual identity of a tile type. [slot] fixes shape + colour so pieces stay
@@ -163,7 +167,13 @@ const Map<String, TileVisual> tileVisuals = {
   'spotlight': TileVisual(Icons.highlight, 5),
 };
 
-TileVisual visualOf(String tileTypeId) => tileVisuals[tileTypeId] ?? const TileVisual(Icons.help_outline, 0);
+TileVisual visualOf(String tileTypeId) =>
+    tileVisuals[tileTypeId] ??
+    batch1Tiles[tileTypeId] ??
+    batch2Tiles[tileTypeId] ??
+    batch3Tiles[tileTypeId] ??
+    batch4Tiles[tileTypeId] ??
+    const TileVisual(Icons.help_outline, 0);
 
 const slotColors = <Color>[
   Color(0xFFFF5A6E), // red circle

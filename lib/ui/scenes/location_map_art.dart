@@ -18,7 +18,11 @@ class MapSpot {
   const MapSpot(this.levelId, this.node, this.area, this.kind, this.accent);
 }
 
-enum MapStyle { farm, restaurant, beach, mansion, castle, lodge, harbor, museum, theater }
+enum MapStyle { farm, restaurant, beach, mansion, castle, lodge, harbor, museum, theater, custom }
+
+/// Paints a custom chapter map's buildings (design space 360×640, ground at
+/// [LocationMapArt.groundY]). [ov] is 0..1 restoration, [t] time in seconds.
+typedef MapScenery = void Function(Canvas c, LocationMapArt art, double ov, double t);
 
 /// Data-driven chapter map (360×640 design space). Each chapter supplies a
 /// style (landmark building) and five spots.
@@ -28,7 +32,22 @@ class LocationMapArt extends ChapterMapArt {
   final Color groundN, groundR;
   final double groundY;
 
-  LocationMapArt({required this.style, required this.spots, required this.groundN, required this.groundR, this.groundY = 450});
+  /// Buildings for [MapStyle.custom] maps.
+  final MapScenery? scenery;
+
+  /// Sky colours when restored (neglected skies are always grey-blue).
+  final Color skyTopR, skyBottomR;
+
+  LocationMapArt({
+    required this.style,
+    required this.spots,
+    required this.groundN,
+    required this.groundR,
+    this.groundY = 450,
+    this.scenery,
+    this.skyTopR = const Color(0xFF5EC2FF),
+    this.skyBottomR = const Color(0xFFFFE9C2),
+  });
 
   @override
   late final Map<String, Offset> nodes = {for (final s in spots) s.levelId: s.node};
@@ -36,8 +55,8 @@ class LocationMapArt extends ChapterMapArt {
   @override
   void paint(Canvas c, Size canvasSize, Set<String> done, double t, {bool celebrate = false}) {
     final ov = done.length / spots.length;
-    final skyTop = Pk.mix(const Color(0xFF9DB8C9), style == MapStyle.beach ? const Color(0xFF3FB8FF) : const Color(0xFF5EC2FF), ov);
-    final skyBottom = Pk.mix(const Color(0xFFE6DCC8), const Color(0xFFFFE9C2), ov);
+    final skyTop = Pk.mix(const Color(0xFF9DB8C9), style == MapStyle.beach ? const Color(0xFF3FB8FF) : skyTopR, ov);
+    final skyBottom = Pk.mix(const Color(0xFFE6DCC8), skyBottomR, ov);
     final layout = MapLayout(canvasSize);
     final gy = layout.toLocal(Offset(0, groundY)).dy;
     Pk.gradientRect(c, Rect.fromLTWH(0, 0, canvasSize.width, gy), skyTop, skyBottom);
@@ -73,6 +92,8 @@ class LocationMapArt extends ChapterMapArt {
         _museum(c, ov);
       case MapStyle.theater:
         _theater(c, ov, t);
+      case MapStyle.custom:
+        scenery?.call(c, this, ov, t);
     }
     for (final s in spots) {
       _spot(c, s, done.contains(s.levelId), t);
@@ -86,6 +107,9 @@ class LocationMapArt extends ChapterMapArt {
     }
     c.restore();
   }
+
+  /// The restored-or-neglected ground band, for custom sceneries.
+  void paintGround(Canvas c, double ov, {double? top}) => _ground(c, ov, top: top ?? groundY);
 
   void _ground(Canvas c, double ov, {double top = 450}) {
     Pk.gradientRect(c, Rect.fromLTWH(-200, top, 760, 260), Pk.mix(groundN, groundR, ov), Pk.dark(Pk.mix(groundN, groundR, ov), 0.15));

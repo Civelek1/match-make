@@ -7,6 +7,10 @@ import 'package:match_make/game/level_session.dart';
 import 'package:match_make/match3/board.dart';
 import 'package:match_make/match3/match3_engine.dart';
 
+import 'support/floors_b1.dart';
+import 'support/floors_b2.dart';
+import 'support/floors_b3.dart';
+import 'support/floors_b4.dart';
 import 'support/key_bot.dart';
 
 /// A deliberately simple bot: prefers specials, then moves whose tile type is
@@ -94,7 +98,9 @@ void main() {
     'harbor_dock': 0.46, 'fish_market': 0.4, 'boathouse': 0.4, 'lighthouse_base': 0.42, 'keeper_cottage': 0.32,
     'museum_steps': 0.48, 'sculpture_hall': 0.38, 'art_gallery': 0.38, 'history_hall': 0.4, 'museum_cafe': 0.34,
     'theater_front': 0.38, 'theater_lobby': 0.36, 'dressing_room': 0.36, 'concert_hall': 0.34, 'grand_stage': 0.3,
-  };
+  };  // Chapters 11+ keep their floors next to their content specs.
+  final floors = {...minWinRate, ...floorsB1, ...floorsB2, ...floorsB3, ...floorsB4};
+
 
   for (final chapter in content.chapters) {
     for (final level in content.levelsOf(chapter.id)) {
@@ -108,7 +114,7 @@ void main() {
           '${level.number} ${level.id}: win ${(r.winRate * 100).toStringAsFixed(0)}% '
           'score p50=${pct(.5)} p90=${pct(.9)} stars1/2/3=$dist',
         );
-        expect(r.winRate, greaterThanOrEqualTo(minWinRate[level.id]!));
+        expect(r.winRate, greaterThanOrEqualTo(floors[level.id]!));
       });
     }
   }

@@ -1,0 +1,816 @@
+{
+ "chapters": [
+  "house",
+  "farm",
+  "restaurant",
+  "beach",
+  "mansion",
+  "castle",
+  "lodge",
+  "harbor",
+  "museum",
+  "theater"
+ ],
+ "levels": [
+  "garden",
+  "kitchen",
+  "bathroom",
+  "gaming_room",
+  "attic",
+  "farmyard",
+  "barn",
+  "chicken_coop",
+  "workshop",
+  "farmhouse",
+  "entrance",
+  "rest_kitchen",
+  "dining_hall",
+  "terrace",
+  "vip_room",
+  "beach",
+  "pool",
+  "beach_bar",
+  "hotel_room",
+  "rooftop",
+  "front_yard",
+  "grand_hall",
+  "luxury_bedroom",
+  "cinema_room",
+  "penthouse",
+  "castle_gate",
+  "banquet_hall",
+  "castle_library",
+  "armory",
+  "throne_room",
+  "lodge_front",
+  "lodge_lounge",
+  "ski_room",
+  "lodge_spa",
+  "lodge_suite",
+  "harbor_dock",
+  "fish_market",
+  "boathouse",
+  "lighthouse_base",
+  "keeper_cottage",
+  "museum_steps",
+  "sculpture_hall",
+  "art_gallery",
+  "history_hall",
+  "museum_cafe",
+  "theater_front",
+  "theater_lobby",
+  "dressing_room",
+  "concert_hall",
+  "grand_stage"
+ ],
+ "tiles": {
+  "flower": 0,
+  "fence": 1,
+  "bench": 2,
+  "grass": 3,
+  "tree": 5,
+  "table": 0,
+  "cabinets": 1,
+  "counter": 2,
+  "herbs": 3,
+  "fridge": 4,
+  "decor_cup": 5,
+  "sink": 0,
+  "cabinet_bath": 1,
+  "mirror": 2,
+  "plants": 3,
+  "bathtub": 4,
+  "soap": 5,
+  "chair": 0,
+  "desk": 1,
+  "pc": 2,
+  "gaming_decor": 3,
+  "monitor": 4,
+  "rgb": 5,
+  "furniture": 0,
+  "boxes": 1,
+  "attic_decor": 2,
+  "floor": 3,
+  "window": 4,
+  "shelves": 5,
+  "tractor": 0,
+  "grain": 2,
+  "water": 4,
+  "animals": 0,
+  "barn_door": 1,
+  "hay": 2,
+  "tools": 3,
+  "lantern": 5,
+  "hen": 0,
+  "nest": 1,
+  "egg": 2,
+  "feed": 3,
+  "blossom": 5,
+  "saw": 0,
+  "hammer": 1,
+  "construction": 2,
+  "wrench": 3,
+  "toolbox": 4,
+  "bulb": 5,
+  "cottage": 0,
+  "hearth": 1,
+  "bed": 2,
+  "pie": 3,
+  "houseplant": 5,
+  "menu": 0,
+  "rest_door": 1,
+  "sign": 2,
+  "awning": 4,
+  "pot": 0,
+  "grill": 1,
+  "cutlery": 2,
+  "plate": 5,
+  "seat": 1,
+  "wine": 2,
+  "glass": 4,
+  "deck": 1,
+  "cocktail": 2,
+  "parasol": 4,
+  "jewel": 0,
+  "lounge": 1,
+  "champagne": 2,
+  "piano": 3,
+  "music": 4,
+  "curtain": 5,
+  "umbrella": 0,
+  "surf": 1,
+  "sun": 2,
+  "palm": 3,
+  "wave": 4,
+  "kayak": 5,
+  "lounger": 0,
+  "towel": 1,
+  "juice": 2,
+  "pool": 4,
+  "sunshade": 5,
+  "tap": 0,
+  "icecream": 4,
+  "speaker": 5,
+  "king_bed": 0,
+  "luggage": 1,
+  "room_service": 2,
+  "shower": 4,
+  "party": 0,
+  "statue": 2,
+  "hedge": 3,
+  "fountain": 4,
+  "stairs": 1,
+  "trophy": 2,
+  "wardrobe": 1,
+  "gold_lamp": 2,
+  "movie": 0,
+  "reel": 2,
+  "console": 3,
+  "projector": 4,
+  "banner": 0,
+  "shield": 1,
+  "torch": 2,
+  "book": 3,
+  "scroll": 4,
+  "hourglass": 5,
+  "medal": 4,
+  "globe": 3,
+  "snowflake": 0,
+  "ski": 1,
+  "sled": 2,
+  "snowboard": 3,
+  "skate": 4,
+  "chalet": 3,
+  "hot_tub": 4,
+  "anchor": 0,
+  "boat": 1,
+  "fish": 2,
+  "rod": 3,
+  "cargo": 5,
+  "beacon": 2,
+  "compass": 4,
+  "palette": 0,
+  "column": 1,
+  "science": 2,
+  "brush": 3,
+  "photo": 4,
+  "mask": 0,
+  "ticket": 1,
+  "mic": 3,
+  "spotlight": 5
+ },
+ "objectives": {
+  "grass": [
+   "Grass",
+   "Çimen"
+  ],
+  "fence": [
+   "Fence",
+   "Çit"
+  ],
+  "flowers": [
+   "Flowers",
+   "Çiçekler"
+  ],
+  "tree": [
+   "Trees",
+   "Ağaçlar"
+  ],
+  "bench": [
+   "Bench",
+   "Bank"
+  ],
+  "cabinets": [
+   "Cabinets",
+   "Dolaplar"
+  ],
+  "counter": [
+   "Counter",
+   "Tezgah"
+  ],
+  "fridge": [
+   "Fridge",
+   "Buzdolabı"
+  ],
+  "table": [
+   "Table",
+   "Masa"
+  ],
+  "kitchen_decor": [
+   "Decorations",
+   "Dekorasyon"
+  ],
+  "bathtub": [
+   "Bathtub",
+   "Küvet"
+  ],
+  "sink": [
+   "Sink",
+   "Lavabo"
+  ],
+  "mirror": [
+   "Mirror",
+   "Ayna"
+  ],
+  "bath_cabinet": [
+   "Cabinet",
+   "Dolap"
+  ],
+  "plants": [
+   "Plants",
+   "Bitkiler"
+  ],
+  "desk": [
+   "Desk",
+   "Masa"
+  ],
+  "pc": [
+   "Gaming PC",
+   "Oyun PC"
+  ],
+  "gaming_chair": [
+   "Chair",
+   "Sandalye"
+  ],
+  "monitor": [
+   "Monitor",
+   "Monitör"
+  ],
+  "rgb": [
+   "RGB Lights",
+   "RGB Işıklar"
+  ],
+  "gaming_decor": [
+   "Decorations",
+   "Dekorasyon"
+  ],
+  "floor": [
+   "Floor",
+   "Zemin"
+  ],
+  "shelves": [
+   "Shelves",
+   "Raflar"
+  ],
+  "boxes": [
+   "Boxes",
+   "Kutular"
+  ],
+  "window": [
+   "Window",
+   "Pencere"
+  ],
+  "furniture": [
+   "Furniture",
+   "Mobilya"
+  ],
+  "attic_decor": [
+   "Decorations",
+   "Dekorasyon"
+  ],
+  "complete": [
+   "{name} COMPLETE!",
+   "{name} TAMAM!"
+  ],
+  "cart": [
+   "Farm Cart",
+   "Araba"
+  ],
+  "crops": [
+   "Crops",
+   "Ekinler"
+  ],
+  "pond": [
+   "Pond",
+   "Gölet"
+  ],
+  "crates": [
+   "Crates",
+   "Kasalar"
+  ],
+  "animals": [
+   "Animals",
+   "Hayvanlar"
+  ],
+  "barn_doors": [
+   "Barn Doors",
+   "Ahır Kapıları"
+  ],
+  "hay": [
+   "Hay",
+   "Saman"
+  ],
+  "tools": [
+   "Tools",
+   "Aletler"
+  ],
+  "trough": [
+   "Trough",
+   "Yalak"
+  ],
+  "lights": [
+   "Lights",
+   "Işıklar"
+  ],
+  "hens": [
+   "Hens",
+   "Tavuklar"
+  ],
+  "coop": [
+   "Coop",
+   "Kümes"
+  ],
+  "eggs": [
+   "Eggs",
+   "Yumurtalar"
+  ],
+  "feed": [
+   "Feed",
+   "Yem"
+  ],
+  "workbench": [
+   "Workbench",
+   "Tezgah"
+  ],
+  "tool_wall": [
+   "Tool Wall",
+   "Alet Duvarı"
+  ],
+  "repairs": [
+   "Repairs",
+   "Tamirler"
+  ],
+  "machines": [
+   "Machines",
+   "Makineler"
+  ],
+  "porch": [
+   "Porch",
+   "Veranda"
+  ],
+  "fireplace": [
+   "Fireplace",
+   "Şömine"
+  ],
+  "bedroom": [
+   "Bedroom",
+   "Yatak Odası"
+  ],
+  "baking": [
+   "Baking",
+   "Fırın İşleri"
+  ],
+  "windows": [
+   "Windows",
+   "Pencereler"
+  ],
+  "menu_board": [
+   "Menu Board",
+   "Menü Tahtası"
+  ],
+  "doors": [
+   "Doors",
+   "Kapılar"
+  ],
+  "sign": [
+   "Sign",
+   "Tabela"
+  ],
+  "planters": [
+   "Planters",
+   "Saksılar"
+  ],
+  "awning": [
+   "Awning",
+   "Tente"
+  ],
+  "ice": [
+   "Ice",
+   "Buz"
+  ],
+  "pots": [
+   "Pots",
+   "Tencereler"
+  ],
+  "stoves": [
+   "Stoves",
+   "Ocaklar"
+  ],
+  "cutlery": [
+   "Cutlery",
+   "Çatal Bıçak"
+  ],
+  "herbs": [
+   "Herbs",
+   "Otlar"
+  ],
+  "dishes": [
+   "Dishes",
+   "Tabaklar"
+  ],
+  "tables": [
+   "Tables",
+   "Masalar"
+  ],
+  "chairs": [
+   "Chairs",
+   "Sandalyeler"
+  ],
+  "wine_rack": [
+   "Wine Rack",
+   "Şarap Rafı"
+  ],
+  "glassware": [
+   "Glassware",
+   "Bardaklar"
+  ],
+  "chandeliers": [
+   "Chandeliers",
+   "Avizeler"
+  ],
+  "decking": [
+   "Decking",
+   "Zemin"
+  ],
+  "bar": [
+   "Bar",
+   "Bar"
+  ],
+  "parasols": [
+   "Parasols",
+   "Şemsiyeler"
+  ],
+  "decor": [
+   "Decor",
+   "Dekor"
+  ],
+  "sofas": [
+   "Sofas",
+   "Kanepeler"
+  ],
+  "champagne": [
+   "Champagne",
+   "Şampanya"
+  ],
+  "piano": [
+   "Piano",
+   "Piyano"
+  ],
+  "stage": [
+   "Stage",
+   "Sahne"
+  ],
+  "curtains": [
+   "Curtains",
+   "Perdeler"
+  ],
+  "umbrellas": [
+   "Umbrellas",
+   "Şemsiyeler"
+  ],
+  "surfboards": [
+   "Surfboards",
+   "Sörf Tahtaları"
+  ],
+  "sunbeds": [
+   "Sunbeds",
+   "Güneş Yatakları"
+  ],
+  "palms": [
+   "Palms",
+   "Palmiyeler"
+  ],
+  "shoreline": [
+   "Shoreline",
+   "Kıyı"
+  ],
+  "kayaks": [
+   "Kayaks",
+   "Kanolar"
+  ],
+  "chains": [
+   "Chains",
+   "Zincirler"
+  ],
+  "loungers": [
+   "Loungers",
+   "Şezlonglar"
+  ],
+  "towels": [
+   "Towels",
+   "Havlular"
+  ],
+  "juice_bar": [
+   "Juice Bar",
+   "Meyve Suyu Barı"
+  ],
+  "pool": [
+   "Pool",
+   "Havuz"
+  ],
+  "sunshades": [
+   "Sunshades",
+   "Gölgelikler"
+  ],
+  "taps": [
+   "Taps",
+   "Musluklar"
+  ],
+  "stools": [
+   "Stools",
+   "Tabureler"
+  ],
+  "cocktails": [
+   "Cocktails",
+   "Kokteyller"
+  ],
+  "ice_cream": [
+   "Ice Cream",
+   "Dondurma"
+  ],
+  "speakers": [
+   "Speakers",
+   "Hoparlörler"
+  ],
+  "bed": [
+   "Bed",
+   "Yatak"
+  ],
+  "luggage": [
+   "Luggage",
+   "Bavullar"
+  ],
+  "room_service": [
+   "Room Service",
+   "Oda Servisi"
+  ],
+  "bathroom": [
+   "Bathroom",
+   "Banyo"
+  ],
+  "lamps": [
+   "Lamps",
+   "Lambalar"
+  ],
+  "party_lights": [
+   "Party Lights",
+   "Parti Işıkları"
+  ],
+  "hot_tub": [
+   "Hot Tub",
+   "Jakuzi"
+  ],
+  "gates": [
+   "Gates",
+   "Kapılar"
+  ],
+  "statues": [
+   "Statues",
+   "Heykeller"
+  ],
+  "hedges": [
+   "Hedges",
+   "Çitler"
+  ],
+  "fountain": [
+   "Fountain",
+   "Çeşme"
+  ],
+  "staircase": [
+   "Staircase",
+   "Merdiven"
+  ],
+  "trophies": [
+   "Trophies",
+   "Kupalar"
+  ],
+  "wardrobe": [
+   "Wardrobe",
+   "Gardırop"
+  ],
+  "bath": [
+   "Bath",
+   "Küvet"
+  ],
+  "screen": [
+   "Screen",
+   "Perde"
+  ],
+  "seats": [
+   "Seats",
+   "Koltuklar"
+  ],
+  "reels": [
+   "Film Reels",
+   "Film Makaraları"
+  ],
+  "consoles": [
+   "Consoles",
+   "Konsollar"
+  ],
+  "projector": [
+   "Projector",
+   "Projektör"
+  ],
+  "banners": [
+   "Banners",
+   "Sancaklar"
+  ],
+  "torches": [
+   "Torches",
+   "Meşaleler"
+  ],
+  "chests": [
+   "Chests",
+   "Sandıklar"
+  ],
+  "books": [
+   "Books",
+   "Kitaplar"
+  ],
+  "scrolls": [
+   "Scrolls",
+   "Parşömenler"
+  ],
+  "clocks": [
+   "Clocks",
+   "Saatler"
+  ],
+  "shields": [
+   "Shields",
+   "Kalkanlar"
+  ],
+  "medals": [
+   "Medals",
+   "Madalyalar"
+  ],
+  "snowmen": [
+   "Snowmen",
+   "Kardan Adamlar"
+  ],
+  "skis": [
+   "Skis",
+   "Kayaklar"
+  ],
+  "sleds": [
+   "Sleds",
+   "Kızaklar"
+  ],
+  "chalet": [
+   "Chalet",
+   "Dağ Evi"
+  ],
+  "ice_rink": [
+   "Ice Rink",
+   "Buz Pisti"
+  ],
+  "cocoa": [
+   "Hot Cocoa",
+   "Sıcak Kakao"
+  ],
+  "boards": [
+   "Snowboards",
+   "Snowboardlar"
+  ],
+  "skates": [
+   "Skates",
+   "Patenler"
+  ],
+  "lockers": [
+   "Lockers",
+   "Dolaplar"
+  ],
+  "toiletries": [
+   "Toiletries",
+   "Banyo Seti"
+  ],
+  "balcony": [
+   "Balcony",
+   "Balkon"
+  ],
+  "anchors": [
+   "Anchors",
+   "Çapalar"
+  ],
+  "boats": [
+   "Boats",
+   "Tekneler"
+  ],
+  "fish": [
+   "Fish Stalls",
+   "Balık Tezgâhı"
+  ],
+  "fishing": [
+   "Fishing Gear",
+   "Olta Takımı"
+  ],
+  "cargo": [
+   "Cargo",
+   "Kargo"
+  ],
+  "waterway": [
+   "Slipway",
+   "Kızak Yolu"
+  ],
+  "beacon": [
+   "Beacon",
+   "Fener Işığı"
+  ],
+  "maps": [
+   "Maps",
+   "Haritalar"
+  ],
+  "columns": [
+   "Columns",
+   "Sütunlar"
+  ],
+  "paintings": [
+   "Paintings",
+   "Tablolar"
+  ],
+  "brushes": [
+   "Brushes",
+   "Fırçalar"
+  ],
+  "frames": [
+   "Frames",
+   "Çerçeveler"
+  ],
+  "exhibits": [
+   "Exhibits",
+   "Sergiler"
+  ],
+  "globes": [
+   "Globes",
+   "Küreler"
+  ],
+  "display_cases": [
+   "Display Cases",
+   "Vitrinler"
+  ],
+  "posters": [
+   "Posters",
+   "Afişler"
+  ],
+  "tickets": [
+   "Tickets",
+   "Biletler"
+  ],
+  "spotlights": [
+   "Spotlights",
+   "Spot Işıkları"
+  ],
+  "masks": [
+   "Masks",
+   "Maskeler"
+  ],
+  "mics": [
+   "Microphones",
+   "Mikrofonlar"
+  ],
+  "sheet_music": [
+   "Sheet Music",
+   "Notalar"
+  ]
+ }
+}

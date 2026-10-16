@@ -10,6 +10,10 @@ import 'attic_scene.dart';
 import 'bathroom_scene.dart';
 import 'chapter_scenes.dart';
 import 'chapter_scenes_2.dart';
+import 'chapter_scenes_b1.dart';
+import 'chapter_scenes_b2.dart';
+import 'chapter_scenes_b3.dart';
+import 'chapter_scenes_b4.dart';
 import 'gaming_room_scene.dart';
 import 'garden_scene.dart';
 import 'kitchen_scene.dart';
@@ -51,6 +55,10 @@ final Map<String, SceneArt Function()> _registry = {
   'attic': AtticScene.new,
   ...chapterScenes,
   ...chapterScenes2,
+  ...batch1Scenes,
+  ...batch2Scenes,
+  ...batch3Scenes,
+  ...batch4Scenes,
 };
 
 final Map<String, SceneArt> _cache = {};

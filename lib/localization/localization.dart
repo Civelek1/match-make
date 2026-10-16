@@ -1,12 +1,19 @@
 import 'package:flutter/foundation.dart';
 
+import 'strings_b1.dart';
+import 'strings_b2.dart';
+import 'strings_b3.dart';
+import 'strings_b4.dart';
 import 'strings_en.dart';
 import 'strings_tr.dart';
 
 /// String lookup with `{param}` interpolation. Missing keys fall back to
 /// English, then to the key itself (so a missing string is visible, not a crash).
 class Localization extends ChangeNotifier {
-  static const supported = <String, Map<String, String>>{'en': stringsEn, 'tr': stringsTr};
+  static const supported = <String, Map<String, String>>{
+    'en': {...stringsEn, ...stringsB1En, ...stringsB2En, ...stringsB3En, ...stringsB4En},
+    'tr': {...stringsTr, ...stringsB1Tr, ...stringsB2Tr, ...stringsB3Tr, ...stringsB4Tr},
+  };
 
   String _lang = 'en';
   String get language => _lang;
@@ -19,7 +26,7 @@ class Localization extends ChangeNotifier {
   }
 
   String t(String key, [Map<String, Object>? args]) {
-    var s = supported[_lang]![key] ?? stringsEn[key] ?? key;
+    var s = supported[_lang]![key] ?? supported['en']![key] ?? key;
     if (args != null) {
       args.forEach((k, v) => s = s.replaceAll('{$k}', '$v'));
     }

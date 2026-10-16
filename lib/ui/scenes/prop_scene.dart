@@ -8,13 +8,43 @@ import 'prop_kit.dart';
 import 'room_kit.dart';
 import 'scene_art.dart';
 
+/// Paints a custom prop into [r] with main colour [a] and accent [b].
+typedef PropPainter = void Function(Canvas c, Rect r, Color a, Color b, double t);
+
+/// A prop drawn by its own painter instead of [PropKit] (chapter-specific
+/// art lives next to the chapter's scenes).
+class CustomProp {
+  final PropPainter painter;
+
+  /// Hung on a wall (pops from its centre, drawn before floor props).
+  final bool wall;
+
+  /// A light source: not shaded for volume.
+  final bool emissive;
+  const CustomProp(this.painter, {this.wall = false, this.emissive = false});
+}
+
 /// One prop placed in the 400×240 scene.
 class Prop {
   final PK kind;
+  final CustomProp? custom;
   final Rect r;
   final Color a;
   final Color b;
-  const Prop(this.kind, this.r, this.a, [this.b = const Color(0xFFFFC93C)]);
+  const Prop(this.kind, this.r, this.a, [this.b = const Color(0xFFFFC93C)]) : custom = null;
+  const Prop.custom(CustomProp this.custom, this.r, this.a, [this.b = const Color(0xFFFFC93C)]) : kind = PK.vase;
+
+  bool get isWall => custom?.wall ?? wallProps.contains(kind);
+  bool get isEmissive => custom?.emissive ?? emissiveProps.contains(kind);
+
+  void paint(Canvas c, double t) {
+    final cp = custom;
+    if (cp != null) {
+      cp.painter(c, r, a, b, t);
+    } else {
+      PropKit.paint(c, kind, r, a, b, t);
+    }
+  }
 }
 
 /// Props restored by one objective. With n props, prop k appears at stage
@@ -198,7 +228,7 @@ class PropScene extends SceneArt {
         for (var k = 0; k < o.props.length; k++) (o, k),
     ]..sort((x, y) {
         final px = x.$1.props[x.$2], py = y.$1.props[y.$2];
-        final wx = wallProps.contains(px.kind) ? 0 : 1, wy = wallProps.contains(py.kind) ? 0 : 1;
+        final wx = px.isWall ? 0 : 1, wy = py.isWall ? 0 : 1;
         if (wx != wy) return wx - wy;
         return px.r.bottom.compareTo(py.r.bottom);
       });
@@ -207,7 +237,7 @@ class PropScene extends SceneArt {
     for (final (o, k) in items) {
       final p = o.props[k];
       final s = o.stageFor(k);
-      if (wallProps.contains(p.kind) || f.stage(o.id) < s) continue;
+      if (p.isWall || f.stage(o.id) < s) continue;
       final pop = f.pop(o.id, s).clamp(0.0, 1.0);
       if (pop > 0.01) Lighting.contactShadow(c, p.r, strength: pop);
     }
@@ -223,12 +253,12 @@ class PropScene extends SceneArt {
         continue;
       }
       final pop = f.pop(o.id, s);
-      final wall = wallProps.contains(p.kind);
+      final wall = p.isWall;
       final pivot = wall ? p.r.center : p.r.bottomCenter;
       Pk.scaled(c, pivot, pop, () {
         try {
-          PropKit.paint(c, p.kind, p.r, p.a, p.b, t);
-          if (!emissiveProps.contains(p.kind)) Lighting.volume(c, p.r, wall: wall);
+          p.paint(c, t);
+          if (!p.isEmissive) Lighting.volume(c, p.r, wall: wall);
         } catch (_) {
           // A broken prop must never take the whole scene down.
         }
@@ -246,7 +276,7 @@ class PropScene extends SceneArt {
   void _ghost(Canvas c, Prop p) {
     final rr = RRect.fromRectAndRadius(p.r, const Radius.circular(4));
     c.drawRRect(rr, Pk.stroke(Colors.black.withValues(alpha: 0.16), 1.2));
-    if (!wallProps.contains(p.kind) && p.r.width > 20) {
+    if (!p.isWall && p.r.width > 20) {
       // Broken plank debris where the prop will go.
       c.save();
       c.translate(p.r.center.dx, p.r.bottom - 3);

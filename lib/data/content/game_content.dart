@@ -1,5 +1,9 @@
 import '../models/chapter_data.dart';
 import '../models/level_data.dart';
+import 'batch_1.dart';
+import 'batch_2.dart';
+import 'batch_3.dart';
+import 'batch_4.dart';
 import 'beach_chapter.dart';
 import 'castle_chapter.dart';
 import 'farm_chapter.dart';
@@ -32,7 +36,7 @@ class GameContent {
   }
 
   factory GameContent.standard() => GameContent(
-    chapters: const [
+    chapters: [
       houseChapter,
       farmChapter,
       restaurantChapter,
@@ -43,6 +47,10 @@ class GameContent {
       harborChapter,
       museumChapter,
       theaterChapter,
+      ...batch1Chapters,
+      ...batch2Chapters,
+      ...batch3Chapters,
+      ...batch4Chapters,
     ],
     levels: [
       ...houseLevels,
@@ -55,6 +63,10 @@ class GameContent {
       ...harborLevels,
       ...museumLevels,
       ...theaterLevels,
+      ...batch1Levels,
+      ...batch2Levels,
+      ...batch3Levels,
+      ...batch4Levels,
     ],
   );
 

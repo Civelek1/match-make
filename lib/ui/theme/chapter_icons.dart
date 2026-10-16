@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'batch_1_theme.dart';
+import 'batch_2_theme.dart';
+import 'batch_3_theme.dart';
+import 'batch_4_theme.dart';
+
 /// Icon shown on chapter cards / headers. Unknown chapters fall back to a map pin.
 IconData chapterIcon(String chapterId) => switch (chapterId) {
   'house' => Icons.house_rounded,
@@ -12,5 +17,5 @@ IconData chapterIcon(String chapterId) => switch (chapterId) {
   'harbor' => Icons.anchor_rounded,
   'museum' => Icons.museum_rounded,
   'theater' => Icons.theater_comedy_rounded,
-  _ => Icons.place_rounded,
+  _ => batch1Icons[chapterId] ?? batch2Icons[chapterId] ?? batch3Icons[chapterId] ?? batch4Icons[chapterId] ?? Icons.place_rounded,
 };

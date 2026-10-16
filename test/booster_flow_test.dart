@@ -37,6 +37,13 @@ Future<void> openLevel(WidgetTester t, AppServices s, String id) async {
   expect(find.byType(GameplayScreen), findsOneWidget);
 }
 
+/// Pumps until the board has settled (cascades vary with the random board).
+Future<void> settle(WidgetTester t, GameplayController c) async {
+  for (var i = 0; i < 300 && c.phase != PlayPhase.playing; i++) {
+    await t.pump(const Duration(milliseconds: 50));
+  }
+}
+
 Future<void> tapCell(WidgetTester t, GameplayController c, Pos p) async {
   final r = c.board.cellRectGlobal(p)!;
   await t.tapAt(r.center);
@@ -67,7 +74,8 @@ void main() {
     final target = Pos(3, c.session.engine.board.height - 1);
     final id = c.session.engine.board.atPos(target)!.id;
     await tapCell(t, c, target);
-    await run(t, 2.5);
+    await run(t, 0.5);
+    await settle(t, c);
     expect(c.armed, isNull);
     expect(s.economy.count(BoosterKind.hammer), 2);
     expect(c.movesLeft, moves);
@@ -84,7 +92,8 @@ void main() {
 
     // Shuffle fires immediately.
     await t.tap(find.bySemanticsLabel('Shuffle'));
-    await run(t, 2);
+    await run(t, 0.5);
+    await settle(t, c);
     expect(s.economy.count(BoosterKind.shuffle), 2);
     expect(c.movesLeft, moves);
 

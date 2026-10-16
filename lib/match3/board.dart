@@ -62,17 +62,26 @@ class Board {
   /// Ice layers per cell (0 = no ice).
   final List<int> ice;
 
+  /// Cells cut out of the board's shape: never hold a piece, can't be hit,
+  /// and falling pieces pass through them.
+  final List<bool> voids;
+
   Board(this.width, this.height)
     : _cells = List<Tile?>.filled(width * height, null),
       crates = List<int>.filled(width * height, 0),
-      ice = List<int>.filled(width * height, 0);
+      ice = List<int>.filled(width * height, 0),
+      voids = List<bool>.filled(width * height, false);
+
+  bool isVoid(int x, int y) => inBounds(x, y) && voids[y * width + x];
+  bool get isShaped => voids.contains(true);
 
   int crateAt(int x, int y) => inBounds(x, y) ? crates[y * width + x] : 0;
   int iceAt(int x, int y) => inBounds(x, y) ? ice[y * width + x] : 0;
   bool hasCrate(Pos p) => crateAt(p.x, p.y) > 0;
 
-  /// Cells a falling piece can come to rest in (no crate, no chained piece).
-  bool isSlot(int x, int y) => crateAt(x, y) == 0 && !(at(x, y)?.locked ?? false);
+  /// Cells a falling piece can come to rest in (on the board, no crate, no
+  /// chained piece).
+  bool isSlot(int x, int y) => inBounds(x, y) && !voids[y * width + x] && crateAt(x, y) == 0 && !(at(x, y)?.locked ?? false);
 
   bool get hasObstacles => crates.any((c) => c > 0) || ice.any((c) => c > 0) || _cells.any((t) => t?.locked ?? false);
 
@@ -99,10 +108,10 @@ class Board {
     return null;
   }
 
-  /// Every non-crate cell holds a piece.
+  /// Every board cell without a crate holds a piece.
   bool get isFull {
     for (var i = 0; i < _cells.length; i++) {
-      if (crates[i] == 0 && _cells[i] == null) return false;
+      if (!voids[i] && crates[i] == 0 && _cells[i] == null) return false;
     }
     return true;
   }
