@@ -1,7 +1,7 @@
-// Generates every sound effect and both music loops procedurally, so the game
-// ships with 100% original audio. Re-run after tweaking:
+// Generates the original procedural placeholder sounds (no longer shipped: the
+// game now uses licensed audio, see assets/audio/CREDITS.md). Writes to
+// build/audio_placeholders/ so it never overwrites the real assets:
 //   dart run tool/generate_audio.dart
-// Replace any file in assets/audio/ with a real asset of the same name later.
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -117,7 +117,7 @@ void writeWav(String path, Buf b, {double gain = 1}) {
 }
 
 void main() {
-  final dir = Directory('assets/audio')..createSync(recursive: true);
+  final dir = Directory('build/audio_placeholders')..createSync(recursive: true);
   String p(String name) => '${dir.path}/$name.wav';
 
   // --- SFX -------------------------------------------------------------------

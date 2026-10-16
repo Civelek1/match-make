@@ -30,7 +30,7 @@ enum MusicTrack { menu, gameplay }
 /// dropping new files in assets/audio (same names) or editing this table.
 class AudioAssets {
   static String sfx(Sfx s) => 'audio/sfx_${s.name}.wav';
-  static String music(MusicTrack t) => 'audio/music_${t.name}.wav';
+  static String music(MusicTrack t) => 'audio/music_${t.name}.mp3';
 }
 
 abstract class AudioService {

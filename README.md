@@ -66,7 +66,7 @@ lib/
     screens/      splash, main menu, map, gallery, leaderboard, settings, profile, chapter complete
     widgets/      GameButton, GamePanel, StarDisplay, GameToggle, confetti, logo...
     debug/        debug panel (only when kDebugMode or MM_DEBUG=true)
-tool/             generate_audio.dart (all SFX/music synthesized), serve_web.dart
+tool/             generate_audio.dart (old synthesized placeholders; real audio credits in assets/audio/CREDITS.md), serve_web.dart
 ```
 
 Key flow: the engine resolves a move instantly and returns a list of `BoardStep`s

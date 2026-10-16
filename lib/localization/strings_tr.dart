@@ -170,6 +170,7 @@ const Map<String, String> stringsTr = {
   'settings.about_text': 'Taşları eşleştir, güzel mekânları yeniden canlandır. Bitirdiğin her oda galerinde seni bekler.',
   'settings.privacy': 'Match Make hiçbir kişisel veri toplamaz. İlerlemen yalnızca bu cihazda saklanır.',
   'settings.studio': 'Bir CiTu Studios oyunu',
+  'settings.credits': 'Müzik: "Carefree" ve "Life of Riley", Kevin MacLeod (incompetech.com), CC BY 4.0. Ses efektleri: Kenney (kenney.nl), CC0.',
   'settings.version': 'Sürüm {v}',
   'lang.en': 'English',
   'lang.tr': 'Türkçe',

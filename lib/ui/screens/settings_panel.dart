@@ -163,6 +163,8 @@ class SettingsPanel extends StatelessWidget {
                   const SizedBox(height: 10),
                   BodyText(s.loc.t('settings.privacy'), color: GameColors.inkSoft, size: 13),
                   const SizedBox(height: 10),
+                  BodyText(s.loc.t('settings.credits'), color: GameColors.inkSoft, size: 12),
+                  const SizedBox(height: 10),
                   BodyText(
                     '${s.loc.t('settings.version', {'v': kGameVersion})} · © 2026 CiTu Studios',
                     color: GameColors.inkSoft,

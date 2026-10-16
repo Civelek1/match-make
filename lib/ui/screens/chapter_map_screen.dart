@@ -137,9 +137,9 @@ class _ChapterMapScreenState extends State<ChapterMapScreen> {
   Widget _positionedNode(BuildContext context, LevelData l, Offset p, double scale, bool isCurrent, Size box) {
     final size = (62 * scale).clamp(52.0, 84.0);
     return Positioned(
-      left: p.dx - size,
+      left: p.dx - size * 1.2,
       top: p.dy - size / 2,
-      width: size * 2,
+      width: size * 2.4,
       child: LevelNode(
         level: l,
         size: size,
@@ -493,14 +493,17 @@ class _LevelNodeState extends State<LevelNode> with TickerProviderStateMixin {
                   color: showLock ? const Color(0xCC3E3A50) : const Color(0xE6FFFFFF),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text(
-                  s.loc.t(widget.level.nameKey),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: (size * 0.2).clamp(11, 15),
-                    color: showLock ? Colors.white : GameColors.ink,
+                // Long names shrink to fit instead of being cut off.
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    s.loc.t(widget.level.nameKey),
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: (size * 0.2).clamp(11, 15),
+                      color: showLock ? Colors.white : GameColors.ink,
+                    ),
                   ),
                 ),
               ),

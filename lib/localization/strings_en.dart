@@ -183,6 +183,7 @@ const Map<String, String> stringsEn = {
   'settings.about_text': 'Match pieces, restore beautiful places. Every room you finish stays in your gallery.',
   'settings.privacy': 'Match Make collects no personal data. Your progress is stored only on this device.',
   'settings.studio': 'A CiTu Studios game',
+  'settings.credits': 'Music: "Carefree" and "Life of Riley" by Kevin MacLeod (incompetech.com), CC BY 4.0. Sound effects: Kenney (kenney.nl), CC0.',
   'settings.version': 'Version {v}',
   'lang.en': 'English',
   'lang.tr': 'Türkçe',

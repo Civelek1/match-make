@@ -3183,6 +3183,51 @@ for _ch in CHAPTERS:
         if 'stars' in _t:
             _lv['stars'] = list(_t['stars'])
 
+# Release pass: levels 51-75 played easier than 41-50, so trim moves to keep
+# the difficulty curve rising into the mid game.
+HARDEN = {
+    'bakery_front': 1, 'bakery_kitchen': 1, 'bakery_cakes': 5, 'bakery_store': 0, 'bakery_cafe': 3,
+    'greenhouse_glass': 1, 'greenhouse_orchids': 3, 'greenhouse_seedlings': 2, 'greenhouse_palms': 4, 'greenhouse_pond': 3,
+    'vineyard_rows': 1, 'vineyard_press': 4, 'vineyard_cellar': 1, 'vineyard_kitchen': 2, 'vineyard_terrace': 1,
+    'station_platform': 2, 'station_tickets': 3, 'station_waiting': 2, 'station_cafe': 4, 'station_shed': 1,
+    'school_yard': 3, 'school_class': 2, 'school_lab': 5, 'school_gym': 3, 'school_music': 1,
+}
+for _ch in CHAPTERS:
+    for _lv in _ch['levels']:
+        _lv['moves'] -= HARDEN.get(_lv['id'], 0)
+
+# Measured after HARDEN (bot, 100 runs): floor = win rate - 0.06; stars = p50/p90.
+RETUNE = {
+    'bakery_front': (0.48, (21500, 33500)),
+    'bakery_kitchen': (0.44, (20000, 24500)),
+    'bakery_cakes': (0.38, (17000, 23500)),
+    'bakery_store': (0.42, (23500, 29000)),
+    'bakery_cafe': (0.30, (21000, 27500)),
+    'greenhouse_glass': (0.52, (21500, 30000)),
+    'greenhouse_orchids': (0.38, (19000, 25500)),
+    'greenhouse_seedlings': (0.34, (18000, 22000)),
+    'greenhouse_palms': (0.36, (20000, 29000)),
+    'greenhouse_pond': (0.26, (18000, 22000)),
+    'vineyard_rows': (0.44, (21500, 27000)),
+    'vineyard_press': (0.40, (20000, 27000)),
+    'vineyard_cellar': (0.42, (20000, 30000)),
+    'vineyard_kitchen': (0.34, (20000, 26500)),
+    'vineyard_terrace': (0.28, (25500, 35000)),
+    'station_platform': (0.50, (22500, 29500)),
+    'station_tickets': (0.40, (21500, 30000)),
+    'station_waiting': (0.36, (18000, 24500)),
+    'station_cafe': (0.32, (20000, 26500)),
+    'station_shed': (0.32, (26500, 32500)),
+    'school_yard': (0.50, (20500, 28500)),
+    'school_class': (0.44, (30000, 37500)),
+    'school_lab': (0.42, (20000, 25000)),
+    'school_gym': (0.36, (22500, 32000)),
+    'school_music': (0.30, (22000, 28500)),
+}
+for _ch in CHAPTERS:
+    for _lv in _ch['levels']:
+        _lv['floor'], _lv['stars'] = RETUNE[_lv['id']][0], list(RETUNE[_lv['id']][1])
+
 # Openers ease in, finales are the hardest of each chapter.
 for _ch in CHAPTERS:
     _ch['levels'][0]['diff'] = 'mediumHard'
