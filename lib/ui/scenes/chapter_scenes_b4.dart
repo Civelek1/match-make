@@ -1953,7 +1953,7 @@ final Map<String, SceneArt Function()> batch4Scenes = {
       ObjectiveProps('hot_tub', [Prop.custom(_onsenPool, _r(270, 170, 124, 52), _teal, _darkStone)]),
       ObjectiveProps('lamps', [Prop.custom(_stoneLantern, _r(20, 118, 26, 58), _stone, _lampGlow), Prop.custom(_stoneLantern, _r(300, 108, 24, 54), _stone, _lampGlow)]),
       ObjectiveProps('crates', [Prop.custom(_bonsai, _r(130, 128, 40, 34), _leaf, _terracotta), Prop.custom(_bonsai, _r(240, 130, 36, 30), _leaf, _terracotta)]),
-      ObjectiveProps('chains', [Prop.custom(_skyLantern, _r(100, 50, 16, 20), _paper, _flame), Prop.custom(_skyLantern, _r(250, 36, 18, 22), _paper, _flame), Prop.custom(_skyLantern, _r(300, 72, 14, 18), _paper, _flame)]),
+      ObjectiveProps('chains', [Prop.custom(_skyLantern, _r(96, 48, 22, 28), _paper, _flame), Prop.custom(_skyLantern, _r(244, 34, 24, 30), _paper, _flame), Prop.custom(_skyLantern, _r(140, 84, 18, 22), _paper, _flame)]),
     ],
   ),
   // ------------------------------------------------------------ SPACE BASE
@@ -2052,12 +2052,12 @@ final Map<String, SceneArt Function()> batch4Scenes = {
     scenery: _ballroomWall,
     objectives: [
       ObjectiveProps('chandeliers', [Prop(PK.chandelier, _r(66, 0, 64, 40), _pink, _brass), Prop(PK.chandelier, _r(270, 0, 64, 40), _pink, _brass)]),
-      ObjectiveProps('stage', [Prop(PK.stage, _r(150, 96, 100, 76), _darkWood, _pink), Prop(PK.curtains, _r(140, 10, 120, 86), _crimson, _brass)]),
+      ObjectiveProps('stage', [Prop(PK.stage, _r(150, 96, 100, 76), _darkWood, _pink), Prop(PK.curtains, _r(128, 8, 144, 92), _crimson, _brass)]),
       ObjectiveProps('piano', [Prop(PK.piano, _r(262, 116, 100, 60), _ebony, _gold)]),
       ObjectiveProps('champagne', [Prop(PK.champagneTower, _r(28, 124, 44, 48), _aqua, _gold)]),
       ObjectiveProps('seats', [Prop(PK.chair, _r(84, 170, 28, 48), _gold, _crimson), Prop(PK.chair, _r(118, 176, 28, 48), _gold, _crimson), Prop(PK.chair, _r(300, 178, 28, 48), _gold, _crimson)]),
-      ObjectiveProps('chains', [Prop(PK.mirror, _r(28, 40, 32, 44), _brass, _pink), Prop(PK.mirror, _r(340, 40, 32, 44), _brass, _pink)]),
-      ObjectiveProps('ice', [Prop(PK.rug, _r(140, 186, 150, 40), _crimson, _brass)]),
+      ObjectiveProps('chains', [Prop.custom(_archWindow, _r(168, 16, 64, 76), _brass, _blossom)]),
+      ObjectiveProps('ice', [Prop(PK.rug, _r(140, 186, 150, 40), _crimson, _brass), Prop(PK.mirror, _r(28, 40, 32, 44), _brass, _pink), Prop(PK.mirror, _r(340, 40, 32, 44), _brass, _pink)]),
     ],
   ),
   'grand_hotel_suite': () => PropScene(
@@ -2118,7 +2118,7 @@ final Map<String, SceneArt Function()> batch4Scenes = {
     scenery: _throneHall,
     objectives: [
       ObjectiveProps('b4_throne', [Prop.custom(_throne, _r(160, 80, 80, 96), _crimson, _gold)]),
-      ObjectiveProps('curtains', [Prop(PK.curtains, _r(136, 8, 128, 100), _crimson, _gold)]),
+      ObjectiveProps('curtains', [Prop.custom(_archWindow, _r(168, 14, 64, 70), _gold, _lilac), Prop(PK.curtains, _r(130, 8, 140, 100), _crimson, _gold)]),
       ObjectiveProps('shields', [Prop.custom(_shield, _r(46, 36, 30, 38), _navy, _gold), Prop.custom(_shield, _r(324, 36, 30, 38), _navy, _gold)]),
       ObjectiveProps('b4_crown', [Prop.custom(_crownCushion, _r(252, 116, 40, 60), _crimson, _gold)]),
       ObjectiveProps('b4_royal_orb', [Prop.custom(_orb, _r(112, 118, 32, 58), _ruby, _gold)]),

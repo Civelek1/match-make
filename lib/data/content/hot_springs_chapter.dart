@@ -42,7 +42,7 @@ const hotSpringsLevels = <LevelData>[
       ObjectiveData(id: 'b4_stream', tileTypeId: 'water', target: 17),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 5),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [23000, 32500],
   ),
   LevelData(
     id: 'hot_springs_baths',
@@ -72,7 +72,7 @@ const hotSpringsLevels = <LevelData>[
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 6),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 4),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [22000, 29500],
   ),
   LevelData(
     id: 'hot_springs_steam',
@@ -102,7 +102,7 @@ const hotSpringsLevels = <LevelData>[
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 7),
       ObjectiveData(id: 'lockers', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [25000, 31000],
   ),
   LevelData(
     id: 'hot_springs_tea',
@@ -133,7 +133,7 @@ const hotSpringsLevels = <LevelData>[
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 4),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 2),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [20000, 28000],
   ),
   LevelData(
     id: 'hot_springs_terrace',
@@ -164,6 +164,6 @@ const hotSpringsLevels = <LevelData>[
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 13),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 2),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [22500, 34000],
   ),
 ];

@@ -43,7 +43,7 @@ const grandHotelLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 2),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [20500, 26500],
   ),
   LevelData(
     id: 'grand_hotel_lobby',
@@ -74,7 +74,7 @@ const grandHotelLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [22000, 29000],
   ),
   LevelData(
     id: 'grand_hotel_ballroom',
@@ -105,7 +105,7 @@ const grandHotelLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [20000, 24000],
   ),
   LevelData(
     id: 'grand_hotel_suite',
@@ -136,7 +136,7 @@ const grandHotelLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'b4_jewelry', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [24500, 29000],
   ),
   LevelData(
     id: 'grand_hotel_pool',
@@ -167,6 +167,6 @@ const grandHotelLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 6),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 5),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [23000, 31500],
   ),
 ];

@@ -191,8 +191,8 @@ final _hotSpringsMap = LocationMapArt(
     MapSpot('hot_springs_path', Offset(180, 545), Rect.fromLTWH(100, 510, 160, 76), SpotKind.yard, Color(0xFFC9B48A)),
     MapSpot('hot_springs_baths', Offset(98, 410), Rect.fromLTWH(64, 386, 68, 48), SpotKind.window, Color(0xFF6FE0D0)),
     MapSpot('hot_springs_steam', Offset(262, 410), Rect.fromLTWH(228, 386, 68, 48), SpotKind.window, Color(0xFFFF9A5C)),
-    MapSpot('hot_springs_tea', Offset(130, 292), Rect.fromLTWH(104, 270, 52, 42), SpotKind.window, Color(0xFFFF8AB0)),
-    MapSpot('hot_springs_terrace', Offset(230, 292), Rect.fromLTWH(204, 270, 52, 42), SpotKind.window, Color(0xFFFFC46B)),
+    MapSpot('hot_springs_tea', Offset(112, 292), Rect.fromLTWH(88, 270, 48, 42), SpotKind.window, Color(0xFFFF8AB0)),
+    MapSpot('hot_springs_terrace', Offset(248, 292), Rect.fromLTWH(224, 270, 48, 42), SpotKind.window, Color(0xFFFFC46B)),
   ],
 );
 
@@ -252,8 +252,8 @@ final _spaceBaseMap = LocationMapArt(
   spots: const [
     MapSpot('space_base_pad', Offset(180, 545), Rect.fromLTWH(100, 508, 160, 78), SpotKind.yard, Color(0xFFFF7A5C)),
     MapSpot('space_base_control', Offset(72, 408), Rect.fromLTWH(40, 388, 64, 40), SpotKind.window, Color(0xFF4FD6E8)),
-    MapSpot('space_base_greenhouse', Offset(180, 400), Rect.fromLTWH(146, 376, 68, 48), SpotKind.window, Color(0xFF7ACB52)),
-    MapSpot('space_base_quarters', Offset(249, 408), Rect.fromLTWH(222, 388, 54, 40), SpotKind.window, Color(0xFFFFB35C)),
+    MapSpot('space_base_greenhouse', Offset(180, 360), Rect.fromLTWH(150, 342, 60, 36), SpotKind.window, Color(0xFF7ACB52)),
+    MapSpot('space_base_quarters', Offset(258, 408), Rect.fromLTWH(232, 388, 52, 40), SpotKind.window, Color(0xFFFFB35C)),
     MapSpot('space_base_deck', Offset(180, 232), Rect.fromLTWH(156, 216, 48, 32), SpotKind.window, Color(0xFF9CF0FF)),
   ],
 );

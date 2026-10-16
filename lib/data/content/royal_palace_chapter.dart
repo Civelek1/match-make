@@ -43,7 +43,7 @@ const royalPalaceLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 4),
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 4),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [20000, 25500],
   ),
   LevelData(
     id: 'royal_palace_gate',
@@ -74,7 +74,7 @@ const royalPalaceLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 5),
       ObjectiveData(id: 'chests', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [25500, 38000],
   ),
   LevelData(
     id: 'royal_palace_throne',
@@ -105,7 +105,7 @@ const royalPalaceLevels = <LevelData>[
       ObjectiveData(id: 'crates', tileTypeId: 'crate', target: 5),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [20000, 29000],
   ),
   LevelData(
     id: 'royal_palace_library',
@@ -136,7 +136,7 @@ const royalPalaceLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 3),
       ObjectiveData(id: 'b4_locked_tomes', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [24500, 29500],
   ),
   LevelData(
     id: 'royal_palace_ballroom',
@@ -167,6 +167,6 @@ const royalPalaceLevels = <LevelData>[
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 4),
       ObjectiveData(id: 'b4_crown_jewels', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [29500, 35000],
   ),
 ];

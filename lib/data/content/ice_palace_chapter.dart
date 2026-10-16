@@ -42,7 +42,7 @@ const icePalaceLevels = <LevelData>[
       ObjectiveData(id: 'lights', tileTypeId: 'b4_aurora', target: 17),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 10),
     ],
-    starThresholds: [25000, 34500],
+    starThresholds: [26000, 34000],
   ),
   LevelData(
     id: 'ice_palace_throne',
@@ -73,7 +73,7 @@ const icePalaceLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 5),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [25500, 32500],
   ),
   LevelData(
     id: 'ice_palace_ballroom',
@@ -103,7 +103,7 @@ const icePalaceLevels = <LevelData>[
       ObjectiveData(id: 'staircase', tileTypeId: 'stairs', target: 16),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 16),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [24000, 31500],
   ),
   LevelData(
     id: 'ice_palace_garden',
@@ -134,7 +134,7 @@ const icePalaceLevels = <LevelData>[
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 6),
       ObjectiveData(id: 'gates', tileTypeId: 'key', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [27500, 34000],
   ),
   LevelData(
     id: 'ice_palace_balcony',
@@ -157,14 +157,14 @@ const icePalaceLevels = <LevelData>[
       '........',
     ],
     objectives: [
-      ObjectiveData(id: 'b4_aurora', tileTypeId: 'b4_aurora', target: 13),
-      ObjectiveData(id: 'b4_telescope', tileTypeId: 'b4_star', target: 13),
-      ObjectiveData(id: 'seats', tileTypeId: 'seat', target: 13),
-      ObjectiveData(id: 'b4_icicles', tileTypeId: 'b4_icicle', target: 13),
-      ObjectiveData(id: 'lamps', tileTypeId: 'b4_moon', target: 13),
+      ObjectiveData(id: 'b4_aurora', tileTypeId: 'b4_aurora', target: 14),
+      ObjectiveData(id: 'b4_telescope', tileTypeId: 'b4_star', target: 14),
+      ObjectiveData(id: 'seats', tileTypeId: 'seat', target: 14),
+      ObjectiveData(id: 'b4_icicles', tileTypeId: 'b4_icicle', target: 14),
+      ObjectiveData(id: 'lamps', tileTypeId: 'b4_moon', target: 14),
       ObjectiveData(id: 'ice', tileTypeId: 'ice', target: 5),
       ObjectiveData(id: 'chains', tileTypeId: 'chain', target: 3),
     ],
-    starThresholds: [24000, 32000],
+    starThresholds: [20500, 27000],
   ),
 ];
