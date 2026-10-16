@@ -300,8 +300,8 @@ final _stationMap = LocationMapArt(
     MapSpot('station_platform', Offset(180, 560), Rect.fromLTWH(95, 524, 170, 74), SpotKind.yard, Color(0xFFFFD447)),
     MapSpot('station_tickets', Offset(180, 410), Rect.fromLTWH(144, 380, 72, 60), SpotKind.window, Color(0xFFFFE08A)),
     MapSpot('station_waiting', Offset(180, 318), Rect.fromLTWH(140, 296, 80, 42), SpotKind.window, Color(0xFF8FD0FF)),
-    MapSpot('station_cafe', Offset(310, 420), Rect.fromLTWH(286, 396, 48, 40), SpotKind.window, Color(0xFFFF9A6B)),
-    MapSpot('station_shed', Offset(51, 420), Rect.fromLTWH(26, 392, 50, 50), SpotKind.window, Color(0xFFFFB35C)),
+    MapSpot('station_cafe', Offset(302, 420), Rect.fromLTWH(286, 396, 48, 40), SpotKind.window, Color(0xFFFF9A6B)),
+    MapSpot('station_shed', Offset(62, 420), Rect.fromLTWH(30, 392, 50, 50), SpotKind.window, Color(0xFFFFB35C)),
   ],
 );
 
