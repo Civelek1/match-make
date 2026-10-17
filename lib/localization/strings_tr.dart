@@ -182,6 +182,8 @@ const Map<String, String> stringsTr = {
   'profile.total_score': 'Toplam Puan',
   'profile.levels_completed': 'Tamamlanan Seviye',
   'profile.current_chapter': 'Mevcut Bölüm',
+  'profile.save': 'KAYDET',
+  'profile.saved': 'İsim kaydedildi',
   'profile.name_hint': 'İsmini yaz',
 
   'error.save_recovered': 'Kayıt okunamadı. Yedek kayıt geri yüklendi.',

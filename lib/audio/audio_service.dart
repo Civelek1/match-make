@@ -43,32 +43,69 @@ abstract class AudioService {
 
 /// audioplayers-backed implementation. Every call is fire-and-forget and
 /// swallows platform errors: missing audio must never break the game.
+///
+/// Each sound effect owns a few players with its file loaded once up front, so
+/// playing a sound only restarts it (no file loading on the hot path, which
+/// made short sounds drop out). On Android they use the low-latency SoundPool.
+/// Music commands run one after another so quick screen changes can't leave
+/// the music player stopped or on the wrong track.
 class GameAudioService implements AudioService {
   final SettingsService settings;
-  final List<AudioPlayer> _sfxPool = [];
-  int _next = 0;
+
+  /// Simultaneous copies for sounds that can overlap in a cascade.
+  static const _voices = {
+    Sfx.match: 3,
+    Sfx.combo: 3,
+    Sfx.star: 3,
+    Sfx.swap: 2,
+    Sfx.click: 2,
+    Sfx.rocket: 2,
+    Sfx.bomb: 2,
+    Sfx.colorBomb: 2,
+    Sfx.objectiveComplete: 2,
+  };
+
+  final Map<Sfx, List<AudioPlayer>> _sfx = {};
+  final Map<Sfx, Future<void>> _ready = {};
+  final Map<Sfx, int> _nextVoice = {};
+  final Map<Sfx, DateTime> _lastPlayed = {};
   AudioPlayer? _music;
+  Future<void> _musicQueue = Future.value();
   MusicTrack? _wantedTrack;
   MusicTrack? _playingTrack;
   bool _suspended = false;
-  final Map<Sfx, DateTime> _lastPlayed = {};
 
   GameAudioService(this.settings) {
     settings.addListener(_onSettings);
     try {
       // Don't request audio focus: otherwise every sound effect takes focus
       // from the music player (which then pauses) and from other apps.
-      unawaited(
-        _safe(() => AudioPlayer.global.setAudioContext(AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers).build())),
+      final focus = _safe(
+        () => AudioPlayer.global.setAudioContext(AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers).build()),
       );
-      for (var i = 0; i < 6; i++) {
-        _sfxPool.add(AudioPlayer()..setReleaseMode(ReleaseMode.stop));
+      final lowLatency = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+      for (final sfx in Sfx.values) {
+        final players = [for (var i = 0; i < (_voices[sfx] ?? 1); i++) AudioPlayer()];
+        _sfx[sfx] = players;
+        _ready[sfx] = focus.then(
+          (_) => _safe(() async {
+            for (final p in players) {
+              await p.setReleaseMode(ReleaseMode.stop);
+              if (lowLatency) await p.setPlayerMode(PlayerMode.lowLatency);
+              await p.setVolume(_volume(sfx));
+              await p.setSource(AssetSource(AudioAssets.sfx(sfx)));
+            }
+          }),
+        );
       }
-      _music = AudioPlayer()..setReleaseMode(ReleaseMode.loop);
+      _music = AudioPlayer();
+      _musicQueue = focus.then((_) => _safe(() => _music!.setReleaseMode(ReleaseMode.loop)));
     } catch (e) {
       debugPrint('Audio unavailable: $e');
     }
   }
+
+  static double _volume(Sfx sfx) => sfx == Sfx.click ? 0.6 : 0.85;
 
   void _onSettings() {
     if (!settings.music) {
@@ -80,18 +117,23 @@ class GameAudioService implements AudioService {
 
   @override
   void play(Sfx sfx) {
-    if (!settings.sfx || _sfxPool.isEmpty || _suspended) return;
+    final players = _sfx[sfx];
+    if (!settings.sfx || players == null || _suspended) return;
     // Throttle identical sounds fired in the same frame burst.
     final now = DateTime.now();
     final last = _lastPlayed[sfx];
     if (last != null && now.difference(last).inMilliseconds < 45) return;
     _lastPlayed[sfx] = now;
-    final p = _sfxPool[_next];
-    _next = (_next + 1) % _sfxPool.length;
+    final i = _nextVoice[sfx] ?? 0;
+    _nextVoice[sfx] = (i + 1) % players.length;
+    final p = players[i];
     unawaited(
       _safe(() async {
+        await _ready[sfx];
+        // stop() rewinds (and clears a finished SoundPool stream) so resume()
+        // always starts the sound from the beginning.
         await p.stop();
-        await p.play(AssetSource(AudioAssets.sfx(sfx)), volume: sfx == Sfx.click ? 0.5 : 0.8);
+        await p.resume();
       }),
     );
     // Browsers only allow audio after a gesture; retry music on first click.
@@ -106,31 +148,39 @@ class GameAudioService implements AudioService {
     if (!settings.music || _music == null || _suspended) return;
     if (_playingTrack == track) return;
     _playingTrack = track;
-    unawaited(
-      _safe(() async {
-        await _music!.stop();
-        await _music!.play(AssetSource(AudioAssets.music(track)), volume: 0.35);
-      }, onError: () => _playingTrack = null),
-    );
+    _enqueueMusic(() async {
+      // A newer request may have replaced this one while it waited.
+      if (_wantedTrack != track || _playingTrack != track || _suspended) return;
+      await _music!.stop();
+      await _music!.play(AssetSource(AudioAssets.music(track)), volume: 0.45);
+    }, onError: () {
+      if (_playingTrack == track) _playingTrack = null;
+    });
+  }
+
+  void _enqueueMusic(Future<void> Function() f, {VoidCallback? onError}) {
+    _musicQueue = _musicQueue.then((_) => _safe(f, onError: onError));
   }
 
   void _stopMusic() {
     _playingTrack = null;
-    if (_music != null) unawaited(_safe(() => _music!.stop()));
+    if (_music != null) _enqueueMusic(() => _music!.stop());
   }
 
   @override
   void pauseAll() {
     _suspended = true;
-    if (_music != null) unawaited(_safe(() => _music!.pause()));
+    if (_music != null) _enqueueMusic(() => _music!.pause());
   }
 
   @override
   void resumeAll() {
     _suspended = false;
-    if (settings.music && _playingTrack != null && _music != null) {
-      unawaited(_safe(() => _music!.resume()));
+    if (!settings.music || _music == null) return;
+    if (_playingTrack != null && _playingTrack == _wantedTrack) {
+      _enqueueMusic(() => _music!.resume());
     } else if (_wantedTrack != null) {
+      _playingTrack = null;
       playMusic(_wantedTrack!);
     }
   }
@@ -147,8 +197,10 @@ class GameAudioService implements AudioService {
   @override
   void dispose() {
     settings.removeListener(_onSettings);
-    for (final p in _sfxPool) {
-      p.dispose();
+    for (final players in _sfx.values) {
+      for (final p in players) {
+        p.dispose();
+      }
     }
     _music?.dispose();
   }

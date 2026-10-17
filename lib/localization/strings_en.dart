@@ -196,6 +196,8 @@ const Map<String, String> stringsEn = {
   'profile.total_score': 'Total Score',
   'profile.levels_completed': 'Levels Completed',
   'profile.current_chapter': 'Current Chapter',
+  'profile.save': 'SAVE',
+  'profile.saved': 'Name saved',
   'profile.name_hint': 'Enter your name',
 
   // Errors

@@ -34,6 +34,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_name.text.trim() != _profile.name) _profile.name = _name.text;
   }
 
+  void _save() {
+    _commit();
+    _name.text = _profile.name;
+    FocusScope.of(context).unfocus();
+    final loc = context.services.loc;
+    showGameToast(context, loc.t('profile.saved'), icon: Icons.check_circle_rounded);
+  }
+
   @override
   void dispose() {
     // Listeners rebuild widgets, which isn't allowed while the tree is being
@@ -99,6 +107,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(color: GameColors.orange, width: 3),
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _name,
+                      builder: (context, value, _) => GameButton(
+                        label: loc.t('profile.save'),
+                        icon: Icons.check_rounded,
+                        height: 50,
+                        fontSize: 18,
+                        onTap: value.text.trim() != s.profile.name ? _save : null,
                       ),
                     ),
                     const SizedBox(height: 14),

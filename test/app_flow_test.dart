@@ -158,4 +158,25 @@ void main() {
     expect(services.profile.name, 'Ayşe');
     expect(t.takeException(), isNull);
   });
+  testWidgets('the profile Save button stores the typed name', (t) async {
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+
+    final services = AppServices.create(repository: MemorySaveRepository(), audio: SilentAudioService());
+    await t.pumpWidget(MatchMakeApp(services: services));
+    await run(t, 3.5);
+    services.navigator.go(AppScreen.profile);
+    await run(t, 0.9);
+    await t.enterText(find.byType(TextField), '  Mehmet ');
+    await run(t, 0.2);
+    final save = find.text(services.loc.t('profile.save')).first;
+    await t.ensureVisible(save);
+    await t.tap(save);
+    await run(t, 0.5);
+    expect(services.profile.name, 'Mehmet');
+    expect(find.text(services.loc.t('profile.saved')), findsWidgets);
+    await run(t, 4);
+    expect(t.takeException(), isNull);
+  });
 }
