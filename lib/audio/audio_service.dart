@@ -105,7 +105,7 @@ class GameAudioService implements AudioService {
     }
   }
 
-  static double _volume(Sfx sfx) => sfx == Sfx.click ? 0.6 : 0.85;
+  static double _volume(Sfx sfx) => sfx == Sfx.click ? 0.7 : 0.85;
 
   void _onSettings() {
     if (!settings.music) {
