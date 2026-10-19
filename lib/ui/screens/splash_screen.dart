@@ -75,7 +75,9 @@ class _SplashScreenState extends State<SplashScreen> {
             final w = min(c.maxWidth * 0.86, 420.0);
             return Column(
               children: [
-                const Spacer(flex: 3),
+                const Spacer(flex: 2),
+                _BouncingMascot(size: min(w * 0.42, c.maxHeight * 0.2)),
+                const SizedBox(height: 8),
                 MatchMakeLogo(width: w),
                 const Spacer(flex: 3),
                 Padding(
@@ -102,6 +104,52 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// The app's mascot, popping in and then bobbing gently while the game loads.
+class _BouncingMascot extends StatefulWidget {
+  final double size;
+  const _BouncingMascot({required this.size});
+
+  @override
+  State<_BouncingMascot> createState() => _BouncingMascotState();
+}
+
+class _BouncingMascotState extends State<_BouncingMascot> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600))
+    ..repeat();
+  final _start = DateTime.now();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final image = Image.asset(
+      'assets/images/mascot.png',
+      height: widget.size,
+      filterQuality: FilterQuality.medium,
+      gaplessPlayback: true,
+    );
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _c,
+        child: image,
+        builder: (context, child) {
+          final age = DateTime.now().difference(_start).inMilliseconds / 500;
+          final pop = age >= 1 ? 1.0 : Curves.elasticOut.transform(age.clamp(0.0, 1.0));
+          final bob = sin(_c.value * 2 * pi);
+          return Transform.translate(
+            offset: Offset(0, -6 * bob),
+            child: Transform.scale(scale: pop * (1 + 0.03 * bob), child: child),
+          );
+        },
       ),
     );
   }

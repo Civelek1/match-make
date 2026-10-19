@@ -357,7 +357,9 @@ class FlyLayerState extends State<FlyLayer> with SingleTickerProviderStateMixin 
   Widget build(BuildContext context) {
     final dpr = MediaQuery.devicePixelRatioOf(context);
     return IgnorePointer(
-      child: CustomPaint(size: Size.infinite, painter: _FlyPainter(this, dpr)),
+      child: RepaintBoundary(
+        child: CustomPaint(size: Size.infinite, painter: _FlyPainter(this, dpr)),
+      ),
     );
   }
 }

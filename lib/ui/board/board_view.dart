@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -135,6 +136,9 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
   int _tNext = 0;
 
   final TileArtCache _art = TileArtCache();
+  ui.Picture? _bgPicture;
+  Object? _bgKey;
+  Path? _clipPath;
   final List<(double, Completer<void>)> _waits = [];
   bool _disposed = false;
 
@@ -171,6 +175,7 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
     if (widget.controller._state == this) widget.controller._state = null;
     _ticker.dispose();
     _art.clear();
+    _bgPicture?.dispose();
     _repaint.dispose();
     super.dispose();
   }
@@ -600,7 +605,10 @@ class _BoardViewState extends State<BoardView> with SingleTickerProviderStateMix
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: (_) => _panStart = null,
-          child: CustomPaint(size: Size(constraints.maxWidth, constraints.maxHeight), painter: _BoardPainter(this)),
+          // Own layer: the board repaints every frame, the screen around it doesn't.
+          child: RepaintBoundary(
+            child: CustomPaint(size: Size(constraints.maxWidth, constraints.maxHeight), painter: _BoardPainter(this)),
+          ),
         );
       },
     );
@@ -632,38 +640,18 @@ class _BoardPainter extends CustomPainter {
     final shaped = s._voids.contains(true);
     bool isCell(int x, int y) => !shaped || !s._voids[y * w + x];
     Rect cellAt(int x, int y) => Rect.fromLTWH(boardRect.left + x * cell, boardRect.top + y * cell, cell, cell);
-    final inner = Color.alphaBlend(Pk.dark(theme.boardFrame, 0.35).withValues(alpha: 0.85), theme.boardFrame);
-    if (!shaped) {
-      canvas.drawRRect(frame.shift(const Offset(0, 5)), Paint()..color = Colors.black.withValues(alpha: 0.28));
-      canvas.drawRRect(frame, Paint()..color = theme.boardFrame);
-      canvas.drawRRect(RRect.fromRectAndRadius(boardRect.inflate(2), Radius.circular(cell * 0.3)), Paint()..color = inner);
-    } else {
-      // Shaped board: the frame follows the cells. Each layer is the union of
-      // per-cell rounded rects (the shadow is drawn opaque into a faded layer
-      // so overlaps don't darken).
-      void layer(double grow, double radius, Paint paint, {Offset shift = Offset.zero}) {
-        for (var y = 0; y < h; y++) {
-          for (var x = 0; x < w; x++) {
-            if (isCell(x, y)) canvas.drawRRect(RRect.fromRectAndRadius(cellAt(x, y).inflate(grow), Radius.circular(radius)).shift(shift), paint);
-          }
-        }
-      }
-
-      canvas.saveLayer(boardRect.inflate(20), Paint()..color = Colors.black.withValues(alpha: 0.28));
-      layer(7, cell * 0.4, Paint()..color = Colors.black, shift: const Offset(0, 5));
-      canvas.restore();
-      layer(7, cell * 0.4, Paint()..color = theme.boardFrame);
-      layer(2, cell * 0.3, Paint()..color = inner);
+    // The frame and cell checkerboard only change with layout or shape:
+    // record them once and replay the picture every frame.
+    final bgKey = (size, cell, s._origin, theme, s._voids);
+    if (s._bgKey != bgKey || s._bgPicture == null) {
+      s._bgPicture?.dispose();
+      final rec = ui.PictureRecorder();
+      _paintBackground(Canvas(rec), boardRect, frame, shaped, isCell, cellAt);
+      s._bgPicture = rec.endRecording();
+      s._clipPath = null;
+      s._bgKey = bgKey;
     }
-    final a = Paint()..color = theme.cellA;
-    final b = Paint()..color = theme.cellB;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        if (!isCell(x, y)) continue;
-        final r = cellAt(x, y).deflate(1);
-        canvas.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(cell * 0.18)), (x + y).isEven ? a : b);
-      }
-    }
+    canvas.drawPicture(s._bgPicture!);
 
     // Tutorial highlight.
     final hl = s._highlight;
@@ -710,11 +698,15 @@ class _BoardPainter extends CustomPainter {
     if (shaped) {
       // Pieces only show over cells: falling through a gap or spawning above
       // a column that starts lower, they appear at the edge of the shape.
-      final clip = Path();
-      for (var y = 0; y < h; y++) {
-        for (var x = 0; x < w; x++) {
-          if (isCell(x, y)) clip.addRect(cellAt(x, y).inflate(0.5));
+      var clip = s._clipPath;
+      if (clip == null) {
+        clip = Path();
+        for (var y = 0; y < h; y++) {
+          for (var x = 0; x < w; x++) {
+            if (isCell(x, y)) clip.addRect(cellAt(x, y).inflate(0.5));
+          }
         }
+        s._clipPath = clip;
       }
       canvas.clipPath(clip);
     } else {
@@ -797,8 +789,10 @@ class _BoardPainter extends CustomPainter {
       if (t.painter == null || age < 0 || age > 0.8) continue;
       final k = age / 0.8;
       final tp = t.painter!;
-      canvas.saveLayer(null, Paint()..color = Colors.white.withValues(alpha: (1 - k * k).clamp(0, 1)));
-      tp.paint(canvas, Offset(t.x - tp.width / 2, t.y - tp.height / 2 - k * cell * 0.9));
+      final at = Offset(t.x - tp.width / 2, t.y - tp.height / 2 - k * cell * 0.9);
+      // Fade layer bounded to the text (an unbounded layer covers the screen).
+      canvas.saveLayer((at & tp.size).inflate(8), Paint()..color = Colors.white.withValues(alpha: (1 - k * k).clamp(0, 1)));
+      tp.paint(canvas, at);
       canvas.restore();
     }
     canvas.restore();
@@ -950,6 +944,51 @@ class _BoardPainter extends CustomPainter {
                 ..color = const Color(0xFFFFE066).withValues(alpha: 1 - kk),
             );
           }
+      }
+    }
+  }
+
+  void _paintBackground(
+    Canvas canvas,
+    Rect boardRect,
+    RRect frame,
+    bool shaped,
+    bool Function(int x, int y) isCell,
+    Rect Function(int x, int y) cellAt,
+  ) {
+    final cell = s._cell;
+    final w = s.widget.width, h = s.widget.height;
+    final theme = s.widget.theme;
+    final inner = Color.alphaBlend(Pk.dark(theme.boardFrame, 0.35).withValues(alpha: 0.85), theme.boardFrame);
+    if (!shaped) {
+      canvas.drawRRect(frame.shift(const Offset(0, 5)), Paint()..color = Colors.black.withValues(alpha: 0.28));
+      canvas.drawRRect(frame, Paint()..color = theme.boardFrame);
+      canvas.drawRRect(RRect.fromRectAndRadius(boardRect.inflate(2), Radius.circular(cell * 0.3)), Paint()..color = inner);
+    } else {
+      // Shaped board: the frame follows the cells. Each layer is the union of
+      // per-cell rounded rects (the shadow is drawn opaque into a faded layer
+      // so overlaps don't darken).
+      void layer(double grow, double radius, Paint paint, {Offset shift = Offset.zero}) {
+        for (var y = 0; y < h; y++) {
+          for (var x = 0; x < w; x++) {
+            if (isCell(x, y)) canvas.drawRRect(RRect.fromRectAndRadius(cellAt(x, y).inflate(grow), Radius.circular(radius)).shift(shift), paint);
+          }
+        }
+      }
+
+      canvas.saveLayer(boardRect.inflate(20), Paint()..color = Colors.black.withValues(alpha: 0.28));
+      layer(7, cell * 0.4, Paint()..color = Colors.black, shift: const Offset(0, 5));
+      canvas.restore();
+      layer(7, cell * 0.4, Paint()..color = theme.boardFrame);
+      layer(2, cell * 0.3, Paint()..color = inner);
+    }
+    final a = Paint()..color = theme.cellA;
+    final b = Paint()..color = theme.cellB;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (!isCell(x, y)) continue;
+        final r = cellAt(x, y).deflate(1);
+        canvas.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(cell * 0.18)), (x + y).isEven ? a : b);
       }
     }
   }

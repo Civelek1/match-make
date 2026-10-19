@@ -117,7 +117,7 @@ class SceneViewState extends State<SceneView> with SingleTickerProviderStateMixi
     _snapshotStages();
     widget.state.addListener(_onState);
     if (widget.animate) {
-      _ticker = createTicker((_) => _time.value = SceneClock.now)..start();
+      _ticker = createTicker(_onTick)..start();
     }
   }
 
@@ -129,6 +129,19 @@ class SceneViewState extends State<SceneView> with SingleTickerProviderStateMixi
       widget.state.addListener(_onState);
       _snapshotStages();
     }
+  }
+
+  /// Until when the scene must repaint every frame (sparkles flying).
+  double _busyUntil = SceneClock.now + 1;
+
+  // The scene is the most expensive thing on screen. Its idle motion (sway,
+  // clouds, flicker) is slow, so it repaints at a reduced rate unless pieces
+  // are popping in or sparkles are flying.
+  void _onTick(Duration _) {
+    final now = SceneClock.now;
+    final busy = now < _busyUntil || widget.state.animating;
+    final step = busy ? 0 : (widget.parallax ? 1 / 30 : 1 / 20);
+    if (now - _time.value >= step) _time.value = now;
   }
 
   void _snapshotStages() {
@@ -152,6 +165,7 @@ class SceneViewState extends State<SceneView> with SingleTickerProviderStateMixi
   /// Spawns a sparkle burst at a design-space point.
   void burst(Offset at, {bool big = false}) {
     final now = SceneClock.now;
+    _busyUntil = max(_busyUntil, now + 1.5);
     final n = big ? 26 : 14;
     const colors = [Color(0xFFFFF3A0), Colors.white, Color(0xFFFFC93C), Color(0xFF9CF08A), Color(0xFFFF9BD2)];
     for (var i = 0; i < n; i++) {

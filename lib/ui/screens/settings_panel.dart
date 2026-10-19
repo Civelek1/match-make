@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../app/game_navigator.dart';
-import '../art/app_icon_art.dart';
 import '../theme/game_colors.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
@@ -151,10 +150,7 @@ class SettingsPanel extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: const CustomPaint(size: Size(96, 96), painter: AppIconPainter()),
-                  ),
+                  Image.asset('assets/images/mascot.png', height: 110, filterQuality: FilterQuality.medium),
                   const SizedBox(height: 10),
                   const GameText('MATCH MAKE', size: 30, color: GameColors.gold),
                   GameText(s.loc.t('settings.studio'), size: 15, strokeWidth: 3),

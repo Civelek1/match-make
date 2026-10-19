@@ -354,7 +354,12 @@ class _ChapterMapViewState extends State<ChapterMapView> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker((e) => _t.value = e.inMicroseconds / 1e6)..start();
+    // Map scenery moves slowly: repaint it at a reduced rate (it is redrawn in
+    // full each time) except during the chapter-complete celebration.
+    _ticker = createTicker((e) {
+      final t = e.inMicroseconds / 1e6;
+      if (widget.celebrate || t < 1 || t - _t.value >= 1 / 20) _t.value = t;
+    })..start();
   }
 
   @override
