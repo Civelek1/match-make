@@ -33,7 +33,7 @@ Her gün gel, 7 günlük takvimle altın ve güçlendirici kazan.
 Yenilediğin her mekân galerinde saklanır. Önce ve sonra hallerini karşılaştır, en iyi puanını geliştir.
 
 ★ İNTERNETSİZ OYNA
-İnternet gerekmez, reklam yok, kişisel veri toplanmaz. İstediğin yerde, istediğin zaman oyna.
+İnternet olmadan da oynanır; istediğin yerde, istediğin zaman oyna. İsteğe bağlı ödüllü reklamlar ve uygulama içi satın almalar içerir.
 
 Türkçe ve İngilizce dil desteği.
 

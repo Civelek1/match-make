@@ -9,6 +9,7 @@ import '../../data/models/level_data.dart';
 import '../../economy/economy_config.dart';
 import '../../game/gameplay_controller.dart';
 import '../../match3/board.dart';
+import '../../monetization/monetization_config.dart';
 import '../art/tile_art.dart';
 import '../screens/settings_panel.dart';
 import '../theme/game_colors.dart';
@@ -915,17 +916,29 @@ class LoseOverlay extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             _ContinueButton(c: c),
-            if (s.rewards.extraMovesAvailable) ...[
-              const SizedBox(height: 12),
-              GameButton.secondary(
-                label: loc.t('lose.extra_moves'),
-                icon: Icons.add_circle_rounded,
-                tone: ButtonTone.purple,
-                onTap: () async {
-                  if (await s.rewards.requestExtraMoves()) c.continueWithExtraMoves(5);
-                },
-              ),
-            ],
+            ListenableBuilder(
+              listenable: s.monetization,
+              builder: (context, _) {
+                final m = s.monetization;
+                if (c.adContinueUsed || !m.adRewardsAvailable) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: GameButton.secondary(
+                    label: loc.t(m.noAds ? 'ad.extra_moves_vip' : 'ad.extra_moves', {'n': AdRewards.extraMoves}),
+                    icon: m.noAds ? Icons.add_circle_rounded : Icons.smart_display_rounded,
+                    tone: ButtonTone.green,
+                    onTap: () async {
+                      if (await m.watch(AdPlacement.extraMoves)) {
+                        c.adContinueUsed = true;
+                        c.continueWithExtraMoves(AdRewards.extraMoves);
+                      } else if (context.mounted) {
+                        showGameToast(context, loc.t('ad.unavailable'));
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 16),
             GameButton.primary(
               label: loc.t('lose.try_again'),

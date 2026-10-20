@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../audio/audio_service.dart';
 import '../../economy/economy_config.dart';
+import '../../monetization/monetization_config.dart';
+import '../../monetization/store_service.dart';
 import '../theme/game_colors.dart';
 import '../widgets/economy_widgets.dart';
 import '../widgets/game_button.dart';
@@ -67,7 +69,7 @@ class _ShopPanel extends StatelessWidget {
     final s = context.services;
     final loc = s.loc;
     return ListenableBuilder(
-      listenable: s.economy,
+      listenable: Listenable.merge([s.economy, s.monetization]),
       builder: (context, _) => GamePanel(
         title: loc.t('shop.title'),
         ribbon: GameColors.green,
@@ -95,11 +97,37 @@ class _ShopPanel extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+                if (s.monetization.adRewardsAvailable) ...[
+                  _section(loc.t('shop.free')),
+                  const _AdCoinsRow(),
+                  const SizedBox(height: 8),
+                ],
+                if (s.monetization.shop.available) ...[
+                  _section(loc.t('shop.specials')),
+                  for (final p in [ProductKind.starterPack, ProductKind.noAds])
+                    if (!s.monetization.owns(p)) _ProductRow(product: p),
+                  _section(loc.t('shop.packs')),
+                  for (final p in ProductKind.coinPacks) _ProductRow(product: p),
+                  const SizedBox(height: 8),
+                ],
                 _section(loc.t('shop.in_level')),
                 for (final b in BoosterKind.inLevel) _ShopRow(kind: b),
                 const SizedBox(height: 8),
                 _section(loc.t('shop.start')),
                 for (final b in BoosterKind.start) _ShopRow(kind: b),
+                if (s.monetization.shop.available)
+                  Center(
+                    child: TextButton(
+                      onPressed: () async {
+                        await s.monetization.restore();
+                        if (context.mounted) showGameToast(context, loc.t('shop.restored'), icon: Icons.restore_rounded);
+                      },
+                      child: Text(
+                        loc.t('shop.restore'),
+                        style: const TextStyle(fontWeight: FontWeight.w800, color: GameColors.inkSoft, fontSize: 13),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -263,6 +291,163 @@ class _OfferPanel extends StatelessWidget {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Card frame shared by the free-coins and store rows.
+Widget _card({required Widget leading, required String title, required String subtitle, required Widget action}) => Container(
+  margin: const EdgeInsets.only(bottom: 8),
+  padding: const EdgeInsets.all(8),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: GameColors.creamDark, width: 2),
+  ),
+  child: Row(
+    children: [
+      SizedBox(width: 46, height: 46, child: Center(child: leading)),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: GameColors.ink, fontSize: 15)),
+            Text(
+              subtitle,
+              style: const TextStyle(fontWeight: FontWeight.w600, color: GameColors.inkSoft, fontSize: 11.5, height: 1.25),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(width: 8),
+      action,
+    ],
+  ),
+);
+
+/// Watch a rewarded ad for coins (a few times a day).
+class _AdCoinsRow extends StatelessWidget {
+  const _AdCoinsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.services;
+    final loc = s.loc;
+    final m = s.monetization;
+    final left = m.adCoinsLeft;
+    return _card(
+      leading: Icon(m.noAds ? Icons.card_giftcard_rounded : Icons.smart_display_rounded, color: GameColors.purple, size: 40),
+      title: loc.t(m.noAds ? 'shop.ad_coins_vip' : 'shop.ad_coins', {'n': AdRewards.coins}),
+      subtitle: left > 0 ? loc.t('shop.ad_left', {'n': left}) : loc.t('shop.ad_done'),
+      action: _MoneyButton(
+        label: m.noAds ? loc.t('shop.buy') : loc.t('shop.ad_watch'),
+        enabled: left > 0,
+        onTap: () async {
+          if (await m.claimAdCoins()) {
+            s.audio.play(Sfx.unlock);
+            s.haptics.success();
+            if (context.mounted) {
+              showGameToast(context, '+${AdRewards.coins} ${loc.t('shop.coins')}', icon: Icons.check_circle_rounded);
+            }
+          } else if (left > 0 && context.mounted) {
+            showGameToast(context, loc.t('ad.unavailable'));
+          }
+        },
+      ),
+    );
+  }
+}
+
+/// A real-money product with its store price.
+class _ProductRow extends StatelessWidget {
+  final ProductKind product;
+  const _ProductRow({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.services;
+    final loc = s.loc;
+    final m = s.monetization;
+    final price = m.shop.price(product);
+    final owned = product.oneTime && m.owns(product);
+    final subtitle = loc.t('${product.nameKey}.how');
+    return _card(
+      leading: product == ProductKind.noAds
+          ? const Icon(Icons.block_rounded, color: GameColors.red, size: 40)
+          : product == ProductKind.starterPack
+          ? const Icon(Icons.card_giftcard_rounded, color: GameColors.orange, size: 40)
+          : CoinIcon(size: 26 + 6.0 * ProductKind.coinPacks.indexOf(product)),
+      title: loc.t(product.nameKey),
+      subtitle: subtitle,
+      action: _MoneyButton(
+        label: owned ? loc.t('shop.owned_once') : (price ?? '…'),
+        enabled: !owned && price != null,
+        onTap: () => _buyProduct(context, product),
+      ),
+    );
+  }
+}
+
+Future<void> _buyProduct(BuildContext context, ProductKind p) async {
+  final s = context.services;
+  final loc = s.loc;
+  final r = await s.monetization.buy(p);
+  if (!context.mounted) return;
+  switch (r) {
+    case PurchaseResult.success:
+      s.audio.play(Sfx.galleryUnlock);
+      s.haptics.success();
+      showGameToast(context, loc.t('shop.purchase_ok', {'name': loc.t(p.nameKey)}), icon: Icons.check_circle_rounded);
+    case PurchaseResult.pending:
+      showGameToast(context, loc.t('shop.purchase_pending'), icon: Icons.hourglass_top_rounded);
+    case PurchaseResult.cancelled:
+      break;
+    case PurchaseResult.unavailable:
+      showGameToast(context, loc.t('shop.store_unavailable'));
+    case PurchaseResult.failed:
+      showGameToast(context, loc.t('shop.purchase_failed'));
+  }
+}
+
+/// Green button with a text label (store price or action).
+class _MoneyButton extends StatelessWidget {
+  final String label;
+  final bool enabled;
+  final VoidCallback onTap;
+  const _MoneyButton({required this.label, required this.enabled, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: Pressable(
+        onTap: enabled ? onTap : null,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.55,
+          child: Container(
+            constraints: const BoxConstraints(minWidth: 72),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF8BE36F), GameColors.green],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: GameColors.greenDark, width: 2.5),
+              boxShadow: const [BoxShadow(color: GameColors.greenDark, offset: Offset(0, 3))],
+            ),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 13.5),
+            ),
+          ),
         ),
       ),
     );

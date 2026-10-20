@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -7,7 +9,9 @@ import '../economy/economy_service.dart';
 import '../haptics/haptics_service.dart';
 import '../leaderboard/leaderboard_service.dart';
 import '../localization/localization.dart';
-import '../monetization/rewards_service.dart';
+import '../monetization/ads_service.dart';
+import '../monetization/monetization_service.dart';
+import '../monetization/store_service.dart';
 import '../progression/progress_service.dart';
 import '../save/save_repository.dart';
 import '../save/save_store.dart';
@@ -40,7 +44,7 @@ class AppServices {
   final AudioService audio;
   final HapticsService haptics;
   final LeaderboardService leaderboard;
-  final RewardsService rewards;
+  final MonetizationService monetization;
   final GameNavigator navigator;
 
   /// Device languages in preference order (injectable for tests).
@@ -58,7 +62,7 @@ class AppServices {
     required this.audio,
     required this.haptics,
     required this.leaderboard,
-    required this.rewards,
+    required this.monetization,
     required this.navigator,
     required this.deviceLanguages,
   });
@@ -69,6 +73,8 @@ class AppServices {
     DateTime Function()? clock,
     List<String> Function()? deviceLanguages,
     GameContent? content,
+    AdsService? ads,
+    StoreService? shop,
   }) {
     content ??= GameContent.standard();
     final store = SaveStore(repository ?? LocalSaveRepository());
@@ -77,19 +83,21 @@ class AppServices {
     final settings = SettingsService(store);
     final loc = Localization();
     settings.addListener(() => loc.language = settings.language);
+    final daily = DailyRewardService(store, economy, clock: clock);
+    audio ??= GameAudioService(settings);
     return AppServices._(
       content: content,
       store: store,
       progress: progress,
       economy: economy,
-      daily: DailyRewardService(store, economy, clock: clock),
+      daily: daily,
       settings: settings,
       profile: ProfileService(store),
       loc: loc,
-      audio: audio ?? GameAudioService(settings),
+      audio: audio,
       haptics: HapticsService(settings),
       leaderboard: MockLeaderboardService(),
-      rewards: const DisabledRewardsService(),
+      monetization: MonetizationService(store, economy, daily, audio, ads ?? DisabledAdsService(), shop ?? DisabledStoreService()),
       navigator: GameNavigator(),
       deviceLanguages: deviceLanguages ?? () => [for (final l in PlatformDispatcher.instance.locales) l.languageCode],
     );
@@ -107,6 +115,8 @@ class AppServices {
     settings.reload();
     economy.reload();
     daily.reload();
+    // Consent form, ads and store start in the background.
+    unawaited(monetization.init());
   }
 
   /// Clears progression, coins and boosters; keeps settings and profile.

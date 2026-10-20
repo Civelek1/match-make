@@ -33,7 +33,7 @@ Come back every day and collect coins and boosters from the 7-day calendar.
 Every place you restore is saved in your gallery. Compare before and after, and beat your best score.
 
 ★ PLAY OFFLINE
-No internet needed, no ads, no personal data collected. Play anywhere, anytime.
+Plays offline too, anywhere, anytime. Contains optional rewarded ads and in-app purchases.
 
 Available in English and Turkish.
 

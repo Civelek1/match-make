@@ -11,6 +11,7 @@ import '../widgets/economy_widgets.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_panel.dart';
 import '../widgets/game_text.dart';
+import '../widgets/game_widgets.dart';
 
 /// Seven-day login calendar with today's reward to claim.
 Future<void> showDailyReward(BuildContext context) {
@@ -45,6 +46,20 @@ class _DailyPanelState extends State<_DailyPanel> {
     if (r == null) return;
     s.audio.play(Sfx.galleryUnlock);
     s.haptics.success();
+    setState(() => _justClaimed = r);
+  }
+
+  Future<void> _double() async {
+    final s = context.services;
+    final r = await s.monetization.doubleDaily();
+    if (!mounted) return;
+    if (r == null) {
+      showGameToast(context, s.loc.t('ad.unavailable'));
+      return;
+    }
+    s.audio.play(Sfx.galleryUnlock);
+    s.haptics.success();
+    showGameToast(context, s.loc.t('daily.doubled'), icon: Icons.check_circle_rounded);
     setState(() => _justClaimed = r);
   }
 
@@ -106,6 +121,23 @@ class _DailyPanelState extends State<_DailyPanel> {
                       loc.t('daily.claimed'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontWeight: FontWeight.w800, color: GameColors.ink, fontSize: 14),
+                    ),
+                    ListenableBuilder(
+                      listenable: s.monetization,
+                      builder: (context, _) {
+                        final m = s.monetization;
+                        if (!m.canDoubleDaily || !m.adRewardsAvailable) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: GameButton.secondary(
+                            label: loc.t(m.noAds ? 'daily.double_vip' : 'daily.double'),
+                            icon: m.noAds ? Icons.card_giftcard_rounded : Icons.smart_display_rounded,
+                            tone: ButtonTone.purple,
+                            width: 240,
+                            onTap: _double,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     GameButton.secondary(label: loc.t('common.ok'), tone: ButtonTone.green, width: 200, onTap: widget.onClose),

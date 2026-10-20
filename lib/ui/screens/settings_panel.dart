@@ -56,6 +56,22 @@ class SettingsPanel extends StatelessWidget {
                 loc.t('settings.language'),
                 LanguageSelector(value: s.settings.language, onChanged: (v) => s.settings.language = v),
               ),
+              // Required where the consent form applies (EEA/UK): lets the
+              // player change their ad consent at any time.
+              ListenableBuilder(
+                listenable: s.monetization,
+                builder: (context, _) => !s.monetization.ads.privacyOptionsRequired
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: GameButton.secondary(
+                          label: loc.t('settings.privacy_options'),
+                          icon: Icons.privacy_tip_rounded,
+                          tone: ButtonTone.blue,
+                          onTap: () => s.monetization.ads.showPrivacyOptions(),
+                        ),
+                      ),
+              ),
               if (!inGame) ...[
                 const SizedBox(height: 12),
                 GameButton.secondary(

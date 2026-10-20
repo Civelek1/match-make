@@ -106,6 +106,20 @@ class SaveData {
   final Map<String, int> boosters;
   final DailyData daily;
 
+  /// Monetization (no version bump: older saves default to nothing owned).
+  /// One-time store products owned (ProductKind.id), e.g. no_ads.
+  final Set<String> purchases;
+
+  /// Store orders already granted, so a re-delivered purchase pays once.
+  final Set<String> grantedOrders;
+
+  /// Coins-for-ad uses today: day number and count.
+  int adCoinsDay;
+  int adCoinsCount;
+
+  /// Day on which the daily reward was doubled by an ad.
+  int dailyDoubledDay;
+
   SaveData({
     Map<String, LevelProgress>? levels,
     Set<String>? galleryUnlocked,
@@ -121,7 +135,14 @@ class SaveData {
     this.coins = 0,
     Map<String, int>? boosters,
     DailyData? daily,
-  }) : levels = levels ?? {},
+    Set<String>? purchases,
+    Set<String>? grantedOrders,
+    this.adCoinsDay = 0,
+    this.adCoinsCount = 0,
+    this.dailyDoubledDay = 0,
+  }) : purchases = purchases ?? {},
+       grantedOrders = grantedOrders ?? {},
+       levels = levels ?? {},
        galleryUnlocked = galleryUnlocked ?? {},
        galleryViewed = galleryViewed ?? {},
        debugUnlocked = debugUnlocked ?? {},
@@ -152,6 +173,10 @@ class SaveData {
     'coins': coins,
     'boosters': boosters,
     'daily': daily.toJson(),
+    'purchases': purchases.toList(),
+    'orders': grantedOrders.toList(),
+    'adCoins': {'d': adCoinsDay, 'n': adCoinsCount},
+    'dailyX2': dailyDoubledDay,
   };
 
   /// Throws [FormatException] only if the root isn't a map at all.
@@ -182,6 +207,11 @@ class SaveData {
             if (e.key is String && _int(e.value) > 0) e.key as String: _int(e.value).clamp(0, 9999),
       },
       daily: DailyData.fromJson(j['daily']),
+      purchases: _strings(j['purchases']),
+      grantedOrders: _strings(j['orders']),
+      adCoinsDay: j['adCoins'] is Map ? _int((j['adCoins'] as Map)['d']) : 0,
+      adCoinsCount: j['adCoins'] is Map ? _int((j['adCoins'] as Map)['n']).clamp(0, 99) : 0,
+      dailyDoubledDay: _int(j['dailyX2']),
     );
   }
 }

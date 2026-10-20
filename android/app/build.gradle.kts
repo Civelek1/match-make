@@ -29,13 +29,16 @@ android {
 
     defaultConfig {
         applicationId = "com.citustudios.matchmake"
-        minSdk = flutter.minSdkVersion
+        // Google Mobile Ads needs Android 7.0 (API 24) or newer.
+        minSdk = maxOf(flutter.minSdkVersion, 24)
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. You can force using the value of versionCode by
         // specifying the `-P force-version-code-ignoring-abi=true` flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["admobAppId"] =
+            (project.findProperty("ADMOB_APP_ID") as String?) ?: "ca-app-pub-3940256099942544~3347511713"
     }
 
     signingConfigs {

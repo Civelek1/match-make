@@ -74,6 +74,9 @@ class GameplayController extends ChangeNotifier implements BoardListener {
   int boostersUsed = 0;
   int continuesUsed = 0;
 
+  /// The one rewarded-ad continue per attempt was used.
+  bool adContinueUsed = false;
+
   /// -1 = no tutorial; 0 = make the move; 1 = objectives; 2 = scene.
   int tutorialStep = -1;
   Move? tutorialMove;
@@ -475,7 +478,7 @@ class GameplayController extends ChangeNotifier implements BoardListener {
     notifyListeners();
   }
 
-  /// Resume a lost level with bonus moves (rewarded-ad hook, disabled in this build).
+  /// Resume a lost level with bonus moves (coins or a rewarded ad).
   void continueWithExtraMoves(int n) {
     if (phase != PlayPhase.lost) return;
     session.movesLeft += n;
