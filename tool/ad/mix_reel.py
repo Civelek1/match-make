@@ -2,7 +2,8 @@
 
     python3 tool/ad/mix_reel.py
 
-Music bed (music_gameplay.mp3) + every sound the game played while recording,
+Music bed (tool/ad/reel_music.mp3: "Beach Dance" by szegvari, Freesound
+#607304, CC0 — no credit needed) + every sound the game played while recording,
 at the exact time it played (build/ad/reel_<lang>_events.json), plus a whoosh
 on the cut into gameplay. Output: build/ad/MatchMake_reel_<lang>.mp4
 """
@@ -28,10 +29,10 @@ for lang in ('tr', 'en'):
         last[e['s']] = e['t']
         cues.append(e)
 
-    inputs = ['-i', video, '-i', f'{AUDIO}/music_gameplay.mp3']
+    inputs = ['-i', video, '-i', 'tool/ad/reel_music.mp3']
     graph = [
         # Quieter under the opening, full from the cut, fade out at the end.
-        f"[1:a]atrim=0:{LEN},asetpts=PTS-STARTPTS,volume='if(lt(t,3),0.35,0.6)':eval=frame,"
+        f"[1:a]atrim=0:{LEN},asetpts=PTS-STARTPTS,volume='if(lt(t,3),0.4,0.55)':eval=frame,"
         f"afade=t=in:d=0.6,afade=t=out:st={LEN - 1.2}:d=1.2[m]"
     ]
     labels = ['[m]']
