@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 
 import '../../data/models/level_data.dart';
 import '../../match3/board.dart';
+import '../../restoration/restoration_state.dart';
 import '../art/paint_kit.dart';
 import '../art/tile_art.dart';
 import '../theme/game_colors.dart';
@@ -286,10 +287,9 @@ class FlyLayerState extends State<FlyLayer> with SingleTickerProviderStateMixin 
   late final Ticker _ticker;
   final _repaint = ValueNotifier<double>(0);
   final TileArtCache _art = TileArtCache();
-  final Stopwatch _clock = Stopwatch()..start();
   final _rng = Random();
 
-  double get _now => _clock.elapsedMicroseconds / 1e6;
+  double get _now => SceneClock.now;
 
   @override
   void initState() {

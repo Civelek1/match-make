@@ -68,8 +68,9 @@ class AppServices {
     AudioService? audio,
     DateTime Function()? clock,
     List<String> Function()? deviceLanguages,
+    GameContent? content,
   }) {
-    final content = GameContent.standard();
+    content ??= GameContent.standard();
     final store = SaveStore(repository ?? LocalSaveRepository());
     final progress = ProgressService(content, store);
     final economy = EconomyService(store, content, progress);

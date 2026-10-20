@@ -5,7 +5,10 @@ import '../data/models/level_data.dart';
 /// Shared clock for all restoration animations (seconds).
 class SceneClock {
   static final Stopwatch _sw = Stopwatch()..start();
-  static double get now => _sw.elapsedMicroseconds / 1e6;
+
+  /// Replaces the real clock (frame-by-frame video capture in tools).
+  static double Function()? debugTimeSource;
+  static double get now => debugTimeSource?.call() ?? _sw.elapsedMicroseconds / 1e6;
 }
 
 /// Tracks the visual restoration stage of each objective and *when* each stage
